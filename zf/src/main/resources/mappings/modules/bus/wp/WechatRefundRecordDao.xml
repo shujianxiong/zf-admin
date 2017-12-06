@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.wp.WechatRefundRecordDao">
+    
+	<sql id="wechatRefundRecordColumns">
+		a.id AS "id",
+		a.refund_no AS "refundNo",
+		a.refund_auto_status AS "refundAutoStatus",
+		a.refund_auto_money AS "refundAutoMoney",
+		a.refund_auto_time AS "refundAutoTime",
+		a.refund_artificial_status AS "refundArtificialStatus",
+		a.refund_artificial_money AS "refundArtificialMoney",
+		a.refund_artificial_time AS "refundArtificialTime",
+		a.wx_pay_id AS "wxPayId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="wechatRefundRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="WechatRefundRecord">
+		SELECT 
+			<include refid="wechatRefundRecordColumns"/>
+		FROM bus_wp_wechat_refund_record a
+		<include refid="wechatRefundRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WechatRefundRecord">
+		SELECT 
+			<include refid="wechatRefundRecordColumns"/>
+		FROM bus_wp_wechat_refund_record a
+		<include refid="wechatRefundRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WechatRefundRecord">
+		SELECT 
+			<include refid="wechatRefundRecordColumns"/>
+		FROM bus_wp_wechat_refund_record a
+		<include refid="wechatRefundRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_wp_wechat_refund_record(
+			id,
+			refund_no,
+			refund_auto_status,
+			refund_auto_money,
+			refund_auto_time,
+			refund_artificial_status,
+			refund_artificial_money,
+			refund_artificial_time,
+			wx_pay_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{refundNo},
+			#{refundAutoStatus},
+			#{refundAutoMoney},
+			#{refundAutoTime},
+			#{refundArtificialStatus},
+			#{refundArtificialMoney},
+			#{refundArtificialTime},
+			#{wxPayId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_wp_wechat_refund_record SET 	
+			refund_no = #{refundNo},
+			refund_auto_status = #{refundAutoStatus},
+			refund_auto_money = #{refundAutoMoney},
+			refund_auto_time = #{refundAutoTime},
+			refund_artificial_status = #{refundArtificialStatus},
+			refund_artificial_money = #{refundArtificialMoney},
+			refund_artificial_time = #{refundArtificialTime},
+			wx_pay_id = #{wxPayId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_wp_wechat_refund_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

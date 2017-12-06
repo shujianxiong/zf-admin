@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" /><!--viewport网页缩放-->
+	<meta charset="utf-8" /><!-- UTF-8编码 -->
+	<meta name="keywords" content="珠宝租赁" /><!-- 关键词 -->
+	<meta name="format-detection" content="telephone=no" /><!-- 禁用自动识别电话号码 -->
+	<meta name="apple-mobile-web-app-capable" content="yes" /><!-- 强制全屏 -->
+	<meta name="msapplication-tap-highlight" content="no" /><!-- 禁用点击高光效果 -->
+    <title>我的代理</title>
+     <link rel="stylesheet" media="screen and (max-width:330px)" href="../../../baseConfig/base320.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:331px) and (max-width:380px)" href="../../../baseConfig/base360.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:381px)" href="../../../baseConfig/base414.css" type="text/css" />
+    <link rel="stylesheet/less" href="myAgency.less" />
+    <script src="../../../lib/js/less-1.3.3.min.js" type="text/javascript"></script>
+    <script src="../../../lib/js/zepto.min.js" type="text/javascript" ></script>
+</head>
+<body>
+<div class="myAgency">
+	<div class="top">
+		<img src="images/head.png"/><span>分享我的代理</span>
+	</div>
+	<div class="content">
+		<div >
+			<img src="images/href.png"/>
+			<h3>复制代理链接</h3>
+		</div>
+		<div >
+			<img src="images/code.png"/>
+			<h3>复制代理二维码</h3>
+		</div>
+		<p>在周范，您可以通过分享您消费后生成的个人专属链接或二维码，让更多的伙伴们加入到一周一范的行列，若有小伙伴注册周范，您将获得积分奖励，小伙伴产生消费，更可获得返现奖励哦</p>
+	</div>
+</div>
+</body>
+    <script src="myAgency.js" type="text/javascript" ></script>
+    <script type="text/javascript">
+    	$("img",".content").each(function(){
+    		$(this).height($(this).width())
+    	})
+    </script>
+</html>

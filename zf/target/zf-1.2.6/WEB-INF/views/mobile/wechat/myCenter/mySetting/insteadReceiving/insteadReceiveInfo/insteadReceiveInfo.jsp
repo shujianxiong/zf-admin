@@ -1,0 +1,61 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/mobile/include/taglib.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" /><!--viewport网页缩放-->
+	<meta charset="utf-8" /><!-- UTF-8编码 -->
+	<meta name="keywords" content="珠宝租赁" /><!-- 关键词 -->
+	<meta name="format-detection" content="telephone=no" /><!-- 禁用自动识别电话号码 -->
+	<meta name="apple-mobile-web-app-capable" content="yes" /><!-- 强制全屏 -->
+	<meta name="msapplication-tap-highlight" content="no" /><!-- 禁用点击高光效果 -->
+    <title>完善待收货人信息</title>
+     <link rel="stylesheet" media="screen and (max-width:330px)" href="${ctxMobile}/baseConfig/base320.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:331px) and (max-width:380px)" href="${ctxMobile}/baseConfig/base360.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:381px)" href="${ctxMobile}/baseConfig/base414.css" type="text/css" />
+    <link rel="stylesheet/less" href="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/insteadReceiveInfo.less" />
+    <script src="${ctxMobile}/lib/js/less-1.3.3.min.js" type="text/javascript"></script>
+    <script src="${ctxMobile}/lib/js/zepto.min.js" type="text/javascript" ></script>
+</head>
+<body>
+<div class="textArea">
+	<p>贵重物品交接，需要完善您的身份信息，确保交接过程中的安全，敬请谅解。</p>
+	<p style="color: #999;">另：完善身份信息之后就可以使用保险及银行贷款业务，降低成本和风险哦</p>
+</div>
+<div class="inputArea">
+	<input type="text" name="" id="" placeholder="请输入您的真实姓名" />
+	<input type="tel" name="" id="" placeholder="请输入您的手机号" />
+	<input type="text" name="" id="" placeholder="请输入您的身份证号" />
+</div>
+<div class="uploadingPic">
+	<p>请上传身份证正反面照片（请不要遮挡主要信息）</p>
+	<div class="operateArea">
+		<div class="left">
+			<img src="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/images/example1.png"/>
+			<p>正面</p>
+		</div>
+		<div class="right">
+			<img src="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/images/example2.png"/>
+			<p>反面</p>
+		</div>
+	</div>
+</div>
+<div class="uploadingPic">
+	<p class="textP">请上传身份证正反面照片（请不要遮挡主要信息）</p>
+	<div class="operateArea">
+		<div class="left">
+			<img src="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/images/id1.png"/>
+			<p>正面</p>
+		</div>
+		<div class="right">
+			<img src="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/images/id2.png"/>
+			<p>反面</p>
+		</div>
+	</div>
+</div>
+<div id="" class="button">
+	确定
+</div>
+</body>
+    <script src="${ctxMobile}/pages/myCenter/mySetting/insteadReceiving/insteadReceiveInfo/finishInformation.js" type="text/javascript" ></script>
+</html>

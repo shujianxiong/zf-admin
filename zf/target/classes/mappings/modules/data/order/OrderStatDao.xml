@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.data.dao.order.OrderStatDao">
+    
+    
+    <select id="statExperienceOrder" parameterType="ExperienceOrder" resultType="com.chinazhoufan.admin.modules.data.vo.order.OrderStat">
+        SELECT 
+        DATE_FORMAT(a.create_date, '%Y-%m') AS 'label',  
+        COUNT(a.id) AS 'num'
+        FROM bus_oe_experience_order a 
+        <where>
+             a.type = 1 AND a.status_pay = '98'
+            <if test="beginCreateDate != null and beginCreateDate != ''">
+                <![CDATA[AND a.create_date >= #{beginCreateDate}]]>
+            </if>
+            <if test="endCreateDate != null and endCreateDate != ''">
+                <![CDATA[AND a.create_date <= #{endCreateDate}]]>
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(a.create_date, '%Y-%m')
+        LIMIT 6
+    </select>
+    
+    
+    <select id="statBuyOrder" parameterType="BuyOrder"  resultType="com.chinazhoufan.admin.modules.data.vo.order.OrderStat">
+        SELECT 
+        DATE_FORMAT(a.create_date, '%Y-%m') AS 'label',  
+        COUNT(a.id) AS 'num'
+        FROM bus_ob_buy_order a 
+        <where>
+             a.type = 1 AND a.status_pay = '98'
+            <if test="beginCreateDate != null and beginCreateDate != ''">
+                <![CDATA[AND a.create_date >= #{beginCreateDate}]]>
+            </if>
+            <if test="endCreateDate != null and endCreateDate != ''">
+                <![CDATA[AND a.create_date <= #{endCreateDate}]]>
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(a.create_date, '%Y-%m')
+        LIMIT 6
+    </select>
+    
+</mapper>

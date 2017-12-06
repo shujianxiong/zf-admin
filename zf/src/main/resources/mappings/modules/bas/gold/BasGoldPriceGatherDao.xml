@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bas.dao.gold.BasGoldPriceGatherDao">
+    
+	<sql id="basGoldPriceGatherColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.price_type AS "priceType",
+		a.price AS "price",
+		a.gather_time AS "gatherTime"
+	</sql>
+	
+	
+	<select id="findList" resultType="BasGoldPriceGather">
+		SELECT 
+			<include refid="basGoldPriceGatherColumns"/>
+		FROM bas_gold_price_gather a
+		<where>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="beginGatherTime != null and endGatherTime != null and beginGatherTime != '' and endGatherTime != ''">
+				AND a.gather_time BETWEEN #{beginGatherTime} AND #{endGatherTime}
+			</if>
+		</where>
+		ORDER BY a.gather_time DESC
+	</select>
+	
+	<select id="findAllList" resultType="BasGoldPriceGather">
+		SELECT 
+			<include refid="basGoldPriceGatherColumns"/>
+		FROM bas_gold_price_gather a
+		<where>
+			<if test="beginGatherTime != null and endGatherTime != null and beginGatherTime != '' and endGatherTime != ''">
+				AND a.gather_time BETWEEN #{beginGatherTime} AND #{endGatherTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.gather_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+
+	
+	
+	
+</mapper>

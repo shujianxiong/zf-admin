@@ -1,0 +1,138 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------收货地址----------------------------*/
+.topText{
+    width: 100%;
+    padding:10px;
+    color:@goldencolor;
+    box-sizing: border-box;
+    h2{
+       font-size: 1.5rem; 
+       line-height: 40px;
+       text-align: center;
+       i{
+           font-size: 2rem;
+           line-height: 40px;
+           padding: 0 10px;
+       }
+    }
+    p{
+       font-size: 1.2rem; 
+       line-height: 2rem;
+       text-align: center;
+    }
+}
+.oderDetail{
+    overflow: hidden;
+    padding: 10px;
+    p{
+        font-size: 1.3rem;
+        line-height: 30px;
+        span:first-child{
+            color: #ddd;
+        }
+        span:last-child{
+            float: right;
+        }
+    }
+}
+.share{
+    padding: 10px;
+    overflow: hidden;
+    border-bottom: 1px solid @linecolor;
+    p{
+        font-size: 1.2rem;
+        color: @goldencolor;
+        line-height: 20px;
+    }
+    .shareWay{
+        min-height: 50px;
+        padding: 10px 20px;
+        li{
+            width: 60px;
+            height: 80px;
+            padding: 10px;
+            img{
+                width: 100%;
+            }
+            span{
+                display: block;
+                line-height: 20px;
+                font-size: 1.2rem;
+                color: #ddd;
+                text-align: center;
+            }
+        }
+    }
+}
+//==============猜您喜欢
+.guessLike{
+    width: 100%;
+    height: auto;
+    padding-top: 10px;
+    .top{
+        position: relative;
+        height: 50px;
+        width: 100%;
+        color: @goldencolor;
+        h2{
+            width: 100%;
+            line-height: 50px;
+            text-align: center;
+            font-size: @commonText;
+        }
+        span{
+            position: absolute;
+            right: 10px;
+            top: 0;
+            display: inline-block;
+            height: 100%;
+            width: auto;
+            line-height: 50px;
+        }
+    }
+    .guessLike_goodsBlock{
+        width: 100%;
+        height: auto;
+        box-sizing: border-box;
+        padding: 5px 0 0 5px;
+        font-size: @viceText;
+        ul{
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            overflow: auto;
+            li{
+                width: 33.333%;
+                float: left;
+                padding: 5px 5px 0 0;
+                box-sizing: border-box;
+                color: #fff;
+                img{
+                    width: 100%;
+                }
+                div{
+                   line-height: 30px; 
+                   padding: 0;
+                   background-color: @functionBar;
+                   display: -webkit-box;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-flex: 1;
+                    height: inherit;
+                }
+                p{
+                    line-height: 30px;
+                    font-weight: 600;
+                    padding-bottom: 5px;
+                    background-color: @functionBar;
+                    b{
+                        font-style: normal;
+                        color: #FF6A56;
+                    }
+                }
+            }
+        }
+    }
+}

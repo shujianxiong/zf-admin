@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.ProductCodeChangeDao">
+    
+	<sql id="productCodeChangeColumns">
+		a.id AS "id",
+		a.product_id AS "product.id",
+		t.code AS "product.code",
+		p.name AS "product.produce.name",
+		g.name AS "product.produce.goods.name",
+		a.pre_product_code AS "preProductCode",
+		a.post_product_code AS "postProductCode",
+		a.reason_type AS "reasonType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="productCodeChangeJoins">
+	   LEFT JOIN lgt_ps_product t ON t.id = a.product_id
+	   LEFT JOIN lgt_ps_produce p ON p.id = t.produce_id
+	   LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id
+	</sql>
+    
+	<select id="get" resultType="ProductCodeChange">
+		SELECT 
+			<include refid="productCodeChangeColumns"/>
+		FROM lgt_ps_product_code_change a
+		<include refid="productCodeChangeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProductCodeChange">
+		SELECT 
+			<include refid="productCodeChangeColumns"/>
+		FROM lgt_ps_product_code_change a
+		<include refid="productCodeChangeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="product != null">
+			    <if test="product.id != null and product.id != ''">
+			         AND a.product_id = #{product.id}
+			    </if>
+			    <if test="product.code != null and product.code != ''">
+			         AND t.code = #{product.code}
+			    </if>
+			</if>
+			<if test="preProductCode != null and preProductCode != ''">
+				AND a.pre_product_code = #{preProductCode}
+			</if>
+			<if test="postProductCode != null and postProductCode != ''">
+				AND a.post_product_code = #{postProductCode}
+			</if>
+			<if test="reasonType != null and reasonType != ''">
+				AND a.reason_type = #{reasonType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProductCodeChange">
+		SELECT 
+			<include refid="productCodeChangeColumns"/>
+		FROM lgt_ps_product_code_change a
+		<include refid="productCodeChangeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_product_code_change(
+			id,
+			product_id,
+			pre_product_code,
+			post_product_code,
+			reason_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{product.id},
+			#{preProductCode},
+			#{postProductCode},
+			#{reasonType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_product_code_change SET 	
+			product_id = #{product.id},
+			pre_product_code = #{preProductCode},
+			post_product_code = #{postProductCode},
+			reason_type = #{reasonType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_product_code_change SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

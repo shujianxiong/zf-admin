@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.tf.TransportFeeDao">
+    
+	<sql id="transportFeeColumns">
+		a.id AS "id",
+		a.warehouse_id AS "warehouse.id",
+		w.name AS "warehouse.name",
+		a.receive_area_id AS "receiveArea.id",
+		s.name AS "receiveArea.name",
+		s.parent_id AS "receiveArea.parent.id",
+		s.parent_ids AS "receiveArea.parentIds",
+		
+		a.cost_money AS "costMoney",
+		a.money AS "money",
+		a.days AS "days",
+		a.usable_flag AS "usableFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="transportFeeJoins">
+	   LEFT JOIN lgt_ps_warehouse w ON w.id = a.warehouse_id
+	   LEFT JOIN sys_area s ON s.id = a.receive_area_id
+	</sql>
+    
+	<select id="get" resultType="TransportFee">
+		SELECT 
+			<include refid="transportFeeColumns"/>
+		FROM lgt_tf_transport_fee a
+		<include refid="transportFeeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TransportFee">
+		SELECT 
+			<include refid="transportFeeColumns"/>
+		FROM lgt_tf_transport_fee a
+		<include refid="transportFeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="warehouse != null and warehouse.id != null and warehouse.id != ''">
+				AND a.warehouse_id = #{warehouse.id}
+			</if>
+			<if test="receiveArea != null and receiveArea.id != null and receiveArea.id != ''">
+				AND a.receive_area_id = #{receiveArea.id}
+			</if>
+			<if test="usableFlag != null and usableFlag != ''">
+				AND a.usable_flag = #{usableFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TransportFee">
+		SELECT 
+			<include refid="transportFeeColumns"/>
+		FROM lgt_tf_transport_fee a
+		<include refid="transportFeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_tf_transport_fee(
+			id,
+			warehouse_id,
+			receive_area_id,
+			cost_money,
+			money,
+			days,
+			usable_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{warehouse.id},
+			#{receiveArea.id},
+			#{costMoney},
+			#{money},
+			#{days},
+			#{usableFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_tf_transport_fee SET 	
+			warehouse_id = #{warehouse.id},
+			receive_area_id = #{receiveArea.id},
+			cost_money = #{costMoney},
+			money = #{money},
+			days = #{days},
+			usable_flag = #{usableFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_tf_transport_fee SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

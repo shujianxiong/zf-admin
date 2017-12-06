@@ -1,0 +1,98 @@
+@import "../../../../baseConfig/config.less";
+.address_head{
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 1.2rem;
+    color:#999;
+}
+
+.address_button{
+    width: 35%;
+    margin: 60px auto;
+    padding: 5px 20px;
+    color: #fff;
+    .border-radius(10px);
+    background: @goldencolor;
+    text-align: center;
+    font-size: @commonText;
+}
+
+/*************************地址列表***********************/
+.address_list{
+   overflow: hidden;
+   .list_item{
+       padding: 0 10px;
+       background: @blockbacground;
+       border-bottom: 1px solid @linecolor;
+       &:last-child{
+           border: none;
+       }
+        .address{
+            position: relative;
+            span{
+                position: absolute;
+                left: 0;
+                color: @goldencolor;font-size: @viceText;
+                padding: 0 5px;
+                line-height: 20px;
+            }
+            p{
+                font-size: @viceText;
+                line-height: 20px;
+                padding:5px;
+            }
+            .more{
+                position: absolute;
+                right: 10px;
+                line-height: 20px;
+                color: @goldencolor;
+                font-size: @blockIcon;
+                top: -10px;
+            }
+        }
+        .name{
+            line-height: 30px;
+            span{
+                font-size: @viceText;
+                color: #fff;
+                padding: 0 5px;
+            }
+        }
+   }
+}
+.list_botton{
+    overflow: hidden;
+    padding: 10px 0;
+    span{
+        float: left;
+        padding: 3px 20px;
+        margin: 0 5px;
+        font-size: @viceText;
+        .border-radius(10px);
+        &.edit{
+            background: @goldencolor;
+        }
+        &.delete{
+             background:#e41f1f;
+        }
+        &.setDefault{
+             background:#2dd6b7;
+        }
+    }
+}
+//收货地址列表
+.addressWrapper{
+    position: fixed;
+    top: 20px;
+    bottom: 0;
+    z-index: 9;
+    width: 100%;
+    overflow: hidden;
+
+}
+
+
+
+
+

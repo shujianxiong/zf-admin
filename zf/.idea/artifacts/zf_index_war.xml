@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="zf-index:war">
+    <output-path>$PROJECT_DIR$/../zf-index/target</output-path>
+    <root id="archive" name="zf-index-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="zf-index:war exploded" />
+    </root>
+  </artifact>
+</component>

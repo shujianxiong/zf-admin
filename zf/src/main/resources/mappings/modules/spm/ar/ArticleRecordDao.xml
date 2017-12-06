@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ar.ArticleRecordDao">
+    
+	<sql id="articleRecordColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		b.usercode AS "member.usercode",
+		b.name AS "member.name",
+		a.article_id AS "article.id",
+		c.name AS "article.name",
+		c.category AS "article.category",
+		c.title AS "article.title",
+		a.ip AS "ip",
+		a.wechat_openid AS "wechatOpenid",
+		a.read_count AS "readCount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="articleRecordJoins">
+		LEFT JOIN crm_mi_member b ON b.id = a.member_id
+		LEFT JOIN spm_ar_article c ON c.id = a.article_id
+	</sql>
+    
+	<select id="get" resultType="ArticleRecord">
+		SELECT 
+			<include refid="articleRecordColumns"/>
+		FROM spm_ar_article_record a
+		<include refid="articleRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ArticleRecord">
+		SELECT 
+			<include refid="articleRecordColumns"/>
+		FROM spm_ar_article_record a
+		<include refid="articleRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != '' ">
+				AND (
+					b.usercode LIKE 
+						<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR
+					c.name LIKE
+						<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ArticleRecord">
+		SELECT 
+			<include refid="articleRecordColumns"/>
+		FROM spm_ar_article_record a
+		<include refid="articleRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_ar_article_record(
+			id,
+			member_id,
+			article_id,
+			ip,
+			wechat_openid,
+			read_count,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{article.id},
+			#{ip},
+			#{wechatOpenid},
+			#{readCount},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ar_article_record SET
+			<if test="member != null and member.id != ''">
+				member_id = #{member.id},
+			</if>
+			<if test="wechatOpenid != null and wechatOpenid != ''">
+				wechat_openid = #{wechatOpenid},
+			</if>
+			read_count = #{readCount}, 	
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_ar_article_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="hasArticleRecord" resultType="java.lang.Integer">
+		select count(a.id) from spm_ar_article_record a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.article_id = #{article.id}
+			AND a.ip = #{ip} 
+		</where>
+	</select>
+	
+	
+	<select id="getArticleRecord"  resultType="ArticleRecord">
+		SELECT 
+			<include refid="articleRecordColumns"/>
+		FROM spm_ar_article_record a
+		<include refid="articleRecordJoins"/>
+		WHERE a.ip = #{ip} AND a.article_id = #{article.id}
+	</select>
+</mapper>

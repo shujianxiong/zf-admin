@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bas.dao.BasMissionDao">
+    
+	<sql id="basMissionColumns">
+		a.id AS "id",
+		a.mission_code AS "missionCode",
+		a.business_type AS "businessType",
+		a.approve_status AS "approveStatus",
+		a.approve_config_id AS "approveConfig",
+		a.approve_user_id AS "approveUser.id",
+		a.start_by AS "startBy.id",
+		a.start_time AS "startTime",
+		a.limit_time AS "limitTime",
+		a.end_time AS "endTime",
+		a.create_by AS "createBy.id",
+		a.delay_count AS"delayCount",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="basMissionJoins">
+	    LEFT JOIN sys_user c ON c.id = a.start_by
+	    LEFT JOIN sys_user u ON u.id = a.approve_user_id
+	</sql>
+    
+	<select id="get" resultType="BasMission">
+		SELECT 
+			<include refid="basMissionColumns"/>
+		FROM bas_mission a
+		<include refid="basMissionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BasMission">
+		SELECT 
+			<include refid="basMissionColumns"/>
+		FROM bas_mission a
+		<include refid="basMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="businessType != null and businessType != ''">
+				and a.business_type =#{businessType}
+			</if>
+			<!-- <if test="approveStatus != null and approveStatus != ''">
+				and a.approve_status =#{approveStatus}
+			</if> -->
+			<if test="approveUser != null and approveUser.id != ''">
+				and a.approve_user_id =#{approveUser.id}
+			</if>
+			<!-- 如果已审核的标志值为1，代表查询的是已审核的任务列表，为了避免采用in查询，所以采用的不等于已审核的标志来查询 -->
+			<choose>
+				<when test="approveStatusPassFlag != null and approveStatusPassFlag != '' and approveStatusPassFlag == 1">
+					<if test="approveStatus != null and approveStatus != ''">
+						and a.approve_status != #{approveStatus}
+					</if>
+				</when>
+				<otherwise>
+					<if test="approveStatus != null and approveStatus != ''">
+						and a.approve_status = #{approveStatus}
+					</if>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BasMission">
+		SELECT 
+			<include refid="basMissionColumns"/>
+		FROM bas_mission a
+		<include refid="basMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findCount" resultType="Integer">
+		select count(id) from bas_mission
+	</select>
+	
+	<select id="findByBarCode" resultType="BasMission">
+		SELECT 
+		a.id AS "id",
+		a.mission_code AS "missionCode",
+		a.business_type AS "businessType",
+		a.approve_status AS "approveStatus",
+		a.approve_config_id AS "approveConfig",
+		a.approve_user_id AS "approveUser.id",
+		a.start_by AS "startBy.id",
+		a.start_time AS "startTime",
+		a.limit_time AS "limitTime",
+		a.end_time AS "endTime",
+		a.delay_count AS"delayCount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+		from bas_mission a
+		WHERE a.mission_code = #{0}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bas_mission(
+			id,
+			mission_code,
+			business_type,
+			approve_status,
+			approve_config_id,
+			approve_user_id,
+			start_by,
+			start_time,
+			limit_time,
+			delay_count,
+			end_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{missionCode},
+			#{businessType},
+			#{approveStatus},
+			#{approveConfig},
+			#{approveUser.id},
+			#{startBy.id},
+			#{startTime},
+			#{limitTime},
+			#{delayCount},
+			#{endTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bas_mission SET 
+		 <if test="missionCode != null and missionCode != ''">
+			 mission_code = #{missionCode},
+		 </if>
+		 <if test="businessType != null and businessType != ''">
+			business_type = #{businessType},
+		</if>
+		<if test="approveStatus != null and approveStatus != ''">
+			approve_status = #{approveStatus},
+		</if>
+		<if test="approveConfig != null and approveConfig != ''">
+			approve_config_id = #{approveConfig},
+		</if>
+		 <if test="startBy != null and startBy.id != ''">
+		 	start_by = #{startBy.id},
+		 </if>
+		 <if test= "limitTime != null and limitTime != ''">
+			limit_time = #{limitTime},
+		 </if>
+		 <if test= "delayCount != null and delayCount != ''">
+			delay_count = #{delayCount},
+		 </if>
+		 <if test = "endTime != null and endTime != ''">
+		 	end_time = #{endTime},
+		 </if>
+		 <if test="approveUser != null and approveUser.id != ''">
+		 	approve_user_id = #{approveUser.id},
+		 </if>
+		 <if test = "updateBy != null and updateBy.id != ''">
+			update_by = #{updateBy.id},
+		 </if>	
+		 <if test = "updateDate != null and updateDate != ''">
+			update_date = #{updateDate}
+		 </if>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bas_mission SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	
+</mapper>

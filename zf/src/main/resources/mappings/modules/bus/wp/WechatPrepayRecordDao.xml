@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.wp.WechatPrepayRecordDao">
+    
+	<sql id="wechatPrepayRecordColumns">
+		a.id AS "id",
+		a.order_type AS "orderType",
+		a.order_id AS "orderId",
+		a.order_no AS "orderNo",
+		a.prepay_no AS "prepayNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="wechatPrepayRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="WechatPrepayRecord">
+		SELECT 
+			<include refid="wechatPrepayRecordColumns"/>
+		FROM bus_wp_wechat_prepay_record a
+		<include refid="wechatPrepayRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WechatPrepayRecord">
+		SELECT 
+			<include refid="wechatPrepayRecordColumns"/>
+		FROM bus_wp_wechat_prepay_record a
+		<include refid="wechatPrepayRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderType != null and orderType != ''">
+				AND a.order_type = #{orderType}
+			</if>
+			<if test="orderId != null and orderId != ''">
+				AND a.order_id = #{orderId}
+			</if>
+			<if test="orderNo != null and orderNo != ''">
+				AND a.order_no = #{orderNo}
+			</if>
+			<if test="prepayNo != null and prepayNo != ''">
+				AND a.prepay_no = #{prepayNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WechatPrepayRecord">
+		SELECT 
+			<include refid="wechatPrepayRecordColumns"/>
+		FROM bus_wp_wechat_prepay_record a
+		<include refid="wechatPrepayRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_wp_wechat_prepay_record(
+			id,
+			order_type,
+			order_id,
+			order_no,
+			prepay_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderType},
+			#{orderId},
+			#{orderNo},
+			#{prepayNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_wp_wechat_prepay_record SET 	
+			order_type = #{orderType},
+			order_id = #{orderId},
+			order_no = #{orderNo},
+			prepay_no = #{prepayNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_wp_wechat_prepay_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

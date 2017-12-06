@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.cl.GoodsViewDao">
+    
+	<sql id="goodsViewColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		a.goods_id AS "goods.id",
+		a.view_count AS "viewCount",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsViewJoins">
+	</sql>
+    
+	<select id="get" resultType="GoodsView">
+		SELECT 
+			<include refid="goodsViewColumns"/>
+		FROM crm_cl_goods_view a
+		<include refid="goodsViewJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="GoodsView">
+		SELECT 
+			<include refid="goodsViewColumns"/>
+		FROM crm_cl_goods_view a
+		<include refid="goodsViewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="GoodsView">
+		SELECT 
+			<include refid="goodsViewColumns"/>
+		FROM crm_cl_goods_view a
+		<include refid="goodsViewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGoodsViewList" resultType="GoodsView">
+		SELECT 
+			a.id AS "id",
+			a.create_date AS "createDate",
+			a.goods_id AS "goods.id",
+			c.name AS "goods.name",
+			c.goods_code AS "goods.code",
+			c.price AS "goods.price",
+			c.icon AS "goods.icon",
+			(select SUM(p.exist_stock) from lgt_ps_produce p where p.goods_id = a.goods_id) AS "goods.allExistStock"
+		FROM crm_cl_goods_view a
+		LEFT JOIN lgt_ps_goods c ON c.id = a.goods_id
+		<where>
+			a.del_flag = #{DELFLAG}
+			<if test="member != null and member.id != ''">
+				AND a.member_id = #{member.id}
+			</if>
+			<if test="goodsStatus == 3">
+				AND c.status = #{goodsStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<update id="deleteList">
+		delete from crm_cl_goods_view 
+		where id in 
+		<foreach collection="goodsViewList" item="goodsView" separator="," open="(" close=")">
+			#{goodsView.id}
+		</foreach>
+	</update>
+	
+	<select id="getCountByMember" resultType="java.lang.Integer">
+		select count(1) from crm_cl_goods_view a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND 
+			a.member_id = #{id}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_cl_goods_view(
+			id,
+			member_id,
+			goods_id,
+			view_count,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{goods.id},
+			#{viewCount},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_cl_goods_view SET 	
+			member_id = #{member.id},
+			goods_id = #{goods.id},
+			view_count = #{viewCount},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<!-- 查询收藏商品是否已经存在 -->
+	<select id="getGoodsView" resultType="GoodsView">
+		SELECT 
+			a.id AS "id",
+			a.member_id AS "member.id",
+			a.goods_id AS "goods.id",
+			a.view_count AS "viewCount"
+		FROM crm_cl_goods_view a
+		WHERE 
+		a.del_flag = 0
+		AND a.member_id = #{memberId}
+	    AND a.goods_id = #{goodsId}
+	</select>
+	
+	<update id="delete">
+		UPDATE crm_cl_goods_view SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

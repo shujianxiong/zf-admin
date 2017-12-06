@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.ser.dao.as.WorkorderDao">
+    
+	<sql id="workorderColumns">
+		a.id AS "id",
+		a.workorder_no AS "workorderNo",
+		a.workorder_type AS "workorderType",
+		a.status AS "status",
+		a.member_id AS "member.id",
+		a.usercode AS "usercode",
+		a.order_type AS "orderType",
+		a.order_id AS "orderId",
+		a.order_no AS "orderNo",
+		a.photos_url AS "photosUrl",
+		a.description AS "description",
+		a.appointed_user AS "appointedUser.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="workorderJoins">
+	   
+	</sql>
+    
+	<select id="get" resultType="Workorder">
+		SELECT 
+			<include refid="workorderColumns"/>
+		FROM ser_as_workorder a
+		<include refid="workorderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<resultMap type="Workorder" id="workOrderMap">
+	   <result property="id"  column="id"/>
+	   <result property="workorderNo"  column="workorderNo"/>
+	   <result property="workorderType"  column="workorderType"/>
+	   <result property="status"  column="status"/>
+	   <result property="member.id"  column="member.id"/>
+	   <result property="usercode"  column="usercode"/>
+	   <result property="orderType"  column="orderType"/>
+	   <result property="orderId"  column="orderId"/>
+	   <result property="orderNo"  column="orderNo"/>
+	   <result property="photosUrl"  column="photosUrl"/>
+	   <result property="description"  column="description"/>
+	   <result property="appointedUser.id" column="appointedUser.id"/>
+	   
+	   <result property="createBy.id"  column="createBy.id"/>
+	   <result property="createDate"  column="createDate"/>
+	   <result property="updateBy.id"  column="updateBy.id"/>
+	   <result property="updateDate"  column="updateDate"/>
+	   <result property="remarks"  column="remarks"/>
+	   <result property="delFlag"  column="delFlag"/>
+	   <collection property="workorderDealList" ofType="WorkorderDeal">
+	       <result property="appointedUser.id" column="wd.appointedUser.id"/>
+	       <result property="requiredTime"  column="requiredTime"/>
+	       <result property="requiredDealtype"  column="requiredDealtype"/>
+	       <result property="remarks"  column="wd.remarks"/>
+	       <result property="updateDate"  column="wd.updateDate"/>
+	   </collection>
+	</resultMap>
+	
+	<select id="find" resultMap="workOrderMap">
+	    SELECT 
+	        wd.appointed_user AS "wd.appointedUser.id",
+            wd.required_time AS "requiredTime",
+            wd.update_date AS "wd.updateDate",
+            wd.required_dealtype AS "requiredDealtype",
+            wd.remarks AS "wd.remarks",
+            <include refid="workorderColumns"/>
+        FROM ser_as_workorder a
+        <include refid="workorderJoins"/>
+        LEFT JOIN ser_as_workorder_deal wd ON wd.workorder_id = a.id
+        WHERE a.id = #{id}
+        ORDER BY wd.update_date DESC
+	</select>
+	
+	<select id="findList" resultType="Workorder">
+		SELECT 
+			<include refid="workorderColumns"/>
+		FROM ser_as_workorder a
+		<include refid="workorderJoins"/>
+		<!-- LEFT JOIN ser_as_workorder_deal wd ON wd.workorder_id = a.id -->
+		<!-- LEFT JOIN crm_mi_member m ON m.id = a.member_id -->
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+			     AND a.create_by = #{createBy.id}
+			</if>
+			<if test="appointedUser != null and appointedUser.id != null and appointedUser.id != ''">
+			     AND a.appointed_user = #{appointedUser.id}
+			</if>
+			<if test="waitDealStatus != null and waitDealStatus != ''">
+			     AND a.status != #{waitDealStatus}
+			</if>
+			<if test="workorderNo != null and workorderNo != ''">
+			     AND a.workorder_no = #{workorderNo}
+			</if>
+			<if test="workorderType != null and workorderType != ''">
+			     AND a.workorder_type = #{workorderType}
+			</if>
+			<if test="status != null and status != ''">
+                 AND a.status = #{status}
+            </if>
+            <if test="orderType != null and orderType != ''">
+                AND a.order_type = #{orderType}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND a.order_no = #{orderNo}
+            </if>
+            <if test="member != null and member.usercode != null and member.usercode != ''">
+                AND a.usercode = #{member.usercode}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Workorder">
+		SELECT 
+			<include refid="workorderColumns"/>
+		FROM ser_as_workorder a
+		<include refid="workorderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ser_as_workorder(
+			id,
+			workorder_no,
+			workorder_type,
+			status,
+			member_id,
+			usercode,
+			order_type,
+			order_id,
+			order_no,
+			photos_url,
+			description,
+			appointed_user,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{workorderNo},
+			#{workorderType},
+			#{status},
+			#{member.id},
+			#{usercode},
+			#{orderType},
+			#{orderId},
+			#{orderNo},
+			#{photosUrl},
+			#{description},
+			#{appointedUser.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ser_as_workorder SET 	
+			workorder_no = #{workorderNo},
+			workorder_type = #{workorderType},
+			status = #{status},
+			member_id = #{member.id},
+			usercode = #{usercode},
+			order_type = #{orderType},
+			order_id = #{orderId},
+			order_no = #{orderNo},
+			photos_url = #{photosUrl},
+			description = #{description},
+			appointed_user = #{appointedUser.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ser_as_workorder SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateStatusById">
+	    UPDATE ser_as_workorder SET 
+            status = #{status}
+        WHERE id = #{id}
+	</update>
+	
+	<update id="updateDealUserAndStatusById">
+	    UPDATE ser_as_workorder SET 
+	        appointed_user = #{appointedUser.id},
+            status = #{status}
+        WHERE id = #{id}
+	</update>
+	<update id="updateStatusByOrderId">
+		UPDATE ser_as_workorder SET
+		status = #{status}
+		WHERE order_id = #{orderId}
+	</update>
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ob.BuyProduceDao">
+    
+	<sql id="buyProduceColumns">
+		a.id AS "id",
+		a.buy_order_id AS "buyOrder.id",
+		a.experience_produce_id AS "experienceProduce.id",
+		a.produce_id AS "produce.id",
+		a.num AS "num",
+		a.goods_title AS "goodsTitle",
+		a.produce_name AS "produceName",
+		a.price_src AS "priceSrc",
+		a.discount_buy AS "discountBuy",
+		a.price_buy AS "priceBuy",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="buyProduceJoins">
+	</sql>
+    
+	<select id="get" resultType="BuyProduce">
+		SELECT 
+			<include refid="buyProduceColumns"/>
+		FROM bus_ob_buy_produce a
+		<include refid="buyProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BuyProduce">
+		SELECT 
+			<include refid="buyProduceColumns"/>
+		FROM bus_ob_buy_produce a
+		<include refid="buyProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="buyOrder != null and buyOrder.id != null and buyOrder.id != ''">
+				AND a.buy_order_id = #{buyOrder.id}
+			</if>
+			<if test="experienceProduce != null and experienceProduce.id != null and experienceProduce.id != ''">
+				AND a.experience_produce_id = #{experienceProduce.id}
+			</if>
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				AND a.produce_id = #{produce.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BuyProduce">
+		SELECT 
+			<include refid="buyProduceColumns"/>
+		FROM bus_ob_buy_produce a
+		<include refid="buyProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="getTotalNumByMember" resultType="int">
+		SELECT IFNULL(SUM(IFNULL(a.num ,0)),0)
+		  FROM bus_ob_buy_produce a, bus_ob_buy_order b
+		 WHERE a.buy_order_id = b.id
+		   AND b.member_id = #{memberId}
+		   AND b.status_system != #{STATUSSYSTEM_CLOSE}
+	</select>
+
+
+	<insert id="insert">
+		INSERT INTO bus_ob_buy_produce(
+			id,
+			buy_order_id,
+			experience_produce_id,
+			produce_id,
+			num,
+			goods_title,
+			produce_name,
+			price_src,
+			discount_buy,
+			price_buy,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{buyOrder.id},
+			#{experienceProduce.id},
+			#{produce.id},
+			#{num},
+			#{goodsTitle},
+			#{produceName},
+			#{priceSrc},
+			#{discountBuy},
+			#{priceBuy},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ob_buy_produce SET 	
+			buy_order_id = #{buyOrder.id},
+			experience_produce_id = #{experienceProduce.id},
+			produce_id = #{produce.id},
+			num = #{num},
+			goods_title = #{goodsTitle},
+			produce_name = #{produceName},
+			price_src = #{priceSrc},
+			discount_buy = #{discountBuy},
+			price_buy = #{priceBuy},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ob_buy_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

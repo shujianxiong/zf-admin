@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.fd.FreeDepositDao">
+    
+	<sql id="freeDepositColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.summary AS "summary",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.register_places AS "registerPlaces",
+		a.places AS "places",
+		a.init_places AS "initPlaces",
+		a.surplus_places AS "surplusPlaces",
+		a.register_num AS "registerNum",
+		a.active_flag AS "activeFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="freeDepositJoins">
+	</sql>
+    
+	<select id="get" resultType="FreeDeposit">
+		SELECT 
+			<include refid="freeDepositColumns"/>
+		FROM spm_fd_free_deposit a
+		<include refid="freeDepositJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FreeDeposit">
+		SELECT 
+			<include refid="freeDepositColumns"/>
+		FROM spm_fd_free_deposit a
+		<include refid="freeDepositJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FreeDeposit">
+		SELECT 
+			<include refid="freeDepositColumns"/>
+		FROM spm_fd_free_deposit a
+		<include refid="freeDepositJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="countByStartTime" resultType="int">
+		SELECT COUNT(1) FROM spm_fd_free_deposit 
+		 WHERE del_flag = #{DEL_FLAG_NORMAL} 
+		   AND active_flag = #{TRUE_FLAG} 
+		   AND <![CDATA[#{startTime} <= end_time]]>
+		   AND id != #{id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_fd_free_deposit(
+			id,
+			name,
+			summary,
+			start_time,
+			end_time,
+			register_places,
+			places,
+			init_places,
+			surplus_places,
+			register_num,
+			active_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{summary},
+			#{startTime},
+			#{endTime},
+			#{registerPlaces},
+			#{places},
+			#{initPlaces},
+			#{surplusPlaces},
+			#{registerNum},
+			#{activeFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_fd_free_deposit SET 	
+			name = #{name},
+			summary = #{summary},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			register_places = #{registerPlaces},
+			places = #{places},
+			init_places = #{initPlaces},
+			surplus_places = #{surplusPlaces},
+			register_num = #{registerNum},
+			active_flag = #{activeFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_fd_free_deposit SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

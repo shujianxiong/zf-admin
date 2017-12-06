@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.wcp.dao.ar.MsgImgDao">
+    
+	<sql id="msgImgColumns">
+		a.id AS "id",
+		a.msg_id AS "msgId",
+		a.photo_name AS "photoName",
+		a.photo_url AS "photoUrl",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="msgImgJoins">
+	</sql>
+    
+	<select id="get" resultType="MsgImg">
+		SELECT 
+			<include refid="msgImgColumns"/>
+		FROM wcp_ar_msg_img a
+		<include refid="msgImgJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MsgImg">
+		SELECT 
+			<include refid="msgImgColumns"/>
+		FROM wcp_ar_msg_img a
+		<include refid="msgImgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MsgImg">
+		SELECT 
+			<include refid="msgImgColumns"/>
+		FROM wcp_ar_msg_img a
+		<include refid="msgImgJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="photoName != null and photoName != ''">
+				AND a.photo_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{photoName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{photoName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{photoName},'%')</if>
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wcp_ar_msg_img(
+			id,
+			msg_id,
+			photo_name,
+			photo_url,
+			update_by,
+			update_date,
+			create_by,
+			create_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{msgId},
+			#{photoName},
+			#{photoUrl},
+			#{updateBy.id},
+			#{updateDate},
+			#{createBy.id},
+			#{createDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wcp_ar_msg_img SET 	
+			msg_id = #{msgId},
+			photo_name = #{photoName},
+			photo_url = #{photoUrl},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wcp_ar_msg_img SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.mb.BeansTempDao">
+    
+	<sql id="beansTempColumns">
+		a.id AS "id",
+		a.beans_id AS "beans.id",
+		b.member_id AS "beans.member.id",
+		a.temp_serial_no AS "tempSerialNo",
+		a.create_type AS "createType",
+		a.change_type AS "changeType",
+		a.change_reason_type AS "changeReasonType",
+		a.num AS "num",
+		a.check_status AS "checkStatus",
+		a.check_by AS "checkBy",
+		a.check_time AS "checkTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="beansTempJoins">
+		LEFT JOIN crm_mb_beans b on b.id=a.beans_id
+		LEFT JOIN crm_mi_member m on m.id=b.member_id
+	</sql>
+    
+	<select id="get" resultType="BeansTemp">
+		SELECT 
+			<include refid="beansTempColumns"/>
+		FROM crm_mb_beans_temp a
+		<include refid="beansTempJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BeansTemp">
+		SELECT 
+			<include refid="beansTempColumns"/>
+		FROM crm_mb_beans_temp a
+		<include refid="beansTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beans != null and beans.member != null and beans.member.usercode != null and beans.member.usercode != ''">
+				AND m.usercode = #{beans.member.usercode}
+			</if>
+			<if test="beans != null and beans.id != null and beans.id != ''">
+				AND a.beans_id = #{beans.id}
+			</if>
+
+			<if test="tempSerialNo != null and tempSerialNo != ''">
+				AND a.temp_serial_no = #{tempSerialNo}
+			</if>
+			<if test="createType != null and createType != ''">
+				AND a.create_type = #{createType}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="changeReasonType != null and changeReasonType != ''">
+				AND a.change_reason_type = #{changeReasonType}
+			</if>
+			<if test="checkStatus != null and checkStatus != ''">
+				AND a.check_status = #{checkStatus}
+			</if>
+			<if test="beginTime != null and beginTime != ''">
+				<![CDATA[ AND a.create_date >= #{beginTime}]]>
+			</if>
+			<if test="endTime != null and endTime != ''">
+				<![CDATA[AND a.create_date <= #{endTime} ]]>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BeansTemp">
+		SELECT 
+			<include refid="beansTempColumns"/>
+		FROM crm_mb_beans_temp a
+		<include refid="beansTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="getTempsPassedCountByBeansId" resultType="Integer">
+		SELECT
+		COUNT(a.id)
+		FROM crm_mb_beans_temp a
+		<where>
+			a.beans_id = #{beansId}
+			AND a.check_status = '2'
+		</where>
+	</select>
+	<insert id="insert">
+		INSERT INTO crm_mb_beans_temp(
+			id,
+			beans_id,
+			temp_serial_no,
+			create_type,
+			change_type,
+			change_reason_type,
+			num,
+			check_status,
+			check_by,
+			check_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{beans.id},
+			#{tempSerialNo},
+			#{createType},
+			#{changeType},
+			#{changeReasonType},
+			#{num},
+			#{checkStatus},
+			#{checkBy},
+			#{checkTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mb_beans_temp SET 	
+			beans_id = #{beans.id},
+			temp_serial_no = #{tempSerialNo},
+			create_type = #{createType},
+			change_type = #{changeType},
+			change_reason_type = #{changeReasonType},
+			num = #{num},
+			check_status = #{checkStatus},
+			check_by = #{checkBy},
+			check_time = #{checkTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mb_beans_temp SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

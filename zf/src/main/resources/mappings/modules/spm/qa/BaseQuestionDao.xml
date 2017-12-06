@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.qa.BaseQuestionDao">
+    
+    <resultMap id="questionResult" type="com.chinazhoufan.admin.modules.spm.entity.qa.BaseQuestion">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="type" column="type" />
+		<result property="description" column="description" />
+		<result property="photo" column="photo" />
+		<result property="answerType" column="answerType" />
+		<result property="activeFlag" column="activeFlag" />
+		<result property="createBy.id" column="createBy.id" />
+		<result property="createDate" column="createDate" />
+		<result property="updateBy.id" column="updateBy.id" />
+		<result property="updateDate" column="updateDate" />
+		<result property="remarks" column="remarks" />
+		<result property="delFlag" column="delFlag" />
+		<collection property="answerList" javaType="ArrayList" ofType="BaseAnswer">
+			<id property="id" column="answerId"/>
+			<result property="name" column="answerName"/>
+			<result property="correctFlag" column="correctFlag" />
+		</collection>
+		
+	</resultMap>
+    
+	<sql id="baseQuestionColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.type AS "type",
+		a.description AS "description",
+		a.photo AS "photo",
+		a.answer_type AS "answerType",
+		a.active_flag AS "activeFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="baseQuestionJoins">
+	</sql>
+    
+	<select id="get" resultType="BaseQuestion">
+		SELECT 
+			<include refid="baseQuestionColumns"/>
+		FROM spm_qa_base_question a
+		<include refid="baseQuestionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="find" resultMap="questionResult">
+		SELECT 
+			a.id AS "id",
+			a.name AS "name",
+			a.type AS "type",
+			a.description AS "description",
+			a.photo AS "photo",
+			a.answer_type AS "answerType",
+			a.active_flag AS "activeFlag",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			b.id AS "answerId",
+			b.name AS "answerName",
+			b.correct_flag AS "correctFlag"
+		FROM spm_qa_base_question a
+			LEFT JOIN spm_qa_base_answer b on b.base_question_id=a.id
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BaseQuestion">
+		SELECT 
+			<include refid="baseQuestionColumns"/>
+		FROM spm_qa_base_question a
+		<include refid="baseQuestionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="answerType != null and answerType != ''">
+				AND a.answer_type = #{answerType}
+			</if>
+			<if test="activeFlag != null and activeFlag != ''">
+				AND a.active_flag = #{activeFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BaseQuestion">
+		SELECT 
+			<include refid="baseQuestionColumns"/>
+		FROM spm_qa_base_question a
+		<include refid="baseQuestionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_qa_base_question(
+			id,
+			name,
+			type,
+			description,
+			photo,
+			answer_type,
+			active_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{type},
+			#{description},
+			#{photo},
+			#{answerType},
+			#{activeFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_qa_base_question SET 	
+			name = #{name},
+			type = #{type},
+			description = #{description},
+			photo = #{photo},
+			answer_type = #{answerType},
+			active_flag = #{activeFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_qa_base_question SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

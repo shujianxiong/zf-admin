@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" /><!--viewport网页缩放-->
+	<meta charset="utf-8" /><!-- UTF-8编码 -->
+	<meta name="keywords" content="珠宝租赁" /><!-- 关键词 -->
+	<meta name="format-detection" content="telephone=no" /><!-- 禁用自动识别电话号码 -->
+	<meta name="apple-mobile-web-app-capable" content="yes" /><!-- 强制全屏 -->
+	<meta name="msapplication-tap-highlight" content="no" /><!-- 禁用点击高光效果 -->
+    <title>购物车</title>
+    <link rel="stylesheet" media="screen and (max-width:330px)" href="../../baseConfig/base320.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:331px) and (max-width:380px)" href="../../baseConfig/base360.css" type="text/css" />
+    <link rel="stylesheet" media="screen and (min-width:381px)" href="../../baseConfig/base414.css" type="text/css" />
+    <link rel="stylesheet/less" href="shoppingcart.less" />
+    <script src="../../lib/js/less-1.3.3.min.js" type="text/javascript"></script>
+    <script src="../../lib/js/zepto.min.js" type="text/javascript" ></script>
+</head>
+<body>
+<div class="shopCart_warp">
+	<div class="selected">
+		<div id="" class="selected_area">
+			<span>全部商品</span>
+			<i class="iconfont">&#xe625;</i>
+			<div class="selected_sub" style="display: block">
+				<ul>
+					<li>租赁商品</li>
+					<li>购买商品</li>
+					<li>降价商品</li>
+				</ul>
+			</div>
+		</div>
+		<span id="" class="edit">
+			编辑
+		</span>
+	</div>
+	<div class="hint">
+		温馨提示：购物车中的商品仅保存2小时，请您迅速租赁或购买
+		<i class="iconfont">&#xe600;</i>
+	</div>
+	<div class="mode_warp">
+		<div class="head">
+			<i class="iconfont">&#xe627;</i>
+			<span id="">
+				租赁
+			</span>
+		</div>
+		<div class="content_warp">
+			<ul>
+				<li>
+					<div class="icon"><i class="iconfont">&#xe627;</i></div>
+					<div class="img"><img src="images/goods1.png"/></div>
+					<div class="text" style="display: none;">
+						<h2>美憾凡尘PT950铂金长脚阶梯型精度切割钻石订婚戒指Mylove系列</h2>
+						<p>奢华款，2克拉，12#</p>
+						<span>库存：<b>12件</b></span>
+						<h2>押金:<span>￥52000</span></h2>
+						<h2>租金:<span>￥2000/月</span></h2>
+						<h2>购买价:<span>￥52000</span></h2>
+					</div>
+					<div class="edit" style="display: block;">
+						<div class="inputArea">
+							<b>-</b>
+							<input type="tel"  id="" value="1" />
+							<b>+</b>
+						</div>
+						<div class="selected_area">
+							<p>豪华款，2克拉，13#</p>
+							<i class="iconfont">&#xe628;</i>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!--猜您喜欢-->
+	<div class="guessLike">
+		<div class="top">
+			<h2>猜您喜欢</h2>
+			<span id="">
+				<i class="iconfont">&#xe609;</i>
+				换一批
+			</span>
+		</div>
+		<div id="" class="guessLike_goodsBlock">
+			<ul>
+				<li>
+					<img src="images/goods2.png"/>
+					<div >铂金订婚戒指奢华爆款</div>
+					<p>会员价<b>￥70000</b></p>
+				</li>
+				<li>
+					<img src="images/goods2.png"/>
+					<div >铂金订婚戒指奢华爆款</div>
+					<p>会员价<b>￥70000</b></p>
+				</li>
+				<li>
+					<img src="images/goods2.png"/>
+					<div >铂金订婚戒指奢华爆款</div>
+					<p>会员价<b>￥70000</b></p>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="bottomBar">
+	<div class="allSelect"> 
+		<i class="iconfont">&#xe627;</i>
+		<span id="">
+			全选
+		</span>
+	</div>
+	<div class="tatal_num" style="display: block;">
+		<h2>合计：<span>￥52000</span></h2>
+		<p>不含运费</p>
+	</div>
+	<div id="" class="submit" style="display: block;">
+		结算
+	</div>
+	<div id="" class="delete" style="display: none;">
+		删除
+	</div>
+	<div id="" class="moveToCollect" style="display: none;">
+		移到收藏夹
+	</div>
+</div>
+<div class="goodsDetail_property_selected" style="display: none;">
+	<div class="shade"></div>
+	<div class="selected_content">
+		<span id="selected_content_close">
+			<i class="iconfont">&#xe600;</i>
+		</span>
+		<div class="goodPvw">
+			<div class="img">
+				<img src="images/goodsChoise.png"/>
+			</div>
+			<div class="title">
+				<h2>美憾凡尘钻石订婚戒指</h2>
+				<span>库存5件</span>
+				<p>￥70000</p>
+			</div>
+		</div>
+		<div class="goodsDetail_text_line">
+				<span></span>
+				<p>款式</p>
+		</div>
+		<div id="" class="goodsDetail_property_selec" >
+			<ul >
+				<li>
+					<span id="" class="">普通款</span>
+				</li>
+				<li>
+					<span id="" class="">豪华款</span>
+				</li>
+				<li>
+					<span id="" class="">奢华款</span>
+				</li>
+			</ul>
+		</div>
+		
+		<div class="goodsDetail_text_line">
+				<span ></span>
+				<p>尺寸</p>
+		</div>
+		<div id="" class="goodsDetail_property_selec" >
+			<ul >
+				<li>
+					<span id="" class="">13#</span>
+				</li>
+				<li>
+					<span id="" class="">16#</span>
+				</li>
+				<li>
+					<span id="" class="">19#</span>
+				</li>
+			</ul>
+		</div>
+		<div class="property_num">
+			<span  class="numTitle">
+				数量
+			</span>
+			<div class="inputArea">
+				<b>-</b>
+				<input type="tel"  id="" value="1" />
+				<b>+</b>
+			</div>
+		</div>
+		<div id="" class="goodsDetail_property_selec" >
+			<ul >
+				<li>
+					<span  class="active">租赁</span>
+				</li>
+				<li>
+					<span id="" class="">购买</span>
+				</li>
+				<li>
+					<span id="" class="">预定租赁</span>
+				</li>
+				<li>
+					<span id="" class="">定做</span>
+				</li>
+			</ul>
+		</div>
+		<div class="button">
+			<span id="">
+				确定
+			</span>
+		</div>
+	</div>
+</div>
+</body>
+</html>

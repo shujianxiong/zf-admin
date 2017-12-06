@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.dp.DispatchProduceDao">
+    
+	<sql id="dispatchProduceColumns">
+		a.id AS "id",
+		o.id AS "dispatchOrder.id",
+		c.id AS "produce.id",
+		c.name AS "produce.name",
+		a.plan_num AS "planNum",
+		a.actual_num AS "actualNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="dispatchProduceJoins">
+		LEFT JOIN lgt_dp_dispatch_order o ON o.id = a.dispatch_order_id
+		LEFT JOIN lgt_ps_produce c ON c.id = a.produce_id
+	</sql>
+    
+	<select id="get" resultType="DispatchProduce">
+		SELECT 
+			<include refid="dispatchProduceColumns"/>
+		FROM lgt_dp_dispatch_produce a
+		<include refid="dispatchProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getOrderId" resultType="DispatchProduce">
+		SELECT 
+			<include refid="dispatchProduceColumns"/>
+		FROM lgt_dp_dispatch_produce a
+		<include refid="dispatchProduceJoins"/>
+		WHERE a.dispatch_order_id = #{id}
+	</select>
+	
+	<select id="findList" resultType="DispatchProduce">
+		SELECT 
+			<include refid="dispatchProduceColumns"/>
+		FROM lgt_dp_dispatch_produce a
+		<include refid="dispatchProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="dispatchOrder != null and dispatchOrder.id != ''">
+				AND a.dispatch_order_id = #{dispatchOrder.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DispatchProduce">
+		SELECT 
+			<include refid="dispatchProduceColumns"/>
+		FROM lgt_dp_dispatch_produce a
+		<include refid="dispatchProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_dp_dispatch_produce(
+			id,
+			dispatch_order_id,
+			produce_id,
+			plan_num,
+			actual_num,
+			actual_remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{dispatchOrder.id},
+			#{produce.id},
+			#{planNum},
+			#{actualNum},
+			#{actualRemarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_dp_dispatch_produce SET 	
+			<if test="dispatchOrder != null and dispatchOrder.id != ''">
+				dispatch_order_id = #{dispatchOrder.id},
+			</if>
+			<if test="produce != null and produce.id != ''">
+				produce_id = #{produce.id},
+			</if>
+			<if test="planNum != null and planNum !=''">
+				plan_num = #{planNum},
+			</if>
+			<if test="actualNum != null and actualNum != ''">
+				actual_num = #{actualNum},
+			</if>
+			<if test="actualRemarks != null and actualRemarks !=''">
+				actual_remarks = #{actualRemarks},
+			</if>
+			<if test="remarks != null and remarks != ''">
+				remarks = #{remarks},
+			</if>
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_dp_dispatch_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据调货单ID获取对应的调货货品信息，附加货品对应的产品信息 -->
+	<sql id="getProductListByDispatchOrderIdColumns">
+		o.id AS "dispatchOrderId", 
+		w.id AS "outWarehouseId",
+		w.name AS "outWarehouseName", 
+		o.order_status AS "dispatchOrderStatus",
+		u.id AS "outUserId", 
+		u.name AS "outUserName", 
+		o.mission_id AS "dispatchMissionId",
+		s.id AS "dispatchProduceProduceId",
+		s.name AS "dispatchProduceProduceName",
+		s.code AS "dispatchProduceProduceCode",
+		e.id AS "dispatchProduceId", 
+		e.plan_num AS "dispatchProducePlanNum", 
+		e.actual_num AS "dispatchProduceActualNum", 
+		e.actual_remarks AS "dispatchProduceActualRemarks",
+		g.name AS "name", 
+		g.code AS "code", 
+		g.factory_code AS "factoryCode",  
+		g.status AS "status", 
+		g.remarks AS "remarks",
+		t.weight AS "weight",
+		t.id AS "productId",
+		t.code AS "productCode",
+		d.id AS "dispatchProductId"
+	</sql>
+	
+	<sql id="getProductListByDispatchOrderIdJoins">
+		LEFT JOIN lgt_ps_product t  ON d.product_id = t.id
+		LEFT JOIN lgt_ps_goods g ON g.id = t.goods_id
+		LEFT JOIN lgt_dp_dispatch_produce e ON e.id = d.dispatch_produce_id
+		LEFT JOIN lgt_dp_dispatch_order o ON o.id = e.dispatch_order_id
+		LEFT JOIN lgt_ps_produce s ON s.id = e.produce_id 
+		LEFT JOIN lgt_ps_warehouse w ON w.id = o.out_warehouse_id
+		LEFT JOIN sys_user u ON u.id = o.out_user_id
+	</sql>
+	
+	<resultMap id="dispatchProductWithOrderAndProduce" type="com.chinazhoufan.admin.modules.lgt.entity.dp.DispatchProduce">
+		<result property="id" column="dispatchProduceId"/>
+		<result property="planNum" column="dispatchProducePlanNum"/>
+		<result property="actualNum" column="dispatchProduceActualNum"/>
+		<result property="actualRemarks" column="dispatchProduceActualRemarks"/>
+		<result property="produce.id" column="dispatchProduceProduceId"/>
+		<result property="produce.name" column="dispatchProduceProduceName"/>
+		<result property="produce.code" column="dispatchProduceProduceCode"/>
+		
+		<result property="produce.goods.name" 			column="name"/>
+		<result property="produce.goods.code" 			column="code"/>
+		<result property="produce.goods.factoryCode" 	column="factoryCode"/>
+		<result property="produce.goods.goodsStatus" 	column="status"/>
+		<result property="produce.goods.remarks" 		column="remarks"/>
+		
+		<result property="dispatchOrder.id" column="dispatchOrderId"/>
+		<result property="dispatchOrder.outWarehouse.name" column="outWarehouseName"/>
+		<result property="dispatchOrder.outWarehouse.id" column="outWarehouseId"/>
+		<result property="dispatchOrder.outUser.name" column="outUserName"/>
+		<result property="dispatchOrder.outUser.id" column="outUserId"/>
+		<result property="dispatchOrder.orderStatus" column="dispatchOrderStatus"/>
+		<result property="dispatchOrder.dispatchMission.id" column="dispatchMissionId"/>
+		
+		<collection property="dispatchProductList" ofType="DispatchProduct">
+			<result property="id" column="dispatchProductId"/>
+			<result property="product.id" column="productId"/>
+			<result property="product.code" column="productCode"/>
+		</collection>
+	</resultMap>
+	
+	<select id="listProductWithProduceByDispatchOrderId" resultMap="dispatchProductWithOrderAndProduce">
+		SELECT 
+			<include refid="getProductListByDispatchOrderIdColumns" />
+		FROM  LGT_DP_DISPATCH_PRODUCT d
+			<include refid="getProductListByDispatchOrderIdJoins" />
+		WHERE o.id = #{dispatchOrderId}
+		ORDER BY s.produce_code
+	</select>
+	
+	<delete id="removeDispatchProduceByDispatchOrderId" parameterType="java.util.List">
+		DELETE FROM lgt_dp_dispatch_produce  WHERE dispatch_order_id in 
+		<foreach collection="dispatchOrderIds" item="oid" index="index" open="(" separator="," close=")">
+			#{oid}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.mb.BeansDao">
+    
+	<sql id="beansColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		a.history_beans AS "historyBeans",
+		a.current_beans AS "currentBeans",
+		a.last_item_no AS "lastItemNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="beansJoins">
+		LEFT JOIN crm_mi_member m on m.id=a.member_id
+	</sql>
+    
+	<select id="get" resultType="Beans">
+		SELECT 
+			<include refid="beansColumns"/>
+		FROM crm_mb_beans a
+		<include refid="beansJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Beans">
+		SELECT 
+			<include refid="beansColumns"/>
+		FROM crm_mb_beans a
+		<include refid="beansJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="member != null  and member.usercode != null and member.usercode != ''">
+				AND m.usercode = #{member.usercode}
+			</if>
+			<if test="beginUpdateDate != null and beginUpdateDate != ''">
+				<![CDATA[AND a.update_date >= #{beginUpdateDate}]]>
+			</if>
+			<if test="endUpdateDate != null and endUpdateDate != ''">
+				<![CDATA[AND a.update_date <= #{endUpdateDate}]]>
+			</if>
+		</where>
+
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Beans">
+		SELECT 
+			<include refid="beansColumns"/>
+		FROM crm_mb_beans a
+		<include refid="beansJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 通过会员ID获取会员魅力豆账户余额记录 -->
+	<select id="getByMemberId" resultType="Beans">
+		SELECT
+		<include refid="beansColumns"/>
+		FROM crm_mb_beans a
+		<include refid="beansJoins"/>
+		WHERE a.member_id = #{memberId}
+	</select>
+
+	<!-- 通过会员ID获取会员资金账户余额记录（同时锁定资金账户余额表） -->
+	<select id="getByMemberIdForUpdate" resultType="Beans">
+		SELECT
+			<include refid="beansColumns"/>
+		FROM crm_mb_beans a
+		<include refid="beansJoins"/>
+		WHERE a.member_id = #{memberId}
+		FOR UPDATE
+	</select>
+
+	<insert id="insert">
+		INSERT INTO crm_mb_beans(
+			id,
+			member_id,
+			history_beans,
+			current_beans,
+			last_item_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{historyBeans},
+			#{currentBeans},
+			#{lastItemNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mb_beans SET 	
+			member_id = #{member.id},
+			history_beans = #{historyBeans},
+			current_beans = #{currentBeans},
+			last_item_no = #{lastItemNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mb_beans SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

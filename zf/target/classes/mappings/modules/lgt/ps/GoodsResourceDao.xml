@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.GoodsResourceDao">
+    
+	<sql id="goodsResourceColumns">
+		a.id AS "id",
+		a.goods_id AS "goods.id",
+		a.use_type AS "useType",
+		a.resource_type AS "resourceType",
+		a.order_by AS "orderBy",
+		a.url AS "url",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsResourceJoins">
+	</sql>
+	
+     <resultMap id="goodsResourceResult" type="GoodsResource">
+    	<result column="id" property="id"/>
+    	<result column="goods.id" property="goods.id"/>
+    	<result column="useType" property="useType"/>
+    	<result column="resourceType" property="resourceType"/>
+    	<result column="url" property="url"/>
+    </resultMap>
+    
+	<select id="get" resultType="GoodsResource">
+		SELECT 
+			<include refid="goodsResourceColumns"/>
+		FROM lgt_ps_goods_resource a
+		<include refid="goodsResourceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="GoodsResource">
+		SELECT 
+			<include refid="goodsResourceColumns"/>
+		FROM lgt_ps_goods_resource a
+		<include refid="goodsResourceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="GoodsResource">
+		SELECT 
+			<include refid="goodsResourceColumns"/>
+		FROM lgt_ps_goods_resource a
+		<include refid="goodsResourceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByGoodsId" resultType="GoodsResource">
+		SELECT 
+			a.id AS "id",
+			a.goods_id AS "goods.id",
+			a.use_type AS "useType",
+			a.resource_type AS "resourceType",
+			a.url AS "url",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag"
+		FROM lgt_ps_goods_resource a
+		WHERE 
+			a.goods_id=#{0}
+			ORDER BY a.order_by ASC
+	</select>
+	
+	<select id="findListByGoodsId" resultMap="goodsResourceResult">
+		SELECT
+			a.id AS "id",
+			a.goods_id AS "goods.id",
+			a.use_type AS "useType",
+			a.resource_type AS "resourceType",
+			a.url AS "url"
+		FROM 
+		lgt_ps_goods_resource a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.goods_id = #{goods.id}
+			<if test="null != resourceType and '' != resourceType">
+				AND a.resource_type = #{resourceType}
+			</if>
+			<if test="null != useType and '' != useType">
+				AND a.use_type = #{useType}
+			</if>
+		</where>
+		ORDER BY a.order_by ASC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_goods_resource(
+			id,
+			goods_id,
+			use_type,
+			resource_type,
+			order_by,
+			url,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goods.id},
+			#{useType},
+			#{resourceType},
+			#{orderBy},
+			#{url},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_goods_resource SET 	
+			goods_id = #{goods.id},
+			use_type = #{useType},
+			resource_type = #{resourceType},
+			url = #{url},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_goods_resource SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM lgt_ps_goods_resource WHERE goods_id = #{0}
+	</delete>
+	
+</mapper>

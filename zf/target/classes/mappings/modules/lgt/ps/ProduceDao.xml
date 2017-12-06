@@ -1,0 +1,1001 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.ProduceDao">
+
+	<!-- 产品（纯）查询字段 -->
+	<sql id="produceColumnsSimple">
+		a.id AS "id",
+		a.goods_id AS "goods.id",
+		a.code AS "code",
+		a.property_str AS "propertyStr",
+		a.property_sku_str AS "propertySkuStr",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		
+		a.title AS "title",
+		
+		a.style_type AS "styleType",
+		a.status AS "status",
+		a.standard_weight AS "standardWeight",
+		a.price_purchase AS "pricePurchase",
+		a.price_operation AS "priceOperation",
+		a.ratio_operation AS "ratioOperation",
+		a.price_src AS "priceSrc",
+		
+		a.scale_experience_fee AS "scaleExperienceFee",
+		a.scale_experience_deposit AS "scaleExperienceDeposit",
+		a.price_dec_point AS "priceDecPoint",
+		
+		a.discount_price AS "discountPrice",
+		a.discount_scale AS "discountScale",
+		a.discount_filter_scale AS "discountFilterScale",
+		a.discount_filter_start AS "discountFilterStart",
+		a.discount_filter_end AS "discountFilterEnd",
+		a.is_buy AS "isBuy",
+        a.is_experience  AS "isExperience" ,
+        a.is_forebuy  AS "isForeBuy",
+        a.is_foreexperience  AS "isForeExperience",
+        a.is_foreexperience_date AS "isForeexperienceDate",
+		a.sell_num AS "sellNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+
+	<!-- 产品（带商品信息）查询字段 -->
+	<sql id="produceJoinsColumns">
+		a.id AS "id",
+		a.goods_id AS "goods.id",
+		g.code AS "goods.code",
+        g.name AS "goods.name",
+        g.title AS "goods.title",
+        g.status AS "goods.status",
+        g.sample_photo AS "goods.samplePhoto",
+        g.icon AS "goods.icon",
+        g.photo AS "goods.photo",
+        g.category_id AS "goods.category.id",
+        c.category_name AS "goods.category.categoryName",
+		a.code AS "code",
+		a.property_str AS "propertyStr",
+		a.property_sku_str AS "propertySkuStr",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		
+		a.title AS "title",
+		
+		a.style_type AS "styleType",
+		a.status AS "status",
+		a.standard_weight AS "standardWeight",
+		a.price_purchase AS "pricePurchase",
+		a.price_operation AS "priceOperation",
+		a.ratio_operation AS "ratioOperation",
+		a.price_src AS "priceSrc",
+		
+		a.scale_experience_fee AS "scaleExperienceFee",
+        a.scale_experience_deposit AS "scaleExperienceDeposit",
+		a.price_dec_point AS "priceDecPoint",
+		
+		a.discount_price AS "discountPrice",
+		a.discount_scale AS "discountScale",
+		a.discount_filter_scale AS "discountFilterScale",
+		a.discount_filter_start AS "discountFilterStart",
+		a.discount_filter_end AS "discountFilterEnd",
+		a.is_buy AS "isBuy",
+        a.is_experience  AS "isExperience" ,
+        a.is_forebuy  AS "isForeBuy",
+        a.is_foreexperience  AS "isForeExperience",
+        a.is_foreexperience_date AS "isForeexperienceDate",
+		a.sell_num AS "sellNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	<sql id="produceJoins">
+	    LEFT JOIN lgt_ps_goods 		g ON g.id = a.goods_id
+        LEFT JOIN lgt_ps_category 	c ON c.id = g.category_id
+        LEFT JOIN  lgt_ps_wh_produce w ON w.produce_id = a.id 
+	</sql>
+	
+	<!-- 产品（带商品信息、产品属性集合信息）查询字段-->
+	<!-- 对应resultMap：produceJoinsWithPropValuesResult -->
+	<resultMap id="produceJoinsWithPropValuesResult" type="Produce">
+    	<result column="id" 							property="id"/>
+    	<result column="goods.id" 						property="goods.id"/>
+    	<result column="goods.code" 					property="goods.code"/>
+    	<result column="goods.name" 					property="goods.name"/>
+    	<result column="goods.status" 					property="goods.status"/>
+    	<result column="goods.samplePhoto" 				property="goods.samplePhoto"/>
+    	<result column="goods.icon" 					property="goods.icon"/>
+    	<result column="goods.photo" 					property="goods.photo"/>
+    	<result column="goods.factoryCode"				property="goods.factoryCode"/>
+    	<result column="goods.category.categoryName"	property="goods.category.categoryName"/>
+    	<result column="code" 							property="code"/>
+    	<result column="factoryCode"        			property="factoryCode"/>
+    	<result column="name" 							property="name"/>
+    	<result column="title"                          property="title"/>
+    	
+    	<result column="styleType" 						property="styleType"/>
+    	<result column="status" 						property="status"/>
+    	<result column="standardWeight" 				property="standardWeight"/>
+    	<result column="pricePurchase" 					property="pricePurchase"/>
+    	<result column="priceOperation"     			property="priceOperation"/>
+    	<result column="ratioOperation"     			property="ratioOperation"/>
+    	<result column="priceSrc" 						property="priceSrc"/>
+    	<result column="scaleExperience" 				property="scaleExperience"/>
+    	<result column="discountPrice" 					property="discountPrice"/>
+    	<result column="discountScale" 					property="discountScale"/>
+    	<result column="discountFilterScale"			property="discountFilterScale"/>
+    	<result column="discountFilterStart" 			property="discountFilterStart"/>
+    	<result column="discountFilterEnd" 				property="discountFilterEnd"/>
+    	<result column="isBuy"              			property="isBuy"/>
+        <result column="isExperience"             		property="isExperience"/>
+        <result column="isForeBuy"           			property="isForeBuy"/>
+        <result column="isForeExperience"     			property="isForeExperience"/>
+    	<result column="isForeexperienceDate"     		property="isForeexperienceDate"/>
+    	<result column="sellNum" 						property="sellNum"/>
+    	<result column="createBy.id" 					property="createBy.id"/>
+    	<result column="createDate" 					property="createDate"/>
+    	<result column="updateBy.id" 					property="updateBy.id"/>
+    	<result column="updateDate" 					property="updateDate"/>
+    	<result column="remarks" 						property="remarks"/>
+    	<result column="delFlag" 						property="delFlag"/>
+    	<result column="stockNormal" 					property="stockNormal"/>
+    	<result column="stockLock" 						property="stockLock"/>
+    	<collection property="producePropValues" javaType="ArrayList" ofType="ProducePropvalue">
+    		<result column="producePropValues.id" 						property="id"/>
+    		<result column="id" 										property="produce.id"/>
+    		<result column="producePropValues.pvalue" 					property="pvalue"/>
+    		<result column="producePropValues.property.id" 				property="property.id"/>
+    		<result column="producePropValues.property.propName" 		property="property.propName"/>
+    		<result column="producePropValues.propvalue.id" 			property="propvalue.id"/>
+    		<result column="producePropValues.propvalue.pvalueName" 	property="propvalue.pvalueName"/>
+    		<result column="producePropValues.propvalue.pvalueNickname" property="propvalue.pvalueNickname"/>
+    		<result column="producePropValues.propvalue.orderNo" 		property="propvalue.orderNo"/>
+    	</collection>
+    </resultMap>
+    <sql id="produceJoinsWithPropValuesColumns">
+		a.id AS "id",
+		a.goods_id AS "goods.id",
+		g.code AS "goods.code",
+		g.name AS "goods.name",
+		g.status AS "goods.status",
+		g.sample_photo AS "goods.samplePhoto",
+		g.icon AS "goods.icon",
+		g.photo AS "goods.photo",
+		g.factory_code AS "goods.factoryCode",
+		c.category_name AS "goods.category.categoryName",
+		a.code AS "code",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		
+		a.title AS "title",
+		
+		a.style_type AS "styleType",
+		a.status AS "status",
+		a.standard_weight AS "standardWeight",
+		a.price_purchase AS "pricePurchase",
+		a.price_operation AS "priceOperation",
+		a.ratio_operation AS "ratioOperation",
+		a.price_src AS "priceSrc",
+		
+		a.scale_experience_fee AS "scaleExperienceFee",
+        a.scale_experience_deposit AS "scaleExperienceDeposit",
+		a.price_dec_point AS "priceDecPoint",
+		
+		a.discount_price AS "discountPrice",
+		a.discount_scale AS "discountScale",
+		a.discount_filter_scale AS "discountFilterScale",
+		a.discount_filter_start AS "discountFilterStart",
+		a.discount_filter_end AS "discountFilterEnd",
+		a.is_buy AS "isBuy",
+        a.is_experience  AS "isExperience" ,
+        a.is_forebuy  AS "isForeBuy",
+        a.is_foreexperience  AS "isForeExperience",
+        a.is_foreexperience_date  AS "isForeexperienceDate",
+        a.sell_num AS "sellNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		(select IFNULL(sum(w.stock_normal),0)	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockNormal",
+		(select IFNULL(sum(w.stock_lock),0)		from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockLock",
+		ppv.id 																		AS "producePropValues.id",
+		ppv.pvalue 																	AS "producePropValues.pvalue",
+		ppv.pid  																	AS "producePropValues.property.id",
+		(SELECT p.prop_name FROM lgt_ps_property p WHERE p.id=ppv.pid) 				AS "producePropValues.property.propName",
+		ppv.pvid  																	AS "producePropValues.propvalue.id",
+		(SELECT pv.pvalue_name FROM lgt_ps_propvalue pv WHERE pv.id=ppv.pvid) 		AS "producePropValues.propvalue.pvalueName",
+		(SELECT pv.pvalue_nickname FROM lgt_ps_propvalue pv WHERE pv.id=ppv.pvid) 	AS "producePropValues.propvalue.pvalueNickname",
+		(SELECT pv.order_no FROM lgt_ps_propvalue pv WHERE pv.id=ppv.pvid) 			AS "producePropValues.propvalue.orderNo"
+	</sql>
+	<sql id="produceJoinsWithPropValues">
+	    LEFT JOIN lgt_ps_goods 				g 	ON g.id = a.goods_id
+		LEFT JOIN lgt_ps_category 			c 	ON c.id = g.category_id
+		LEFT JOIN lgt_ps_produce_propvalue 	ppv ON a.id = ppv.produce_id
+	</sql>
+    
+	<select id="get" resultType="Produce">
+		SELECT 
+			<include refid="produceJoinsColumns"/>
+		FROM lgt_ps_produce a
+		  <include refid="produceJoins" />
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询产品（不链接其他表） -->
+	<select id="getProduceOnly" resultType="Produce">
+        SELECT 
+            <include refid="produceColumnsSimple"/>
+	    FROM lgt_ps_produce a
+        WHERE a.id = #{id}
+    </select>
+	
+	<resultMap id="ProduceSelectResult" type="Produce">
+    	<result column="id" 				property="id"/>
+    	<result column="code" 				property="code"/>
+    	<result column="factoryCode"        property="factoryCode"/>
+    	<result column="name" 				property="name"/>
+    	<result column="title"              property="title"/>
+    	<result column="goods.name" 		property="goods.name"/>
+    	<result column="goods.samplePhoto" 	property="goods.samplePhoto"/>
+    	<result column="goods.title" 		property="goods.title"/>
+   	    <result column="status" 			property="status"/>
+    	<result column="stockNormal" 		property="stockNormal"/>
+    	<result column="stockLock"			property="stockLock"/>
+    	<result column="stockStandard" 		property="stockStandard"/>
+    	<result column="stockSafe" 			property="stockSafe"/>
+		<result column="stockWarning" 		property="stockWarning"/>
+		<result column="stockDebt" 		property="stockDebt"/>
+	</resultMap>
+	<select id="findSelectList" resultMap="ProduceSelectResult">
+		SELECT 
+			a.id AS "id",
+			g.name AS "goods.name",
+			g.sample_photo AS "goods.samplePhoto",
+			g.title AS "goods.title",
+			<choose>
+				<when test="warehouse != null and warehouse.id != null and warehouse.id != ''">
+					(select IFNULL(sum(w.stock_normal),0) 	from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockNormal",
+					(select IFNULL(sum(w.stock_lock),0)		from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockLock",
+					(select IFNULL(sum(w.stock_standard),0) from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockStandard",
+					(select IFNULL(sum(w.stock_safe),0)		from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockSafe",
+					(select IFNULL(sum(w.stock_warning),0)	from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockWarning",
+					(select IFNULL(sum(w.stock_debt),0)	from lgt_ps_wh_produce w where w.produce_id = a.id and w.warehouse_id = #{warehouse.id}) AS "stockDebt",
+				</when>
+				<otherwise>
+					(select IFNULL(sum(w.stock_normal),0) 	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockNormal",
+					(select IFNULL(sum(w.stock_lock),0)		from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockLock",
+					(select IFNULL(sum(w.stock_standard),0) from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockStandard",
+					(select IFNULL(sum(w.stock_safe),0)		from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockSafe",
+					(select IFNULL(sum(w.stock_warning),0)	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockWarning",
+					(select IFNULL(sum(w.stock_debt),0)	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockDebt",
+				</otherwise>
+			</choose>
+			a.code AS "code",
+			a.factory_code AS "factoryCode",
+			a.name AS "name",
+			a.title AS "title",
+			a.status AS "status"
+		FROM lgt_ps_produce a
+		LEFT JOIN lgt_ps_goods g ON g.id=a.goods_id
+		<if test="warehouse != null and warehouse.id != null and warehouse.id != ''">
+			LEFT JOIN lgt_ps_wh_produce c ON c.produce_id=a.id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter !=null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR g.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="warehouse != null and warehouse.id != null and warehouse.id != '' ">
+				AND c.warehouse_id = #{warehouse.id}
+			</if>
+			<!-- 过滤掉新建状态的数据 -->
+			AND a.status != #{STATUS_NEW}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getInfo" resultMap="produceJoinsWithPropValuesResult">
+		SELECT 
+			<include refid="produceJoinsWithPropValuesColumns"/>
+		FROM lgt_ps_produce a
+		<include refid="produceJoinsWithPropValues"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 产品打印查询接口 -->
+	<select id="printPreview" resultMap="produceJoinsWithPropValuesResult">
+	   SELECT 
+            <include refid="produceJoinsWithPropValuesColumns"/>
+        FROM lgt_ps_produce a
+        <include refid="produceJoinsWithPropValues"/>
+        <where>
+            <if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+                AND (a.code LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR a.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="goods != null and goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+                AND (g.code LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+                    OR g.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+                )
+            </if>
+            <if test="goods != null and goods.status != null and goods.status != ''">
+                AND g.status = #{goods.status}
+            </if>
+            <if test="goods != null and goods.category != null and goods.category.id != null and goods.category.id != ''">
+                AND g.category_id = #{goods.category.id}
+            </if>
+            <if test="styleType != null and styleType != ''">
+                AND a.style_type = #{styleType}
+            </if>
+        </where>
+	</select>
+	
+	<select id="findList" resultType="Produce">
+		SELECT 
+			(select IFNULL(sum(w.stock_normal),0) 	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockNormal",
+			(select IFNULL(sum(w.stock_lock),0)		from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockLock",
+<!-- 			(select IFNULL(sum(w.stock_debt),0)	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockDebt", -->
+			<include refid="produceJoinsColumns"/>
+		FROM lgt_ps_produce a
+		<include refid="produceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+                AND (a.code LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR a.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                )
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="goods != null and goods.id != null and goods.id != ''">
+                AND a.goods_id = #{goods.id}
+            </if>
+            <if test="goods != null and goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+                AND (g.code LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+                    OR g.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+                )
+            </if>
+            <if test="goods != null and goods.status != null and goods.status != ''">
+                AND g.status = #{goods.status}
+            </if>
+            <if test="goods != null and goods.category != null and goods.category.id != null and goods.category.id != ''">
+                AND g.category_id = #{goods.category.id}
+            </if>
+            <if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+                AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+            </if>
+            <if test="styleType != null and styleType != ''">
+                AND a.style_type = #{styleType}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Produce">
+		SELECT 
+			<include refid="produceJoinsColumns"/>
+		FROM lgt_ps_produce a
+		<include refid="produceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListWithGoodsAndStock" resultType="Produce">
+		SELECT 
+			<include refid="produceJoinsColumns"/>,
+			(select IFNULL(sum(w.stock_normal),0)	from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockNormal",
+			(select IFNULL(sum(w.stock_lock),0)		from lgt_ps_wh_produce w where w.produce_id = a.id) AS "stockLock"
+		FROM lgt_ps_produce a
+		<include refid="produceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} 
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="goods != null and goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+				AND (g.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					OR g.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="goods != null and goods.status != null and goods.status != ''">
+				AND g.status = #{goods.status}
+			</if>
+			<if test="goods != null and goods.category != null and goods.category.id != null and goods.category.id != ''">
+				AND g.category_id = #{goods.category.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<if test="styleType != null and styleType != ''">
+                AND a.style_type = #{styleType}
+            </if>
+            <if test="isStock != null and isStock != ''">
+            <if test="isStock == '1'.toString() ">
+                AND w.stock_normal &gt; 0
+            </if>
+            <if test="isStock == '0'.toString()">
+                AND w.stock_normal &lt;= 0
+            </if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findCount" resultType="Integer">
+		SELECT COUNT(id) FROM lgt_ps_produce
+	</select>
+	
+	<select id="findByBarCode" resultType="Produce">
+		SELECT 
+			<include refid="produceColumnsSimple"/>
+		FROM lgt_ps_produce a
+		WHERE a.code = #{0}
+	</select>
+	
+	<select id="findListByGoodsId" resultMap="produceJoinsWithPropValuesResult">
+		SELECT
+			<include refid="produceJoinsWithPropValuesColumns"/>
+		FROM lgt_ps_produce a
+		<include refid="produceJoinsWithPropValues"/>
+		<where> 
+			a.goods_id = #{goodsId}
+			AND a.del_flag = '0'
+		</where>
+		ORDER BY ppv.pid DESC
+	</select>
+    
+    
+    <resultMap id="produceResult" type="Produce">
+        <result column="id"                     property="id"/>
+        <result column="goods.id"               property="goods.id"/>
+        <result column="code"                   property="code"/>
+        <result column="factoryCode"            property="factoryCode"/>
+        <result column="name"                   property="name"/>
+        <result column="title"                  property="title"/>
+        <result column="status"                 property="status"/>
+        <collection property="producePropValues" javaType="ArrayList" ofType="ProducePropvalue">
+            <result column="producePropValues.id"           property="id"/>
+            <result column="producePropValues.property.id"  property="property.id"/>
+            <result column="producePropValues.propvalue.id" property="propvalue.id"/>
+            <result column="producePropValues.pvalue"       property="pvalue"/>
+            <result column="id"                             property="produce.id"/>
+        </collection>
+    </resultMap>
+    
+    <select id="findProduceAllColumnByIds" resultType="Produce">
+        SELECT 
+            <include refid="produceColumnsSimple"/>
+        FROM lgt_ps_produce a
+        WHERE a.id in
+        <foreach collection="produceIds" item="produceId" separator="," open="(" close=")">
+            #{produceId}
+        </foreach>
+    </select>
+    
+	<select id="findProduceByIds" resultMap="produceResult">
+		SELECT
+			a.id AS "Id",
+			a.goods_id AS "goods.id",
+			a.code AS "code",
+			a.factory_code AS "factoryCode",
+			a.name AS "name",
+			a.title AS "title",
+			a.status AS "status",
+			ppv.id AS "producePropValues.id",
+			ppv.pid  AS "producePropValues.property.id",
+			ppv.pvid  AS "producePropValues.propvalue.id",
+			ppv.pvalue AS "producePropValues.pvalue" 
+		FROM lgt_ps_produce a 
+		LEFT JOIN lgt_ps_produce_propvalue ppv ON a.id = ppv.produce_id
+		WHERE a.id in
+		<foreach collection="produceIds" item="produceId" separator="," open="(" close=")">
+			#{produceId}
+		</foreach>
+		ORDER BY ppv.pid DESC
+	</select>
+	
+	<select id="findProduceByIdsWithGoods" resultMap="produceResult">
+        SELECT
+            <include refid="produceJoinsColumns"/> 
+        FROM lgt_ps_produce a 
+            <include refid="produceJoins"/>
+        WHERE a.id in
+        <foreach collection="produceIds" item="produceId" separator="," open="(" close=")">
+            #{produceId}
+        </foreach>
+    </select>
+	
+	<!--  产品促销 条件筛选查询 -->
+	
+	<select id="filterList" resultType="Produce">
+	    SELECT 
+	        <include refid="produceJoinsColumns"/>
+        FROM lgt_ps_produce a
+          <include refid="produceJoins" />
+        WHERE a.del_flag = #{produce.DEL_FLAG_NORMAL}
+        <if test='maps != null and maps != "" and maps.size != 0'>
+        	AND 
+	        <foreach collection="maps" index="pid" item="searchKeyList" separator=" AND " >
+	            (
+	            <foreach collection="searchKeyList" separator="  OR  " item="skey">
+	                a.property_str like CONCAT('%', #{skey}, '%')
+	            </foreach>
+	            )
+	        </foreach>
+        </if>
+        <if test='searchType != null and searchType != "" and searchType == "S"'>
+            <if test="produce != null">
+                 <if test="produce.code != null and produce.code != ''">
+                    AND a.code = #{produce.code}
+                 </if>
+                 <if test="produce.goods != null and produce.goods.code != null and produce.goods.code != ''">
+                    AND g.code = #{produce.goods.code}
+                 </if>
+                 <if test="produce.minPrice != null and produce.minPrice != ''">
+                    <![CDATA[AND a.price_src >= #{produce.minPrice}]]>
+                 </if>   
+                 <if test="produce.maxPrice != null and produce.maxPrice != ''">
+                    <![CDATA[AND a.price_src <= #{produce.maxPrice}]]>
+                 </if>
+            </if>
+            limit #{pageFromNum}, #{pageSize}
+        </if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_produce(
+			id,
+			goods_id,
+			code,
+			<!-- factory_code, -->
+			name,
+			title,
+			style_type,
+			status,
+			standard_weight,
+			price_purchase,
+			price_operation,
+			ratio_operation,
+			price_src,
+			
+			scale_experience_fee,
+            scale_experience_deposit,
+			price_dec_point,
+			
+			discount_price,
+			discount_scale,
+			discount_filter_scale,
+			discount_filter_start,
+			discount_filter_end,
+			is_buy,
+            is_experience,
+            is_forebuy,
+            is_foreexperience,
+            is_foreexperience_date,
+			sell_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goods.id},
+			#{code},
+			<!-- #{factoryCode}, -->
+			#{name},
+			#{title},
+			#{styleType},
+			#{status},
+			#{standardWeight},
+			#{pricePurchase},
+			#{priceOperation},
+			#{ratioOperation},
+			#{priceSrc},
+			
+			#{scaleExperienceFee},
+            #{scaleExperienceDeposit},
+			#{priceDecPoint},
+			
+			#{discountPrice},
+			#{discountScale},
+			#{discountFilterScale},
+			#{discountFilterStart},
+			#{discountFilterEnd},
+			#{isBuy},
+            #{isExperience},
+            #{isForeBuy},
+            #{isForeExperience},
+            #{isForeexperienceDate},
+			#{sellNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<!-- 更新产品 -->
+	<update id="update">
+		UPDATE lgt_ps_produce SET
+			<!-- code = #{code}, -->
+			<!-- factory_code = #{factoryCode}, -->
+			name = #{name},
+			title = #{title},
+			style_type = #{styleType},
+			status = #{status},
+			standard_weight = #{standardWeight},
+			price_purchase = #{pricePurchase},
+			price_operation = #{priceOperation},
+			ratio_Operation = #{ratioOperation},
+			price_src = #{priceSrc},
+			
+			scale_experience_fee = #{scaleExperienceFee},
+            scale_experience_deposit = #{scaleExperienceDeposit},
+            price_dec_point = #{priceDecPoint},
+
+			discount_price = #{discountPrice},
+			discount_scale = #{discountScale},
+			discount_filter_scale = #{discountFilterScale},
+			discount_filter_start = #{discountFilterStart},
+			discount_filter_end = #{discountFilterEnd},
+			is_buy  = #{isBuy},
+            is_experience = #{isExperience},
+            is_forebuy = #{isForeBuy},
+            is_foreexperience = #{isForeExperience},
+            is_foreexperience_date = #{isForeexperienceDate},
+			sell_num = #{sellNum},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 更新产品状态 -->
+	<update id="updateStatus">
+		UPDATE lgt_ps_produce SET
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 根据产品ID，和折扣信息，  批量更新产品的折扣信息 -->
+	<update id="batchUpdateDiscountByProduce">
+	    UPDATE lgt_ps_produce SET
+            discount_filter_scale = #{produce.discountFilterScale},
+            discount_filter_start = #{produce.discountFilterStart},
+            discount_filter_end = #{produce.discountFilterEnd},
+            update_by = #{produce.updateBy.id},
+            update_date = #{produce.updateDate}
+        WHERE id in
+        <foreach collection="produceIdArr" item="produceId" separator="," open="(" close=")">
+            #{produceId}
+        </foreach>
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteByGoodsId">
+	   	UPDATE lgt_ps_produce SET 
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE goods_id = #{goods.id} 
+        AND status = #{status}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM lgt_ps_produce WHERE id = #{id}
+	</delete>
+	
+	<!-- Wap  Select Interface Start -->
+	<!-- 根据产品编码获取对应的产品详细详细，包括库存及全部存放位置 -->
+	<select id="getByCode" resultType="Produce">
+        SELECT 
+            ka.id AS "id",
+            ka.gid AS "goods.id",
+            ka.gname AS "goods.name",
+            ka.gcode AS "goods.code",
+            ka.gicon AS "goods.icon",
+            ka.gstatus AS "goods.status",
+            ka.gisCouponUsable AS "goods.isCouponUsable",
+            ka.gisRecommend AS "goods.isRecommend",
+            ka.gfactoryCode AS "goods.factoryCode",
+            ka.gbname AS "goods.brand.name",
+            ka.gdname AS "goods.designer.name",
+            ka.code AS "code",
+            ka.factoryCode AS "factoryCode",
+            ka.name AS "name",
+            a.title AS "title",
+            
+            ka.styleType AS "styleType",
+            ka.status AS "status",
+            ka.standardWeight AS "standardWeight",
+            ka.pricePurchase AS "pricePurchase",
+            ka.priceOperation AS "priceOperation",
+            ka.ratioOperation AS "ratioOperation",
+            ka.priceSrc AS "priceSrc",
+            
+            
+            ka.scaleExperienceFee AS "scaleExperienceFee",
+            ka.scaleExperienceDeposit AS "scaleExperienceDeposit",
+            ka.priceDecPoint AS "priceDecPoint",
+            
+            ka.discountPrice AS "discountPrice",
+            ka.discountScale AS "discountScale",
+            ka.discountFilterScale AS "discountFilterScale",
+            ka.discountFilterStart AS "discountFilterStart",
+            ka.discountFilterEnd AS "discountFilterEnd",
+            ka.isBuy AS "isBuy",
+            ka.isExperience  AS "isExperience" ,
+            ka.isForeBuy  AS "isForeBuy",
+            ka.isForeExperience  AS "isForeExperience",
+            ka.isForeexperienceDate AS "isForeexperienceDate"，
+            ka.sellNum AS "sellNum",
+            ka.createBy AS "createBy.id",
+            ka.createDate AS "createDate",
+            ka.updateBy AS "updateBy.id",
+            ka.updateDate AS "updateDate",
+            ka.remarks AS "remarks",
+            ka.delFlag AS "delFlag",
+            SUM(ka.stockNormal) AS 'stockNormal',
+            GROUP_CONCAT(ka.fullWareplace) AS 'fullWareplace'
+		FROM (	
+			SELECT DISTINCT
+	            a.id AS "id",
+	            a.goods_id AS "gid",
+	            g.name AS "gname",
+	            g.code AS "gcode",
+	            g.icon AS "gicon",
+	            g.status AS "gstatus",
+	            g.is_coupon_usable AS "gisCouponUsable",
+	            g.is_recommend AS "gisRecommend",
+	            g.factory_code AS "gfactoryCode",
+	            (select b.name from lgt_bs_brand b where b.id=g.brand_id) AS "gbname",
+	            (select c.name from lgt_bs_designer c where c.id=g.designer_id) AS "gdname",
+	            a.code AS "code",
+	            a.factory_code AS "factoryCode",
+	            a.name AS "name",
+	            a.title AS "title",
+	            
+	            a.style_type AS "styleType",
+	            a.status AS "status",
+	            a.standard_weight AS "standardWeight",
+	            a.price_purchase AS "pricePurchase",
+	            a.price_operation AS "priceOperation",
+	            a.ratio_operation AS "ratioOperation",
+	            a.price_src AS "priceSrc",
+	            
+	            a.scale_experience_fee AS "scaleExperienceFee",
+                a.scale_experience_deposit AS "scaleExperienceDeposit",
+	            a.price_dec_point AS "priceDecPoint",
+	            
+	            a.discount_price AS "discountPrice",
+	            a.discount_scale AS "discountScale",
+	            a.discount_filter_scale AS "discountFilterScale",
+	            a.discount_filter_start AS "discountFilterStart",
+	            a.discount_filter_end AS "discountFilterEnd",
+	            a.is_buy AS "isBuy",
+	            a.is_experience  AS "isExperience" ,
+	            a.is_forebuy  AS "isForeBuy",
+	            a.is_foreexperience  AS "isForeExperience",
+	            a.is_foreexperience_date AS "isForeexperienceDate",
+	            a.sell_num AS "sellNum",
+	            a.create_by AS "createBy",
+	            a.create_date AS "createDate",
+	            a.update_by AS "updateBy",
+	            a.update_date AS "updateDate",
+	            a.remarks AS "remarks",
+	            a.del_flag AS "delFlag",
+	            whp.stock_normal AS 'stockNormal',
+	            concat(h.name,'-',ar.name,'-',c.code,'-',wp.code) AS 'fullWareplace'
+	        FROM lgt_ps_produce a
+	        LEFT JOIN lgt_ps_goods g ON g.id = a.goods_id
+	        LEFT JOIN lgt_ps_wh_produce whp ON whp.produce_id = a.id
+	        LEFT JOIN lgt_ps_product t ON t.produce_id = a.id
+	        LEFT JOIN lgt_ps_wareplace wp ON wp.id = t.wareplace_id
+	        LEFT JOIN lgt_ps_warecounter c ON c.id = wp.warecounter_id
+	        LEFT JOIN lgt_ps_warearea ar ON ar.id = c.warearea_id
+	        LEFT JOIN lgt_ps_warehouse h ON h.id = ar.warehouse_id 
+	    	WHERE a.code = #{0} AND a.del_flag = 0
+		) ka 
+		GROUP BY ka.code
+    </select>
+    
+    
+    <resultMap type="Produce" id="searchByWareplaceMap">
+        <result column="goods.id"  property="goods.id"/>
+        <result column="goods.name"  property="goods.name"/>
+        <result column="goods.code"  property="goods.code"/>
+        <result column="name"  property="name"/>
+        <result column="title" property="title"/>
+        <result column="code"  property="code"/>
+        <result column="fullWareplace"  property="fullWareplace"/>
+        <result column="stockNormal"  property="stockNormal"/>
+    </resultMap>
+    <!-- 根据货位编码获取相关的具体货位位置存放的产品信息及可用库存量 -->
+    <select id="searchByWareplace" resultMap="searchByWareplaceMap">
+        SELECT 
+			g.id AS 'goods.id', 
+			g.name AS 'goods.name', 
+            g.code AS "goods.code",
+			p.name AS 'name',
+			p.title AS 'title',
+			p.code AS "code", 
+			p.factory_code AS "factoryCode",
+			concat(h.name,'-',ar.name,'-',c.code,'(',wp.code,')') AS 'fullWareplace', 
+			count(p.id) AS 'stockNormal' ,
+			p.create_by AS "createBy",
+            p.create_date AS "createDate",
+            p.update_by AS "updateBy",
+            p.update_date AS "updateDate",
+            p.remarks AS "remarks"
+		FROM lgt_ps_produce p
+		LEFT JOIN lgt_ps_goods g ON p.goods_id = g.id
+		LEFT JOIN lgt_ps_product t ON t.goods_id = g.id
+		LEFT JOIN lgt_ps_wareplace wp ON wp.id = t.wareplace_id
+		LEFT JOIN lgt_ps_warecounter c ON c.id = wp.warecounter_id
+		LEFT JOIN lgt_ps_warearea ar ON ar.id = c.warearea_id
+		LEFT JOIN lgt_ps_warehouse h ON h.id = ar.warehouse_id 
+		WHERE wp.code = #{fullWareplace} AND p.del_flag = 0
+		GROUP BY wp.code, p.code
+		ORDER BY g.code DESC, p.code DESC
+    </select>
+    
+    <!-- 根据商品ID获取对应的产品规格信息及产品对应的存放货位和可用库存数量 -->
+    <select id="getFullProduceWithStockAndLocateByGoods" resultType="Produce">
+        SELECT
+		    ka.name AS 'name',
+		    ka.title AS 'title',
+		    ka.code AS 'code',
+		    ka.factoryCode AS 'factoryCode',
+		    sum(ka.stockNormal) AS 'stockNormal',
+		    GROUP_CONCAT(ka.fullWareplace) AS 'fullWareplace'
+		FROM
+		    (
+		        SELECT DISTINCT
+		            a. NAME AS 'name',
+		            a.title AS 'title',
+		            a. CODE AS 'code',
+		            a.factory_code AS 'factoryCode',
+		            wpe.stock_normal AS 'stockNormal',
+		            concat(
+		                h. NAME,
+		                '-',
+		                ar. NAME,
+		                '-',
+		                c. CODE,
+		                '-',
+		                wp. CODE
+		            ) AS 'fullWareplace'
+		        FROM
+		            lgt_ps_produce a
+		        LEFT JOIN lgt_ps_wh_produce wpe ON wpe.produce_id = a.id
+		        LEFT JOIN lgt_ps_product t ON t.produce_id = a.id
+		        LEFT JOIN lgt_ps_wareplace wp ON wp.id = t.wareplace_id
+		        LEFT JOIN lgt_ps_warecounter c ON c.id = wp.warecounter_id
+		        LEFT JOIN lgt_ps_warearea ar ON ar.id = c.warearea_id
+		        LEFT JOIN lgt_ps_warehouse h ON h.id = ar.warehouse_id
+		        WHERE
+		            a.goods_id = #{0} 
+		        AND a.del_flag = 0
+		    ) ka
+		GROUP BY ka.code
+    </select>
+	<!-- Wap  Select Interface End -->
+	
+	<update id="updateProducePropertyStrAndSkuStr">
+	   update lgt_ps_produce set property_str = #{propertyStr}, property_sku_str = #{propertySkuStr} where id = #{id}
+	</update>
+	
+	<select id="countByGoods" resultType="int">
+		SELECT COUNT(1) FROM lgt_ps_produce WHERE goods_id = #{goodsId}
+	</select>
+	
+</mapper>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.msg.dao.um.UmMessageDao">
+    
+	<sql id="umMessageColumns">
+		a.id AS "id",
+		a.category AS "category",
+		a.type AS "type",
+		a.send_user_id AS "sendUser.id",
+		s.name AS "sendUser.name",
+		a.title AS "title",
+		a.content AS "content",
+		a.receive_user_id AS "receiveUser.id",
+		a.status AS "status",
+		a.push_time AS "pushTime",
+		a.view_time AS "viewTime",
+		a.del_flag_receive AS "delFlagReceive",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="umMessageJoins">
+		LEFT JOIN sys_user s ON s.id = a.send_user_id
+	</sql>
+    
+	<select id="get" resultType="UmMessage">
+		SELECT 
+			<include refid="umMessageColumns"/>
+		FROM msg_um_message a
+		<include refid="umMessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UmMessage">
+		SELECT 
+			<include refid="umMessageColumns"/>
+		FROM msg_um_message a
+		<include refid="umMessageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="category != null and category != ''">
+				AND a.category = #{category}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="sendUser != null and sendUser.id != null and sendUser.id != ''">
+				AND a.send_user_id = #{sendUser.id}
+			</if>
+			<if test="title != null and title != ''">
+				AND ( a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+					OR
+					a.content LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+					)
+			</if>
+			<if test="receiveUser != null and receiveUser.id != null and receiveUser.id != ''">
+				AND a.receive_user_id = #{receiveUser.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="beginPushTime != null and endPushTime != null and beginPushTime != '' and endPushTime != ''">
+				AND a.push_time BETWEEN #{beginPushTime} AND #{endPushTime}
+			</if>
+			<if test="beginViewTime != null and endViewTime != null and beginViewTime != '' and endViewTime != ''">
+				AND a.view_time BETWEEN #{beginViewTime} AND #{endViewTime}
+			</if>
+			<!-- 收件人删除标志，主要用于 -->
+			<if test="delFlagReceive != null and delFlagReceive !='' and delFlagReceive != 0">
+			     AND a.del_flag_receive != #{delFlagReceive}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UmMessage">
+		SELECT 
+			<include refid="umMessageColumns"/>
+		FROM msg_um_message a
+		<include refid="umMessageJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllMyList" resultType="UmMessage">
+	   SELECT 
+            <include refid="umMessageColumns"/>
+        FROM msg_um_message a
+        <include refid="umMessageJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.del_flag_receive = #{DEL_FLAG_RECEIVE_NORMAL}
+            <if test="sendUser != null and sendUser.id != null and sendUser.id != '' and receiveUser != null and receiveUser.id != null and receiveUser.id != ''">
+                AND ( a.send_user_id = #{sendUser.id} or a.receive_user_id = #{receiveUser.id} )
+            </if>
+        </where>        
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO msg_um_message(
+			id,
+			category,
+			type,
+			send_user_id,
+			title,
+			content,
+			receive_user_id,
+			status,
+			push_time,
+			view_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			del_flag_receive
+		) VALUES (
+			#{id},
+			#{category},
+			#{type},
+			#{sendUser.id},
+			#{title},
+			#{content},
+			#{receiveUser.id},
+			#{status},
+			#{pushTime},
+			#{viewTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{delFlagReceive}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE msg_um_message SET 	
+			category = #{category},
+			type = #{type},
+			send_user_id = #{sendUser.id},
+			title = #{title},
+			content = #{content},
+			receive_user_id = #{receiveUser.id},
+			status = #{status},
+			push_time = #{pushTime},
+			view_time = #{viewTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag_receive = #{delFlagReceive}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="view">
+		UPDATE msg_um_message SET 	
+			status = #{status},
+			view_time = #{viewTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE msg_um_message SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="deleteUmMessageByReceive">
+	   UPDATE msg_um_message SET 
+	       del_flag_receive = #{delFlagReceive}
+	   WHERE id = #{id}
+	</update>
+	
+	
+	<select id="findMyPageByUser" parameterType="map" resultType="UmMessage">
+		SELECT a.id AS "id",
+			   a.title AS "title",
+			   a.content AS "content",
+			   a.push_time AS "pushTime",
+			   a.status AS "status"
+		  FROM msg_um_message a
+		 WHERE a.receive_user_id = #{sysUserId}
+		   <if test="category != null and category != '' ">
+		   		AND a.category = #{category}
+		   </if>
+		   <if test="type != null and type != '' ">
+		   		AND a.type = #{type}
+		   </if>
+		   <if test="status != null and status != '' ">
+		   		AND a.status = #{status}
+		   </if>
+		   AND a.del_flag = '0'
+		   AND a.del_flag_receive = '0'
+	</select>
+	
+	<select id="countNotReadMessage" parameterType="String" resultType="int">
+		SELECT count(1) from msg_um_message where receive_user_id = #{receiveUserId} and status = '0'
+	</select>
+	
+</mapper>

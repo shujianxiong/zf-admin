@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.mi.AddressDao">
+    
+	<sql id="addressColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		b.usercode AS "member.usercode",
+		b.name AS "member.name",
+		a.sys_area_id AS "sysArea.id",
+		a.address_detail AS "addressDetail",
+		a.zip_code AS "zipCode",
+		a.receive_name AS "receiveName",
+		a.receive_tel AS "receiveTel",
+		a.default_flag AS "defaultFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="addressJoins">
+		LEFT JOIN crm_mi_member b ON b.id = a.member_id
+	</sql>
+    
+	<select id="get" resultType="Address">
+		SELECT 
+			<include refid="addressColumns"/>
+		FROM crm_mi_address a
+		<include refid="addressJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findByMember" parameterType="String" resultType="Address">
+		SELECT 
+			<include refid="addressColumns"/>
+		FROM crm_mi_address a
+		<include refid="addressJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.member_id = #{memberId}
+		</where>
+		ORDER BY a.default_flag DESC, a.create_date DESC
+	</select>
+	
+	<select id="findList" resultType="Address">
+		SELECT 
+			<include refid="addressColumns"/>
+		FROM crm_mi_address a
+		<include refid="addressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (b.usercode LIKE
+						<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				    OR
+				    b.name LIKE 
+				    	<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Address">
+		SELECT 
+			<include refid="addressColumns"/>
+		FROM crm_mi_address a
+		<include refid="addressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findDefaultByMember" parameterType="String" resultType="Address">
+		SELECT 
+			<include refid="addressColumns"/>
+		FROM crm_mi_address a
+		<include refid="addressJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.default_flag = '1'
+			AND a.member_id = #{memberId}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_mi_address(
+			id,
+			member_id,
+			sys_area_id,
+			address_detail,
+			zip_code,
+			receive_name,
+			receive_tel,
+			default_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{sysArea.id},
+			#{addressDetail},
+			#{zipCode},
+			#{receiveName},
+			#{receiveTel},
+			#{defaultFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mi_address SET 	
+			member_id = #{member.id},
+			sys_area_id = #{sysArea.id},
+			address_detail = #{addressDetail},
+			zip_code = #{zipCode},
+			receive_name = #{receiveName},
+			receive_tel = #{receiveTel},
+			default_flag = #{defaultFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mi_address SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 查询默认地址条数 -->
+	<select id="countByMember" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) 
+		FROM crm_mi_address a
+		<where>
+			a.member_id = #{memberId}
+			AND a.default_flag = '1'
+		</where>
+	</select>
+	
+	<!-- 将会员默认地址全部改成非默认 -->
+	<select id="updateByMember" parameterType="String">
+		UPDATE crm_mi_address a
+		set default_flag = '0',update_date = now()
+		<where>
+			a.member_id = #{memberId}
+			and default_flag = '1'
+		</where>
+	</select>
+	
+</mapper>

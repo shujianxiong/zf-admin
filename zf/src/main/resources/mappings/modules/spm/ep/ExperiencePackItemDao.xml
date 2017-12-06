@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ep.ExperiencePackItemDao">
+    
+	<sql id="experiencePackItemColumns">
+		a.id AS "id",
+		a.no AS "no",
+		a.member_id AS "member.id",
+		a.experience_pack_id AS "experiencePack.id",
+		a.pay_type AS "payType",
+		a.pay_time AS "payTime",
+		a.pay_money AS "payMoney",
+		a.openid AS "openid",
+		a.return_result AS "returnResult",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.use_times AS "useTimes",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="experiencePackItemJoins">
+		LEFT JOIN crm_mi_member m on m.id=a.member_id
+	</sql>
+    
+	<select id="get" resultType="ExperiencePackItem">
+		SELECT 
+			<include refid="experiencePackItemColumns"/>
+		FROM spm_ep_experience_pack_item a
+		<include refid="experiencePackItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ExperiencePackItem">
+		SELECT
+			p.name AS "experiencePack.name",
+			<include refid="experiencePackItemColumns"/>
+		FROM spm_ep_experience_pack_item a
+		JOIN spm_ep_experience_pack p   ON p.id = a.experience_pack_id
+		<include refid="experiencePackItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="member != null  and member.usercode != null and member.usercode != ''">
+				AND m.usercode = #{member.usercode}
+			</if>
+			<if test="member != null  and member.id != null and member.id != ''">
+				AND m.id = #{member.id}
+			</if>
+			<if test="payType != null  and  payType != ''">
+				AND a.pay_type = #{payType}
+			</if>
+			<if test="status != null   and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="id != null   and id != ''">
+				AND a.id = #{id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ExperiencePackItem">
+		SELECT 
+			<include refid="experiencePackItemColumns"/>
+		FROM spm_ep_experience_pack_item a
+		<include refid="experiencePackItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_ep_experience_pack_item(
+			id,
+			no,
+			member_id,
+			experience_pack_id,
+			pay_type,
+			pay_time,
+			pay_money,
+			openid,
+			return_result,
+			start_date,
+			end_date,
+			use_times,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{no},
+			#{member.id},
+			#{experiencePack.id},
+			#{payType},
+			#{payTime},
+			#{payMoney},
+			#{openid},
+			#{returnResult},
+			#{startDate},
+			#{endDate},
+			#{useTimes},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ep_experience_pack_item SET 	
+			no = #{no},
+			member_id = #{member.id},
+			experience_pack_id = #{experiencePack.id},
+			pay_type = #{payType},
+			pay_time = #{payTime},
+			pay_money = #{payMoney},
+			openid = #{openid},
+			return_result = #{returnResult},
+			start_date = #{startDate},
+			end_date = #{endDate},
+			use_times = #{useTimes},
+			status =#{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateBatch">
+		UPDATE spm_ep_experience_pack_item SET
+		status =#{status},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE <![CDATA[date(end_date) <= date_sub(curdate(),interval 1 day)]]>
+	</update>
+	<update id="delete">
+		UPDATE spm_ep_experience_pack_item SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="getByMemberAndType" resultType="ExperiencePackItem">
+		SELECT
+		a.id AS "id",
+		a.no AS "no",
+		a.member_id AS "member.id",
+		a.experience_pack_id AS "experiencePack.id",
+		a.pay_type AS "payType",
+		a.pay_time AS "payTime",
+		a.pay_money AS "payMoney",
+		a.openid AS "openid",
+		a.return_result AS "returnResult",
+		a.start_date AS "startDate",
+		a.end_date AS "endDate",
+		a.use_times AS "useTimes",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		m.usercode AS "member.usercode",
+
+		b.type AS "experiencePack.type",
+		b.summary AS "experiencePack.summary",
+		b.price AS "experiencePack.price",
+		b.persons AS "experiencePack.persons",
+		b.discount_scale AS "experiencePack.discountScale",
+		b.express_money AS "experiencePack.expressMoney",
+		b.days AS "experiencePack.days",
+		b.active_flag AS "experiencePack.activeFlag",
+
+		a.del_flag AS "delFlag"
+		FROM spm_ep_experience_pack_item a
+		<include refid="experiencePackItemJoins"/>
+		JOIN spm_ep_experience_pack b ON  a.experience_pack_id = b.id
+		WHERE a.experience_pack_id = #{experiencePackId}  AND b.active_flag = 1
+		<if test="type != null  and type != ''">
+			AND b.type = #{type}
+		</if>
+		<if test="status != null  and status != ''">
+			AND a.status = #{status}
+		</if>
+		<if test="orderTime != null  and orderTime != ''">
+			AND #{orderTime} BETWEEN a.start_date AND a.end_date
+		</if>
+		Limit 1
+	</select>
+	<select id="getByMember" resultType="ExperiencePackItem">
+		SELECT
+		a.id AS "id",
+		a.no AS "no",
+		a.member_id AS "member.id",
+		a.use_times AS "useTimes",
+		a.experience_pack_id AS "experiencePack.id",
+		b.type AS "experiencePack.type",
+		b.summary AS "experiencePack.summary",
+		b.name AS "experiencePack.name",
+		b.persons AS "experiencePack.persons",
+		b.discount_scale AS "experiencePack.discountScale",
+		b.express_money AS "experiencePack.expressMoney",
+		b.days AS "experiencePack.days",
+		b.active_flag AS "experiencePack.activeFlag",
+		b.discount_scale AS "experiencePack.discountScale",
+		b.times AS "experiencePack.times"
+		FROM spm_ep_experience_pack_item a
+		JOIN spm_ep_experience_pack b ON a.experience_pack_id = b.id
+		WHERE a.member_id = #{memberId}
+		AND a.status = #{status}
+		AND CURDATE() BETWEEN a.start_date AND a.end_date
+		Limit 1
+	</select>
+	<select id="getByEp" resultType="ExperiencePackItem">
+		SELECT
+		a.id AS "id",
+		a.no AS "no",
+		a.member_id AS "member.id",
+		a.use_times AS "useTimes",
+		a.experience_pack_id AS "experiencePack.id",
+		b.discount_scale AS "experiencePack.discountScale",
+		b.times AS "experiencePack.times"
+		FROM spm_ep_experience_pack_item a
+		JOIN spm_ep_experience_pack b ON a.experience_pack_id = b.id
+		WHERE a.experience_pack_id = #{experiencePackId}
+		AND a.status = #{status}
+		AND #{orderTime} BETWEEN a.start_date AND a.end_date
+		Limit 1
+	</select>
+	<select id="findListOverdue" resultType="ExperiencePackItem">
+		SELECT
+		<include refid="experiencePackItemColumns"/>
+		FROM spm_ep_experience_pack_item a
+		<include refid="experiencePackItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND  <![CDATA[a.end_date <= now()]]>
+		</where>
+	</select>
+</mapper>

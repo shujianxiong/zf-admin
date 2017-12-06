@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.dp.DispatchMissionDao">
+    
+    <resultMap id="DispatchMissionWithChidResult" type="com.chinazhoufan.admin.modules.lgt.entity.dp.DispatchMission">
+    	<result property="id"                  				column="id"/>
+    	<result property="batchNo"    						column="batchNo"/>
+    	<result property="reasonType"    					column="reasonType"/>
+    	<result property="missionStatus"    				column="missionStatus"/>
+    	<result property="inWarehouse.id"    				column="inWarehouse.id"/>
+    	<result property="inWarehouse.name"    				column="inWarehouse.name"/>
+    	<result property="inUser.id"    					column="inUser.id"/>
+    	<result property="missionCode"    					column="missionCode"/>
+  		<result property="businessType"    					column="businessType"/>
+    	<result property="approveStatus"    				column="approveStatus"/>
+    	<result property="startBy.id"    					column="startBy.id"/>
+    	<result property="startTime"    					column="startTime"/>
+    	<result property="limitTime"    					column="limitTime"/>
+    	<result property="delayCount"    					column="delayCount"/>
+    	<result property="endTime"    						column="endTime"/>
+    	<result property="createBy.id" 						column="createBy.id"/>
+		<result property="createDate" 						column="createDate"/>
+		<result property="updateBy.id" 						column="updateBy.id"/>
+		<result property="updateDate" 						column="updateDate"/>
+		<result property="remarks" 							column="remarks"/>
+		<result property="delFlag" 							column="delFlag"/>
+    	<collection property="dispatchProduceList" ofType="DispatchProduce">
+			<result property="id" 						column="b.id"/>
+			<result property="produce.id" 				column="produce.id"/>
+			<result property="produce.name"	 			column="produce.name"/>
+			<result property="status" 					column="b.status"/>
+			<result property="planNum" 					column="b.planNum"/>
+			<result property="actualNum" 				column="b.actualNum"/>
+		</collection>
+    </resultMap>
+    
+    <resultMap id="DispatchMissionWithProductChidResult" type="com.chinazhoufan.admin.modules.lgt.entity.dp.DispatchMission">
+    	<result property="id"                  	column="id"/>
+    	<result property="batchNo"    			column="batchNo"/>
+    	<result property="reasonType"    		column="reasonType"/>
+    	<result property="missionStatus"    	column="missionStatus"/>
+    	<result property="inWarehouse.id"    	column="inWarehouse.id"/>
+    	<result property="inWarehouse.name"    	column="inWarehouse.name"/>
+    	<result property="inUser.id"    		column="inUser.id"/>
+    	<result property="missionCode"    		column="missionCode"/>
+  		<result property="businessType"    		column="businessType"/>
+    	<result property="approveStatus"    	column="approveStatus"/>
+    	<result property="startBy.id"    		column="startBy.id"/>
+    	<result property="startTime"    		column="startTime"/>
+    	<result property="limitTime"    		column="limitTime"/>
+    	<result property="delayCount"    		column="delayCount"/>
+    	<result property="endTime"    			column="endTime"/>
+    	<result property="createBy.id" 			column="createBy.id"/>
+		<result property="createDate" 			column="createDate"/>
+		<result property="updateBy.id" 			column="updateBy.id"/>
+		<result property="updateDate" 			column="updateDate"/>
+		<result property="remarks" 				column="remarks"/>
+		<result property="delFlag" 				column="delFlag"/>
+		<collection property="dispatchProduceList" ofType="DispatchProduce">
+			<result property="id" 						column="b.id"/>
+			<result property="produce.id" 				column="produce.id"/>
+			<result property="produce.name"	 			column="produce.name"/>
+			<result property="status" 					column="b.status"/>
+			<result property="planNum" 					column="b.planNum"/>
+			<result property="actualNum" 				column="b.actualNum"/>
+		</collection>
+    	<collection property="dispatchProductList" ofType="DispatchProduct">
+    		<result property="id" 						column="dispatchProductId"/>
+			<result property="product.id" 				column="pct.id"/>
+			<result property="product.goods.id"	 		column="pct.goods_id"/>
+			<result property="product.code" 			column="pct.code"/>
+			<result property="product.factoryCode" 		column="pct.factory_code"/>
+			<result property="product.certificateNo"	column="pct.certificate_no"/>
+			<result property="product.status" 			column="pct.status"/>
+			<result property="product.weight" 			column="pct.weight"/>
+		</collection>
+    </resultMap>
+    
+    <!-- 发布任务部分 -->
+	<sql id="dispatchMissionColumns">
+		a.id AS "id",
+		a.batch_no AS "batchNo",
+		a.mission_status AS "missionStatus",
+		a.create_date AS "createDate",
+		a.reason_type AS "reasonType",
+		c.name AS "outWarehouse.name",
+		o.id AS "dispatchOrder.id",
+		o.out_user_id AS "outUser.id",
+		o.order_status AS "dispatchOrder.orderStatus",
+		a.in_warehouse_id AS "inWarehouse.id",
+		d.name AS "inWarehouse.name",
+		a.in_user_id AS "inUser.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		o.post_type AS "dispatchOrder.postType",
+		o.post_user_id AS "dispatchOrder.postUserId.id",
+		o.post_no AS "dispatchOrder.postNo",
+		o.post_company AS "dispatchOrder.postCompany",
+		o.poster_name AS "dispatchOrder.posterName",
+		o.poster_tel AS "dispatchOrder.posterTel",
+		<!-- 查询父任务 -->
+		f.mission_code AS "missionCode",
+		f.business_type AS "businessType",
+		f.approve_status AS "approveStatus",
+		f.start_by AS "startBy.id",
+		f.start_time AS "startTime",
+		f.limit_time AS "limitTime",
+		f.delay_count AS "delayCount",
+		f.end_time AS "endTime"
+	</sql>
+	
+	<sql id="dispatchMissionJoins">
+		LEFT JOIN bas_mission f ON f.id = a.id
+		LEFT JOIN lgt_dp_dispatch_order o ON o.mission_id = f.id
+		LEFT JOIN lgt_ps_warehouse c ON c.id = o.out_warehouse_id
+		LEFT JOIN lgt_ps_warehouse d ON d.id = a.in_warehouse_id
+	</sql>
+    
+    <!-- 发布任务部分 -->
+	<sql id="getByChildIdColumns">
+		a.id AS "id",
+		a.mission_status AS "missionStatus",
+		a.create_date AS "createDate",
+		a.reason_type AS "reasonType",
+		e.name AS "outWarehouse.name",
+		a.in_warehouse_id AS "inWarehouse.id",
+		d.name AS "inWarehouse.name",
+		a.in_user_id AS "inUser.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		<!-- 查询父任务 -->
+		f.business_type AS "businessType",
+		f.approve_status AS "approveStatus",
+		f.start_by AS "startBy.id",
+		f.start_time AS "startTime",
+		f.limit_time AS "limitTime",
+		f.delay_count AS "delayCount",
+		f.end_time AS "endTime",
+		<!-- 查询子对象 -->
+		b.id AS "b.id",
+		c.id AS "produce.id",
+		c.name AS "produce.name",
+		b.plan_num AS "b.planNum",
+		b.actual_num AS "b.actualNum"
+		
+	</sql>
+    
+    <sql id="getByChildIdJoins">
+		LEFT JOIN lgt_dp_dispatch_order o ON o.mission_id = a.id
+		LEFT JOIN lgt_dp_dispatch_produce b ON b.dispatch_order_id = o.id
+		LEFT JOIN lgt_ps_produce c ON c.id=b.produce_id
+		LEFT JOIN lgt_ps_warehouse e ON e.id = o.out_warehouse_id
+		LEFT JOIN lgt_ps_warehouse d ON d.id = a.in_warehouse_id
+		LEFT JOIN bas_mission f ON f.id = a.id
+	</sql>
+	
+	<sql id="getMissionWithProductAndProduceColumns">
+		<!--  调货（父+子）任务字段 -->
+		a.id AS "id",
+		a.mission_status AS "missionStatus",
+		a.create_date AS "createDate",
+		a.reason_type AS "reasonType",
+		e.name AS "outWarehouse.name",
+		a.in_warehouse_id AS "inWarehouse.id",
+		d.name AS "inWarehouse.name",
+		a.in_user_id AS "inUser.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		<!--  基础任务字段 -->
+		f.business_type AS "businessType",
+		f.approve_status AS "approveStatus",
+		f.start_by AS "startBy.id",
+		f.start_time AS "startTime",
+		f.limit_time AS "limitTime",
+		f.delay_count AS "delayCount",
+		f.end_time AS "endTime",
+		<!--  #调货单物流信息字段 -->
+		o.id, 
+		o.order_status, 
+		o.post_type, 
+		o.post_user_id, 
+		o.post_no, 
+		o.post_company, 
+		o.poster_name, 
+		o.poster_tel, 
+		o.post_start_time, 
+		o.post_end_time,
+		<!--  #调货产品相关字段 -->
+		b.id AS "b.id",	
+		c.id AS "produce.id",
+		c.name AS "produce.name",	
+		b.plan_num AS "b.planNum",
+		b.actual_num AS "b.actualNum",
+		<!--  #调货货品相关字段 -->
+		pro.id AS "dispatchProductId",
+		pct.id AS "pct.id", 
+		pct.goods_id AS "pct.goods_id", 
+		pct.`code` AS "pct.code", 
+		pct.factory_code AS "pct.factory_code", 
+		pct.certificate_no AS "pct.certificate_no", 
+		pct.hold_user_id AS "pct.hold_user_id", 
+		pct.wareplace_id AS "pct.wareplace_id", 
+		pct.`status` AS "pct.status", 
+		pct.weight AS "pct.weight"
+	</sql>
+	
+	<sql id="getMissionWithProductAndProduceJoins">
+		LEFT JOIN lgt_dp_dispatch_order o ON o.mission_id = a.id
+		LEFT JOIN lgt_dp_dispatch_produce b ON b.dispatch_order_id = o.id
+		LEFT JOIN lgt_dp_dispatch_product pro ON pro.dispatch_produce_id = b.id
+		LEFT JOIN lgt_ps_product pct ON pct.id = pro.product_id
+		LEFT JOIN lgt_ps_produce c ON c.id=b.produce_id
+		LEFT JOIN lgt_ps_warehouse e ON e.id = o.out_warehouse_id
+		LEFT JOIN lgt_ps_warehouse d ON d.id = a.in_warehouse_id
+		LEFT JOIN bas_mission f ON f.id = a.id
+	</sql>
+	
+	<!-- 发布任务部分 -->
+	<sql id="getByIdColumns">
+		a.id AS "id",
+		a.mission_status AS "missionStatus",
+		a.create_date AS "createDate",
+		a.reason_type AS "reasonType",
+		a.in_warehouse_id AS "inWarehouse.id",
+		d.name AS "inWarehouse.name",
+		a.in_user_id AS "inUser.id",
+		s.name AS "inUser.name",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		<!-- 查询父任务 -->
+		f.start_by AS "startBy.id",
+		f.business_type AS "businessType",
+		f.approve_status AS "approveStatus",
+		f.start_time AS "startTime",
+		f.limit_time AS "limitTime",
+		f.end_time AS "endTime"
+	</sql>
+    
+    <sql id="getByIdJoins">
+    	LEFT JOIN lgt_ps_warehouse d ON d.id = a.in_warehouse_id
+		LEFT JOIN bas_mission f ON f.id = a.id
+		LEFT JOIN sys_user s ON s.id = a.in_user_id
+	</sql>
+    
+	<select id="get" resultType="DispatchMission">
+		SELECT 
+			<include refid="getByIdColumns"/>
+		FROM lgt_dp_dispatch_mission a
+		<include refid="getByIdJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByChildId" resultMap="DispatchMissionWithChidResult">
+		SELECT
+			<include refid="getByChildIdColumns"/>
+		FROM lgt_dp_dispatch_mission a
+		<include refid="getByChildIdJoins"/>
+		<where>
+			a.id=#{id}
+		</where>
+	</select>
+	
+	<!-- 根据调货单ID获取，关联的任务信息，调货产品信息，调货货品信息 -->
+	<select id="getMissionWithProductAndProduceById" resultMap="DispatchMissionWithProductChidResult">
+		SELECT 
+			<include refid="getMissionWithProductAndProduceColumns" />
+		FROM lgt_dp_dispatch_mission a
+			<include refid="getMissionWithProductAndProduceJoins" />
+		<where>
+			o.id = #{dispatchOrder.id} AND a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+	
+	<!-- 待入库查询，根据调货单ID获取对应的货品信息 -->
+	<select id="findMissionWithProductAndProduceBySearchParam"  resultMap="DispatchMissionWithProductChidResult">
+		SELECT 
+			<include refid="getMissionWithProductAndProduceColumns" />
+		FROM lgt_dp_dispatch_order a
+			<include refid="getMissionWithProductAndProduceJoins" />
+		<where>
+			a.id = #{id} AND a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+	
+	<select id="findList" resultType="DispatchMission">
+		SELECT 
+			<include refid="dispatchMissionColumns"/>
+		FROM lgt_dp_dispatch_mission a
+		<include refid="dispatchMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND o.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="reasonType != null and reasonType != ''">
+				AND a.reason_type = #{reasonType}
+			</if>
+			<if test="missionStatus != null and missionStatus != ''">
+				AND a.mission_status = #{missionStatus}
+			</if>
+			<if test="approveStatus != null and approveStatus != ''">
+				AND f.approve_status = #{approveStatus}
+			</if>
+			<if test="startBy != null and startBy.id != ''">
+				AND f.start_by = #{startBy.id}
+			</if>
+			<if test="dispatchOrder != null and dispatchOrder.orderStatus">
+				AND o.order_status = #{dispatchOrder.orderStatus}
+			</if>
+			<if test="outUser != null and outUser.id != ''">
+				AND o.out_user_id = #{outUser.id}
+			</if>
+			<if test="inUser != null and inUser.id != ''">
+				AND a.in_user_id = #{inUser.id}
+			</if>
+			<if test="businessType != null and businessType != ''">
+				AND f.business_type =#{businessType}
+			</if>
+			<if test="approveUser != null and approveUser.id != ''">
+				AND f.approve_user_id =#{approveUser.id}
+			</if>
+			GROUP BY f.mission_code
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DispatchMission">
+		SELECT 
+			<include refid="dispatchMissionColumns"/>
+		FROM lgt_dp_dispatch_mission a
+		<include refid="dispatchMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND o.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findPageOutUserList" resultType="DispatchMission">
+		SELECT 
+			<include refid="dispatchMissionColumns"/>
+		FROM lgt_dp_dispatch_mission a
+		<include refid="dispatchMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND o.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="reasonType != null and reasonType != ''">
+				AND a.reason_type = #{reasonType}
+			</if>
+			<if test="missionStatus != null and missionStatus != ''">
+				AND a.mission_status in ('2','3')
+			</if>
+			<if test="approveStatus != null and approveStatus != ''">
+				AND f.approve_status = #{approveStatus}
+			</if>
+			<if test="startBy != null and startBy.id != ''">
+				AND f.start_by = #{startBy.id}
+			</if>
+			<if test="dispatchOrder != null and dispatchOrder.orderStatus != null">
+				AND o.order_status = #{dispatchOrder.orderStatus}
+			</if>
+			<if test="outUser != null and outUser.id != ''">
+				AND o.out_user_id = #{outUser.id}
+			</if>
+			<if test="inUser != null and inUser.id != ''">
+				AND a.in_user_id = #{inUser.id}
+			</if>
+			<if test="businessType != null and businessType != ''">
+				AND f.business_type =#{businessType}
+			</if>
+			<if test="approveUser != null and approveUser.id != ''">
+				AND f.approve_user_id =#{approveUser.id}
+			</if>
+			GROUP BY f.mission_code
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<!-- 根据任务ID，获取任务明细  START-->
+	<resultMap type="com.chinazhoufan.admin.modules.lgt.entity.dp.DispatchMission" id="dispatchMissionWithDetailAll">
+		<!-- mission对象 -->
+		<result property="id"                  				column="id"/>
+    	<result property="batchNo"    						column="batchNo"/>
+    	<result property="reasonType"    					column="reasonType"/>
+    	<result property="missionStatus"    				column="missionStatus"/>
+    	<result property="inWarehouse.id"    				column="inWarehouse.id"/>
+    	<result property="inWarehouse.name"    				column="inWarehouse.name"/>
+    	<result property="inUser.id"    					column="inUser.id"/>
+    	<result property="inUser.name"                      column="inUser.name"/>
+    	<result property="missionCode"    					column="missionCode"/>
+  		<result property="businessType"    					column="businessType"/>
+    	<result property="approveStatus"    				column="approveStatus"/>
+    	<result property="startTime"    					column="startTime"/>
+    	<result property="limitTime"    					column="limitTime"/>
+    	<result property="delayCount"    					column="delayCount"/>
+    	<result property="endTime"    						column="endTime"/>
+    	<result property="startBy.id"                       column="startBy.id"/>
+    	<result property="startBy.name"                     column="startBy.name"/>
+		<result property="remarks" 							column="remarks"/>
+		
+		<!-- 关联调货单记录 -->
+		<collection property="dispatchOrderList" ofType="DispatchOrder">
+			<result property="id"                    column="dispatchOrder.id"/>
+			<result property="outWarehouse.id"       column="dispatchOrder.outWarehouse.id"/>
+			<result property="outWarehouse.name"     column="dispatchOrder.outWarehouse.name"/>
+			<result property="outWarehouse.responsibleUser.id"    column="dispatchOrder.outWarehouse.responsibleUser.id"/>
+			<result property="outWarehouse.responsibleUser.name"  column="dispatchOrder.outWarehouse.responsibleUser.name"/>
+			<result property="outWarehouse.responsibleMobile"     column="dispatchOrder.outWarehouse.responsibleMobile"/>
+			
+			<result property="outUser.id"            column="dispatchOrder.outUser.id"/>
+			<result property="outUser.name"          column="dispatchOrder.outUser.name"/>
+			<result property="orderStatus"           column="dispatchOrder.orderStatus"/>
+			<result property="postType"              column="dispatchOrder.postType"/>
+			<result property="postUserId.id"         column="dispatchOrder.postUserId.id"/>
+			<result property="postUserId.name"       column="dispatchOrder.postUserId.name"/>
+			<result property="postCompany"           column="dispatchOrder.postCompany"/>
+			<result property="postNo"                column="dispatchOrder.postNo"/>
+			<result property="posterName"            column="dispatchOrder.posterName"/>
+			<result property="posterTel"             column="dispatchOrder.posterTel"/>
+			<result property="postStartTime"         column="dispatchOrder.postStartTime"/>
+			<result property="postEndTime"           column="dispatchOrder.postEndTime"/>
+			
+			<!-- 调拨产品记录 -->
+			<collection property="dispatchProduceList"      ofType="DispatchProduce">
+				<result property="id" 						column="dispatchProduce.id"/>
+				<result property="produce.id" 				column="dispatchProduce.produce.id"/>
+				<result property="produce.code"     	 	column="dispatchProduce.produce.code"/>
+				<result property="produce.name"	 			column="dispatchProduce.produce.name"/>
+				<result property="planNum" 					column="planNum"/>
+				<result property="actualNum" 				column="actualNum"/>
+				
+				<!-- 调拨货品记录 -->
+		    	<collection property="dispatchProductList"     ofType="DispatchProduct">
+					<result property="product.id"                       column="product.id"/>
+					<result property="product.goods.id"	 	            column="product.goods.id"/>
+					<result property="product.code" 					column="product.code"/>
+					<result property="product.factoryCode" 				column="product.factoryCode"/>
+					<result property="product.certificateNo" 			column="product.certificateNo"/>
+					<result property="product.status" 				    column="product.status"/>
+					<result property="product.weight"                   column="product.weight"/>
+					<result property="product.goods.name"          		column="product.goods.name"/>
+					<result property="product.goods.code"          		column="product.goods.code"/>
+					<result property="product.preWarehouseFullName"     column="product.preWarehouseFullName"/>
+					<result property="product.postWarehouseFullName"    column="product.postWarehouseFullName"/>
+				</collection>
+			</collection>
+			
+		</collection>
+		
+	</resultMap>
+
+	
+	<sql id="dispatchMissionWithDetailAllColumn">
+		<!-- ##调货任务父类基本信息  -->
+		f.mission_code AS "missionCode",
+		f.business_type AS "businessType",
+		f.approve_status AS "approveStatus",
+		f.start_by AS "startBy.id",
+		st.name AS "startBy.name", 
+		f.start_time AS "startTime",
+		f.end_time AS "endTime",
+		f.limit_time AS "limitTime",
+		f.delay_count AS "delayCount",
+		
+		<!-- ##调货任务基本信息  -->
+		m.id AS "id",
+		m.batch_no AS "batchNo",
+		m.reason_type AS "reasonType",
+		m.mission_status AS "missionStatus",
+		m.in_warehouse_id AS "inWarehouse.id",
+		c.name AS "inWarehouse.name",
+		m.in_user_id AS "inUser.id",
+		um.name AS "inUser.name",
+		m.remarks AS "remarks",
+		
+		<!-- ##调货单基本信息  -->
+		a.id AS "dispatchOrder.id",
+		a.order_status AS "dispatchOrder.orderStatus",
+		a.out_warehouse_id AS "dispatchOrder.outWarehouse.id",
+		d.name AS "dispatchOrder.outWarehouse.name",
+		d.responsible_user_id AS "dispatchOrder.outWarehouse.responsibleUser.id",
+		sd.name AS "dispatchOrder.outWarehouse.responsibleUser.name",
+		d.responsible_mobile AS "dispatchOrder.outWarehouse.responsibleMobile",
+		a.out_user_id AS "dispatchOrder.outUser.id",
+		u.name AS "dispatchOrder.outUser.name",
+		a.poster_name AS "dispatchOrder.posterName",
+		a.poster_tel AS "dispatchOrder.posterTel",
+		a.post_company AS "dispatchOrder.postCompany",
+		a.post_no AS "dispatchOrder.postNo",
+		a.post_type AS "dispatchOrder.postType",
+		a.post_user_id AS "dispatchOrder.postUserId.id",
+		ua.name AS "dispatchOrder.postUserId.name",
+		a.post_start_time AS "dispatchOrder.postStartTime",
+		a.post_end_time AS "dispatchOrder.postEndTime",
+		
+		<!-- ##调货产品信息详情  -->
+		e.id AS "dispatchProduce.id",
+		e.produce_id AS "dispatchProduce.produce.id",
+		p.code AS "dispatchProduce.produce.code",
+		concat(eg.name, p.name) AS "dispatchProduce.produce.name",
+		e.plan_num AS "planNum",
+		e.actual_num AS "actualNum",
+		e.remarks AS "remarks",
+		
+		<!-- ##调货货品信息详情  -->
+		t.id AS "product.id",
+		t.goods_id AS "product.goods.id",
+		t.code AS "product.code",
+		t.factory_code AS "product.factoryCode",
+		t.certificate_no AS "product.certificateNo",
+		t.status AS "product.status",
+		t.weight AS "product.weight",
+		t.wareplace_id AS "product.wareplace.id",
+		
+		g.name AS "product.goods.name",
+		g.code AS "product.goods.code",
+		
+		<!-- 货品货位变更信息 -->
+		<!-- CONCAT(wh2.name,' ', ar2.name,' ', wc2.code, ' ', wp2.code) AS "product.preWarehouseFullName",
+		CONCAT(wh.name,' ', ar.name,' ', wc.code, ' ', wp.code) AS "product.postWarehouseFullName" -->
+		
+		(SELECT CONCAT(wh.name,'  ', wa.name,'  ',wc.code,'  ', ap.code) AS FULLNAME	
+		FROM lgt_ps_wareplace ap
+		LEFT JOIN lgt_ps_warecounter wc ON wc.id=ap.warecounter_id
+		LEFT JOIN lgt_ps_warearea 	 wa ON wa.id=wc.warearea_id
+		LEFT JOIN lgt_ps_warehouse 	 wh ON wh.id=wa.warehouse_id
+		LEFT JOIN lgt_ps_produce 	 p  ON p.id=ap.produce_id
+		LEFT JOIN lgt_ps_product_wp_change wpc2 ON wpc2.pre_wareplace_id = ap.id 
+		WHERE wpc2.product_id = t.id   ) AS "product.preWarehouseFullName",
+		
+		(SELECT CONCAT(wh.name,'  ', wa.name,'  ',wc.code,'  ', ap.code) AS FULLNAME	
+		FROM lgt_ps_wareplace ap
+		LEFT JOIN lgt_ps_warecounter wc ON wc.id=ap.warecounter_id
+		LEFT JOIN lgt_ps_warearea 	 wa ON wa.id=wc.warearea_id
+		LEFT JOIN lgt_ps_warehouse 	 wh ON wh.id=wa.warehouse_id
+		LEFT JOIN lgt_ps_produce 	 p  ON p.id=ap.produce_id
+		LEFT JOIN lgt_ps_product_wp_change wpc ON wpc.post_wareplace_id = ap.id
+		WHERE wpc.product_id = t.id  ) AS "product.postWarehouseFullName"
+	</sql>
+	
+	<sql id="dispatchMissionWithDetailJoins">
+		LEFT JOIN lgt_dp_dispatch_order a ON m.id = a.mission_id
+		LEFT JOIN lgt_ps_warehouse c ON c.id = m.in_warehouse_id
+		LEFT JOIN lgt_ps_warehouse d ON d.id = a.out_warehouse_id
+		LEFT JOIN lgt_dp_dispatch_produce e ON e.dispatch_order_id = a.id
+		LEFT JOIN lgt_ps_produce p ON p.id = e.produce_id
+		LEFT JOIN lgt_ps_goods eg ON eg.id = p.goods_id
+		LEFT JOIN lgt_dp_dispatch_product o ON o.dispatch_produce_id = e.id
+		LEFT JOIN lgt_ps_product t ON t.id = o.product_id 
+		LEFT JOIN lgt_ps_goods g ON g.id = t.goods_id
+		LEFT JOIN bas_mission f ON f.id = a.mission_id
+		LEFT JOIN sys_user u ON u.id = d.responsible_user_id 
+		LEFT JOIN sys_user ua ON ua.id = a.post_user_id
+		LEFT JOIN sys_user um ON um.id = m.in_user_id
+		LEFT JOIN sys_user sd ON sd.id = d.responsible_user_id
+		LEFT JOIN sys_user st ON st.id = f.start_by
+		<!-- 变更之前的货位 -->
+		<!-- LEFT JOIN lgt_ps_product_wp_change wpc2 ON wpc2.product_id = t.id 
+		LEFT JOIN lgt_ps_wareplace wp2 ON wp2.id =  wpc2.pre_wareplace_id
+		LEFT JOIN lgt_ps_warecounter wc2 ON  wc2.id = wp2.warecounter_id
+		LEFT JOIN lgt_ps_warearea ar2 ON  ar2.id = wc2.warearea_id
+		LEFT JOIN lgt_ps_warehouse wh2 ON wh2.id = ar2.warehouse_id -->
+		<!-- 变更之后的货位 -->
+		<!-- LEFT JOIN lgt_ps_product_wp_change wpc ON wpc.product_id = t.id 
+		LEFT JOIN lgt_ps_wareplace wp ON  wp.id = wpc.post_wareplace_id
+		LEFT JOIN lgt_ps_warecounter wc ON  wc.id = wp.warecounter_id
+		LEFT JOIN lgt_ps_warearea ar ON  ar.id  = wc.warearea_id 
+		LEFT JOIN lgt_ps_warehouse wh ON  wh.id = ar.warehouse_id -->
+	</sql>
+	
+	<select id="getDispatchMissionWithDetailAll" resultMap="dispatchMissionWithDetailAll">
+		SELECT
+			<include refid="dispatchMissionWithDetailAllColumn"/>
+		FROM lgt_dp_dispatch_mission m
+		<include refid="dispatchMissionWithDetailJoins" />
+		<where>
+			m.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+			 	AND m.id = #{id}
+			</if>
+			<if test="dispatchOrder != null and dispatchOrder.id != null and dispatchOrder.id != ''">
+				AND a.id = #{dispatchOrder.id}
+			</if>
+		</where>
+	</select>
+	<!-- 根据任务ID，获取任务明细  END -->
+	
+	
+	<insert id="insert">
+		INSERT INTO lgt_dp_dispatch_mission(
+			id,
+			batch_no,
+			reason_type,
+			mission_status,
+			in_warehouse_id,
+			in_user_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{batchNo},
+			#{reasonType},
+			#{missionStatus},
+			#{inWarehouse.id},
+			#{inUser.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_dp_dispatch_mission SET 	
+			<if test = "reasonType != null and reasonType != ''">
+				reason_type = #{reasonType},
+			</if>
+			<if test="missionStatus != null and missionStatus != ''">
+				mission_status = #{missionStatus},
+			</if>
+			<if test="inWarehouse != null and inWarehouse.id  != ''">
+				in_warehouse_id = #{inWarehouse.id},
+			</if>
+			in_user_id = #{inUser.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_dp_dispatch_mission SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

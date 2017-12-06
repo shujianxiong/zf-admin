@@ -1,0 +1,157 @@
+.table-toolbars{
+	padding-bottom:10px;
+}
+
+.content-header-menu h1 small a{
+	font-family: 'Microsoft YaHei';
+}
+
+.content-header-menu i{
+    padding-right: 5px;
+}
+
+.menu-active i,.menu-active a{
+	color:#00c0ef;
+}
+.zf-query h5{
+	margin: 0;
+}
+.form-group .control-label,.form-control,.form-group .select2-selection__rendered, .box-body strong,.box-body p,.timeline-item,.timeline-item .timeline-header{
+	font-size:12px !important;
+}
+.btn i::before{
+	padding:0 3px
+}
+/* 瀛椾綋璁剧疆 */
+.btn-info a{
+	color:#fff !important;
+}
+/* dropdown涓嬫媺閫夋嫨妗嗗瓧浣撹缃�*/
+.dropdown-menu{
+	font-size:12px
+}
+/* dropdown涓嬫媺閫夋嫨妗嗗搴﹁缃�*/
+.zf-dropdown-width{
+	min-width:80px !important;
+}
+/* 琛ㄦ牸鎸夐挳鏍峰紡璋冩暣 */
+.zf-tableButton{
+	margin: -5px 0 !important;
+}
+.zf-tableButton button{
+    padding: 5px 8px !important;
+}
+.box-info .box-body{
+	padding-bottom: 0;
+}
+.zf-dataTables-multiline{
+	width:1px;
+}
+.zf-tbody-font-size{
+	font-size: 12px;
+}
+.zf-sub-table{
+	min-width:30%;
+	margin:0 0 0 30px
+}
+.zf-sub-table > tbody > tr > td{
+	 padding: 8px;
+	 line-height: 1.42857143;
+	 vertical-align: top;
+	 border-top: 1px solid #ddd;
+	 border-collapse: separate !important;
+	 width:50%;
+	 text-align:left;
+	 box-sizing:border-box;
+	 word-break: keep-all;white-space:nowrap;
+	 height:40px;
+	 line-height:22px
+}
+.zf-box-mul-margin{
+	margin: 0px;
+}
+.zf-box-mul-border{
+	border-top: 0px;
+	border-bottom: 3px solid #00a65a;
+}
+.primary{
+	border-bottom: 3px solid #3c8dbc;
+}
+
+/* 杈撳叆妗嗛敊璇牱寮�*/
+.zf-input-err{
+	border-color:#dd4b39 !important;;
+}
+.zf-label-err{
+	color:#dd4b39;
+}
+.zf-menu{
+    height: 45px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.zf-menu li{
+    float: left;
+}
+.zf-input-readonly{
+	background-color:#fff !important;
+}
+/*datatable*/
+.dataTables_empty{
+	text-align: center
+}
+.zf-table-numinput{
+	max-width: 80px;
+}
+.dropdown-toggle.disable:hover,.dropdown-toggle.disable span,.dropdown-toggle.disable span:hover{
+	color: #00c0ef;
+	background-color:#00c0ef
+}
+.zf-table-money{
+	text-align: right;
+}
+/*radio checkbox */
+.zf-check-wrapper-padding{
+	padding-top: 5px;
+}
+.zf-hr{
+	margin: 5px 0;
+}
+.zf-img-list{
+	margin: 2px 2px 2px 2px !important;
+}
+.tooltip{
+	position:fixed
+}
+.reColor{
+	border-color:#a7a7a7 !important;
+}
+.reColor{
+	background-color:#a7a7a7 !important;
+}
+
+thead>tr>th{
+	white-space : nowrap !important;
+}
+
+.notifications-menu>#goldPricA{font-size:10px;padding:15px 0;}
+.box-body>p>.label{
+	line-height:2;
+}
+.zf-img-list a{
+	padding:0 !important;
+}
+.table-responsive{
+	overflow: inherit
+}
+/*强制换行*/
+.text-primary {
+	word-wrap: break-word
+}
+
+/**换行**/
+p {
+	word-break:break-all;
+}

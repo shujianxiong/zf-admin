@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.bb.BankbookTempDao">
+    
+	<sql id="bankbookTempColumns">
+		a.id AS "id",
+		a.balance_id AS "bankbookBalance.id",
+		b.member_id AS "bankbookBalance.member.id",
+		a.create_type AS "createType",
+		a.change_type AS "changeType",
+		a.money_type AS "moneyType",
+		a.money AS "money",
+		a.status AS "status",
+		a.check_by AS "checkBy",
+		a.check_time AS "checkTime",
+		a.check_msg AS "checkMsg",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bankbookTempJoins">
+	LEFT JOIN crm_bb_bankbook_balance b on b.id=a.balance_id
+	LEFT JOIN crm_mi_member m on m.id=b.member_id
+	</sql>
+    
+	<select id="get" resultType="BankbookTemp">
+		SELECT 
+			<include refid="bankbookTempColumns"/>
+		FROM crm_bb_bankbook_temp a
+		<include refid="bankbookTempJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BankbookTemp">
+		SELECT 
+			<include refid="bankbookTempColumns"/>
+		FROM crm_bb_bankbook_temp a
+		<include refid="bankbookTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="bankbookBalance != null and bankbookBalance.member != null and bankbookBalance.member.usercode != null and bankbookBalance.member.usercode != ''">
+				AND m.usercode = #{bankbookBalance.member.usercode}
+			</if>
+			<if test="bankbookBalance != null and bankbookBalance.id != null and bankbookBalance.id != ''">
+				AND a.balance_id = #{bankbookBalance.id}
+			</if>
+			<if test="createType != null and createType != ''">
+				AND a.create_type = #{createType}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="moneyType != null and moneyType != ''">
+				AND a.money_type = #{moneyType}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="beginTime != null and beginTime != ''">
+				<![CDATA[ AND a.create_date >= #{beginTime}]]>
+			</if>
+			<if test="endTime != null and endTime != ''">
+				<![CDATA[AND a.create_date <= #{endTime} ]]>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BankbookTemp">
+		SELECT 
+			<include refid="bankbookTempColumns"/>
+		FROM crm_bb_bankbook_temp a
+		<include refid="bankbookTempJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getTempsPassedCountByBalanceId" resultType="Integer">
+		SELECT 
+			COUNT(a.id)
+		FROM crm_bb_bankbook_temp a
+		<where>
+			a.balance_id = #{balanceId}
+			AND a.status = '2'
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_bb_bankbook_temp(
+			id,
+			balance_id,
+			create_type,
+			change_type,
+			money_type,
+			money,
+			status,
+			check_by,
+			check_time,
+			check_msg,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{bankbookBalance.id},
+			#{createType},
+			#{changeType},
+			#{moneyType},
+			#{money},
+			#{status},
+			#{checkBy},
+			#{checkTime},
+			#{checkMsg},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_bb_bankbook_temp SET 	
+			balance_id = #{bankbookBalance.id},
+			create_type = #{createType},
+			change_type = #{changeType},
+			money_type = #{moneyType},
+			money = #{money},
+			status = #{status},
+			check_by = #{checkBy},
+			check_time = #{checkTime},
+			check_msg = #{checkMsg},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_bb_bankbook_temp SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.mb.BeansDetailDao">
+    
+	<sql id="beansDetailColumns">
+		a.id AS "id",
+		a.item_no AS "itemNo",
+		a.beans_id AS "beans.id",
+		b.member_id AS "beans.member.id",
+		a.change_type AS "changeType",
+		a.num AS "num",
+		a.history_beans AS "historyBeans",
+		a.current_beans AS "currentBeans",
+		a.change_reason_type AS "changeReasonType",
+		a.pre_item_no AS "preItemNo",
+
+		a.pre_history_beans AS "preHistoryBeans",
+		a.pre_current_beans AS "preCurrentBeans",
+
+		a.operate_source_no AS "operateSourceNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="beansDetailJoins">
+		LEFT JOIN crm_mb_beans b on b.id=a.beans_id
+		LEFT JOIN crm_mi_member m on m.id=b.member_id
+	</sql>
+    
+	<select id="get" resultType="BeansDetail">
+		SELECT 
+			<include refid="beansDetailColumns"/>
+		FROM crm_mb_beans_detail a
+		<include refid="beansDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BeansDetail">
+		SELECT 
+			<include refid="beansDetailColumns"/>
+		FROM crm_mb_beans_detail a
+		<include refid="beansDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="beans != null and beans.member != null and beans.member.usercode != null and beans.member.usercode != ''">
+				AND m.usercode = #{beans.member.usercode}
+			</if>
+			<if test="beans != null and beans.id != null and beans.id != ''">
+				AND a.beans_id = #{beans.id}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="changeReasonType != null and changeReasonType != ''">
+				AND a.change_reason_type = #{changeReasonType}
+			</if>
+			<if test="operateSourceNo != null and operateSourceNo != ''">
+				AND a.operate_source_no = #{operateSourceNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BeansDetail">
+		SELECT 
+			<include refid="beansDetailColumns"/>
+		FROM crm_mb_beans_detail a
+		<include refid="beansDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="getByChangeTypeAndUniqueNo" resultType="BeansDetail">
+		SELECT
+		<include refid="beansDetailColumns"/>
+		FROM crm_mb_beans_detail a
+		<include refid="beansDetailJoins"/>
+		<where>
+			a.change_type = #{changeType}
+			AND a.operate_source_no = #{operateSourceNo}
+		</where>
+	</select>
+
+	<select id="getLastByMemberId" resultType="BeansDetail">
+		SELECT
+			<include refid="beansDetailColumns"/>
+		FROM crm_mb_beans_detail a
+		<include refid="beansDetailJoins"/>
+		WHERE b.member_id = #{memberId}
+		ORDER BY a.item_no DESC
+		LIMIT 1
+	</select>
+
+	<select id="getItemsCountTotal" resultType="Integer">
+		SELECT
+		COUNT(a.id)
+		FROM crm_mb_beans_detail a
+	</select>
+
+	<insert id="insert">
+		INSERT INTO crm_mb_beans_detail(
+			id,
+			item_no,
+			beans_id,
+			change_type,
+			change_reason_type,
+			num,
+			history_beans,
+			current_beans,
+			pre_item_no,
+			pre_history_beans,
+			pre_current_beans,
+			operate_source_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{itemNo},
+			#{beans.id},
+			#{changeType},
+			#{changeReasonType},
+			#{num},
+			#{historyBeans},
+			#{currentBeans},
+			#{preItemNo},
+			#{preHistoryBeans},
+			#{preCurrentBeans},
+			#{operateSourceNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mb_beans_detail SET
+			item_no = #{itemNo},
+			beans_id = #{beans.id},
+			change_type = #{changeType},
+			change_reason_type = #{changeReasonType},
+			num = #{num},
+			history_beans = #{historyBeans},
+			current_beans = #{currentBeans},
+			pre_item_no = #{preItemNo},
+			pre_history_beans = #{preHistoryBeans},
+			pre_current_beans = #{preCurrentBeans},
+			operate_source_no = #{operateSourceNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mb_beans_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

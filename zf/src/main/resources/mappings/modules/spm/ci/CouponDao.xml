@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ci.CouponDao">
+    
+	<sql id="couponColumns">
+		a.id AS "id",
+		a.coupon_template_id AS "couponTemplate.id",
+		
+		a.reach_money AS "couponTemplate.reachMoney",
+        a.decrease_money AS "couponTemplate.decreaseMoney",
+        a.discount_scale AS "couponTemplate.discountScale",
+        a.discount_money_max AS "couponTemplate.discountMoneyMax",
+		
+		a.name AS "name",
+		a.code AS "code",
+		a.status AS "status",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.type AS "type",
+		a.reach_money AS "reachMoney",
+		a.decrease_money AS "decreaseMoney",
+		a.discount_scale AS "discountScale",
+		a.discount_money_max AS "discountMoneyMax",
+		a.member_id AS "member.id",
+		a.receive_type AS "receiveType",
+		a.receive_time AS "receiveTime",
+		a.use_buy_order_id AS "useBuyOrder",
+		a.use_dec_money AS "useDecMoney",
+		a.use_time AS "useTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="couponJoins">
+	   LEFT JOIN spm_ci_coupon_template t ON t.id = a.coupon_template_id
+	</sql>
+    
+	<select id="get" resultType="Coupon">
+		SELECT 
+			<include refid="couponColumns"/>
+		FROM spm_ci_coupon a
+		<include refid="couponJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Coupon">
+		SELECT 
+			<include refid="couponColumns"/>
+		FROM spm_ci_coupon a
+		<include refid="couponJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="couponTemplate != null and couponTemplate.id != null and couponTemplate.id != ''">
+				AND a.coupon_template_id = #{couponTemplate.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="code != null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="member != null and member.id != null and member.id != ''">
+				AND a.member_id = #{member.id}
+			</if>
+			<if test="receiveType != null and receiveType != ''">
+				AND a.receive_type = #{receiveType}
+			</if>
+			<if test="useBuyOrder != null and useBuyOrder != ''">
+				AND a.use_buy_order_id = #{useBuyOrder}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Coupon">
+		SELECT 
+			<include refid="couponColumns"/>
+		FROM spm_ci_coupon a
+		<include refid="couponJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_ci_coupon(
+			id,
+			coupon_template_id,
+			name,
+			code,
+			status,
+			start_time,
+			end_time,
+			type,
+			reach_money,
+			decrease_money,
+			discount_scale,
+			discount_money_max,
+			member_id,
+			receive_type,
+			receive_time,
+			use_buy_order_id,
+			use_dec_money,
+			use_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{couponTemplate.id},
+			#{name},
+			#{code},
+			#{status},
+			#{startTime},
+			#{endTime},
+			#{type},
+			#{reachMoney},
+			#{decreaseMoney},
+			#{discountScale},
+			#{discountMoneyMax},
+			#{member.id},
+			#{receiveType},
+			#{receiveTime},
+			#{useBuyOrder},
+			#{useDecMoney},
+			#{useTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ci_coupon SET 	
+			coupon_template_id = #{couponTemplate.id},
+			name = #{name},
+			code = #{code},
+			status = #{status},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			type = #{type},
+			reach_money = #{reachMoney},
+			decrease_money = #{decreaseMoney},
+			discount_scale = #{discountScale},
+			discount_money_max = #{discountMoneyMax},
+			member_id = #{member.id},
+			receive_type = #{receiveType},
+			receive_time = #{receiveTime},
+			use_buy_order_id = #{useBuyOrder},
+			use_dec_money = #{useDecMoney},
+			use_time = #{useTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_ci_coupon SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

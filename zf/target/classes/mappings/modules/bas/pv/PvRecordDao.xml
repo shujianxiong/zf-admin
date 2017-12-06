@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bas.dao.pv.PvRecordDao">
+    
+	<sql id="pvRecordColumns">
+		a.id AS "id",
+		a.page_type AS "pageType",
+		a.page_category AS "pageCategory",
+		a.detail_id AS "detailId",
+		a.member_id AS "member.id",
+		a.view_time AS "viewTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pvRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="PvRecord">
+		SELECT 
+			<include refid="pvRecordColumns"/>
+		FROM bas_pv_record a
+		<include refid="pvRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PvRecord">
+		SELECT 
+			<include refid="pvRecordColumns"/>
+		FROM bas_pv_record a
+		<include refid="pvRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="pageType != null and pageType != ''">
+			     AND a.page_type = #{pageType}
+			</if>
+			<if test="searchParameter != null and searchParameter.starTime != null and searchParameter.starTime != ''">
+                <![CDATA[AND a.view_time >= #{searchParameter.starTime}]]>
+            </if>
+            <if test="searchParameter != null and searchParameter.endTime != null and searchParameter.endTime != ''">
+                <![CDATA[AND a.view_time <= #{searchParameter.endTime}]]>
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="statPageViewByPageType" resultType="PvRecord">
+	   SELECT 
+	       (select label from sys_dict where type = 'bas_pv_record_pageType' and value = a.page_type) AS "pageType",
+	       count(a.member_id) AS "count"
+	   FROM bas_pv_record a
+	   <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="pageType != null and pageType != ''">
+                 AND a.page_type = #{pageType}
+            </if>
+            <if test="searchParameter == null or searchParameter.starTime == null or searchParameter.starTime == ''">
+                <![CDATA[AND a.view_time >= DATE_ADD(NOW(),INTERVAL -30 DAY)]]>
+            </if>
+            <if test="searchParameter != null and searchParameter.starTime != null and searchParameter.starTime != ''">
+                <![CDATA[AND a.view_time >= #{searchParameter.starTime}]]>
+            </if>
+            <if test="searchParameter != null and searchParameter.endTime != null and searchParameter.endTime != ''">
+                <![CDATA[AND a.view_time <= #{searchParameter.endTime}]]>
+            </if>
+        </where>
+        GROUP BY a.page_type
+	</select>
+	
+	<select id="findAllList" resultType="PvRecord">
+		SELECT 
+			<include refid="pvRecordColumns"/>
+		FROM bas_pv_record a
+		<include refid="pvRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bas_pv_record(
+			id,
+			page_type,
+			page_category,
+			detail_id,
+			member_id,
+			view_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{pageType},
+			#{pageCategory},
+			#{detailId},
+			#{member.id},
+			#{viewTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bas_pv_record SET 	
+			page_type = #{pageType},
+			page_category = #{pageCategory},
+			detail_id = #{detailId},
+			member_id = #{member.id},
+			view_time = #{viewTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bas_pv_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

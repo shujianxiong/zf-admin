@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ol.SendProduceDao">
+    
+	<sql id="sendProduceColumns">
+		a.id AS "id",
+		a.send_order_id AS "sendOrder.id",
+		a.order_produce_id AS "orderProduceId",
+		a.produce_id AS "produce.id",
+		a.num AS "num",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sendProduceJoins">
+	</sql>
+    
+	<select id="get" resultType="SendProduce">
+		SELECT 
+			<include refid="sendProduceColumns"/>
+		FROM bus_ol_send_produce a
+		<include refid="sendProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SendProduce">
+		SELECT 
+			<include refid="sendProduceColumns"/>
+		FROM bus_ol_send_produce a
+		<include refid="sendProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sendOrder != null and sendOrder.id != null and sendOrder.id != ''">
+				AND a.send_order_id = #{sendOrder.id}
+			</if>
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				AND a.produce_id = #{produce.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SendProduce">
+		SELECT 
+			<include refid="sendProduceColumns"/>
+		FROM bus_ol_send_produce a
+		<include refid="sendProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据发货单ID获取对应关联的发货产品信息包含对应的商品信息 -->
+	<select id="findSendProduceBySendOrder" resultType="SendProduce">
+        SELECT 
+           sp.num, 
+           sp.produce_id AS "produce.id",
+           p.code AS "produce.code",
+           p.name AS "produce.name",
+           g.name AS "produce.goods.name",
+           g.icon AS "produce.goods.icon"
+        FROM bus_ol_send_produce sp
+        LEFT JOIN lgt_ps_produce p ON p.id = sp.produce_id
+        LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id
+        WHERE sp.send_order_id = #{sendOrderId} AND sp.del_flag = 0
+    </select>
+	
+	<insert id="insert">
+		INSERT INTO bus_ol_send_produce(
+			id,
+			send_order_id,
+			order_produce_id,
+			produce_id,
+			num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sendOrder.id},
+			#{orderProduceId},
+			#{produce.id},
+			#{num},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ol_send_produce SET 	
+			send_order_id = #{sendOrder.id},
+			order_produce_id = #{orderProduceId},
+			produce_id = #{produce.id},
+			num = #{num},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ol_send_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+	xmlns:p="http://www.springframework.org/schema/p"
+	default-lazy-init="true">
+
+	<description>Jedis Configuration</description>
+
+    <!-- redis配置 -->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}" /><!-- 最大空闲连接，默认8 -->
+        <property name="maxTotal" value="${redis.maxTotal}" /><!-- 最大链接数，默认8 -->
+        <property name="minIdle" value="${redis.minIdle}" /><!-- 最小空闲连接数, 默认0 -->
+        <!-- <property name="maxWaitMillis" value="${redis.maxWait}" />获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间, 默认-1 -->
+        <property name="minEvictableIdleTimeMillis" value="${redis.minEvictableIdleTimeMillis}" /><!-- 逐出连接的最小空闲时间 默认1800000毫秒(30分钟) -->
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" /> <!-- 指明是否在从池中取出连接前进行检验,如果检验失败,则从池中去除连接并尝试取出另一个, 默认false -->
+        <!--<property name="testWhileIdle" value="false" /> 在空闲时检查有效性, 默认false -->
+        <!--<property name="blockWhenExhausted" value="true" /> 连接耗尽时是否阻塞, false报异常,ture阻塞直到超时, 默认true -->
+        <property name="lifo" value="true" /> <!-- 是否启用后进先出, 默认true -->
+        <property name="jmxNamePrefix" value="${redis.keyPrefix}" />  <!--默 认为"pool" jmx管理名称 -->
+        <property name="jmxEnabled" value="true"/> <!-- 是否启用pool的jmx管理功能 -->
+    </bean>
+
+    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
+    	p:host-name="${redis.host}" 
+    	p:port="${redis.port}"
+    	p:password="${redis.pass}"  
+    	p:pool-config-ref="poolConfig">
+    	<!-- 使用连接池 -->
+    	<property name="usePool" value="true"></property>
+    </bean> 
+    
+    <bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+    
+    <!-- 开启事务，可以通过transcational注解控制 -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+		p:connection-factory-ref="connectionFactory">
+		<!-- 自定义keys序列化 防止默认序列化出错 -->
+		<property name="keySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<!-- 支持序列集合对象 -->
+		<property name="valueSerializer"> 
+          <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"></bean> 
+      	</property>
+		
+		<property name="hashKeySerializer">
+			<bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+		</property>
+		<property name="hashValueSerializer"> 
+        	<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean> 
+      	</property>
+		<!-- 关闭事务 -->
+		<property name="enableTransactionSupport" value="false" />
+		
+	</bean>
+	
+</beans>

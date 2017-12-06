@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ep.InvitationDetailDao">
+    
+	<sql id="invitationDetailColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		a.inviteder_openid AS "invitederOpenid",
+		a.order_flag AS "orderFlag",
+		a.user_flag AS "userFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate"
+	</sql>
+	
+	<sql id="invitationDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="InvitationDetail">
+		SELECT 
+			<include refid="invitationDetailColumns"/>
+		FROM spm_ep_invitation_detail a
+		<include refid="invitationDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InvitationDetail">
+		SELECT 
+			<include refid="invitationDetailColumns"/>
+		FROM spm_ep_invitation_detail a
+		<include refid="invitationDetailJoins"/>
+		<where>
+			<if test="invitederOpenid != null and invitederOpenid != ''">
+				AND a.inviteder_openid = #{invitederOpenid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InvitationDetail">
+		SELECT 
+			<include refid="invitationDetailColumns"/>
+		FROM spm_ep_invitation_detail a
+		<include refid="invitationDetailJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="countByMember" resultType="int">
+		SELECT COUNT(1)
+		  FROM spm_ep_invitation_detail
+		 WHERE member_id = #{memberId}
+		 	<if test="orderFlag != null and orderFlag != '' ">
+				AND order_flag = #{orderFlag}
+			</if>
+	</select>
+
+	<select id="getInviteMemberIds" resultType="String">
+		SELECT  DISTINCT b.id
+		  FROM spm_ep_invitation_detail a
+		  LEFT JOIN crm_mi_member b ON a.inviteder_openid = b.wechat_openid
+		 WHERE a.member_id = #{memberId}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO spm_ep_invitation_detail(
+			id,
+			member_id,
+			inviteder_openid,
+			order_flag,
+			user_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{invitederOpenid},
+			#{orderFlag},
+			#{userFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ep_invitation_detail SET 	
+			member_id = #{member.id},
+			order_flag = #{orderFlag},
+			user_flag = #{userFlag},
+			inviteder_openid = #{invitederOpenid},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM spm_ep_invitation_detail
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.mobile.index.modules.usercenter.dao.WapAccountDetailDao">
+    <!-- 
+	<sql id="accountDetailColumns">
+		a.id AS "id",
+		a.account_id AS "account.id",
+		a.change_type AS "changeType",
+		a.change_amount AS "changeAmount",
+		a.last_usable_amount AS "lastUsableAmount",
+		a.last_frozen_amount AS "lastFrozenAmount",
+		a.last_deposit_amount AS "lastDepositAmount",
+		a.change_reason_type AS "changeReasonType",
+		a.change_time AS "changeTime",
+		a.operater_type AS "operaterType",
+		a.operate_source_no AS "operateSourceNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="accountDetailJoins">
+		LEFT JOIN crm_mi_account_detail a1 ON a1.id = a.account_id
+	</sql>
+    
+	<select id="get" resultType="AccountDetail">
+		SELECT 
+			<include refid="accountDetailColumns"/>
+		FROM crm_mi_account_detail a
+		<include refid="accountDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="AccountDetail">
+		SELECT 
+			<include refid="accountDetailColumns"/>
+		FROM crm_mi_account_detail a
+		<include refid="accountDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="account != null and account.id !='' ">
+				and a.account_id = #{account.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AccountDetail">
+		SELECT 
+			<include refid="accountDetailColumns"/>
+		FROM crm_mi_account_detail a
+		<include refid="accountDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_mi_account_detail(
+			id,
+			account_id,
+			change_type,
+			change_amount,
+			last_usable_amount,
+			last_frozen_amount,
+			last_deposit_amount,
+			change_reason_type,
+			change_time,
+			operater_type,
+			operate_source_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{changeType},
+			#{changeAmount},
+			#{lastUsableAmount},
+			#{lastFrozenAmount},
+			#{lastDepositAmount},
+			#{changeReasonType},
+			#{changeTime},
+			#{operaterType},
+			#{operateSourceNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mi_account_detail SET 	
+			account_id = #{accountId},
+			change_type = #{changeType},
+			change_amount = #{changeAmount},
+			last_usable_amount = #{lastUsableAmount},
+			last_frozen_amount = #{lastFrozenAmount},
+			last_deposit_amount = #{lastDepositAmount},
+			change_reason_type = #{changeReasonType},
+			change_time = #{changeTime},
+			operater_type = #{operaterType},
+			operate_source_no = #{operateSourceNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mi_account_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	 -->
+</mapper>

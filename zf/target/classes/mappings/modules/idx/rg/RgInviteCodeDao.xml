@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.idx.dao.rg.RgInviteCodeDao">
+    
+	<sql id="rgInviteCodeColumns">
+		a.id AS "id",
+		a.invite_code AS "inviteCode",
+		a.use_flag AS "useFlag",
+		a.use_member_id AS "useMember.id",
+		a.use_time AS "useTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rgInviteCodeJoins">
+	</sql>
+    
+	<select id="get" resultType="RgInviteCode">
+		SELECT 
+			<include refid="rgInviteCodeColumns"/>
+		FROM idx_rg_invite_code a
+		<include refid="rgInviteCodeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RgInviteCode">
+		SELECT 
+			<include refid="rgInviteCodeColumns"/>
+		FROM idx_rg_invite_code a
+		<include refid="rgInviteCodeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="inviteCode != null and inviteCode != ''">
+			     AND a.invite_code = #{inviteCode}
+			</if>
+			<if test="useFlag != null and useFlag != ''">
+			     AND a.use_flag = #{useFlag}
+			</if>
+			<if test="beginTimeTemp != null and beginTimeTemp != ''">
+              <![CDATA[AND a.create_date >= #{beginTimeTemp}]]>
+        </if>
+        <if test="endTimeTemp != null and endTimeTemp != ''">
+              <![CDATA[AND a.create_date <= #{endTimeTemp}]]>
+        </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RgInviteCode">
+		SELECT 
+			<include refid="rgInviteCodeColumns"/>
+		FROM idx_rg_invite_code a
+		<include refid="rgInviteCodeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO idx_rg_invite_code(
+			id,
+			invite_code,
+			use_flag,
+			use_member_id,
+			use_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{inviteCode},
+			#{useFlag},
+			#{useMember.id},
+			#{useTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE idx_rg_invite_code SET 	
+			invite_code = #{inviteCode},
+			use_flag = #{useFlag},
+			use_member_id = #{useMember.id},
+			use_time = #{useTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE idx_rg_invite_code SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

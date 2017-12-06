@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bas.dao.code.CodeGeneratorDao">
+    
+	<sql id="codeGeneratorColumns">
+		a.id AS "id",
+		a.code_handle AS "codeHandle",
+		a.code_name AS "codeName",
+		a.prefix AS "prefix",
+		a.date_type AS "dateType",
+		a.date_value AS "dateValue",
+		a.midfix AS "midfix",
+		a.main_value_type AS "mainValueType",
+		a.main_value_length AS "mainValueLength",
+		a.main_value AS "mainValue",
+		a.postfix AS "postfix",
+		a.last_code AS "lastCode",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="codeGeneratorJoins">
+	</sql>
+    
+	<select id="get" resultType="CodeGenerator">
+		SELECT 
+			<include refid="codeGeneratorColumns"/>
+		FROM bas_code_generator a
+		<include refid="codeGeneratorJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CodeGenerator">
+		SELECT 
+			<include refid="codeGeneratorColumns"/>
+		FROM bas_code_generator a
+		<include refid="codeGeneratorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="codeHandle != null and codeHandle != ''">
+				AND (a.code_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{codeHandle}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{codeHandle}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{codeHandle},'%')</if>
+					OR a.code_handle LIKE 
+					<if test="dbName == 'oracle'">'%'||#{codeHandle}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{codeHandle}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{codeHandle},'%')</if>
+					)
+			</if>
+			<if test="dateType != null and dateType != ''">
+				AND a.date_type = #{dateType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- codeHandle查询该编码是否存在 -->
+	<select id="findCodeHandleList" resultType="CodeGenerator">
+		SELECT 
+			<include refid="codeGeneratorColumns"/>
+		FROM bas_code_generator a
+		<include refid="codeGeneratorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="codeHandle != null and codeHandle != '' and codeName != null and codeName != ''">
+				AND (a.code_name = #{codeName}
+					OR a.code_handle = #{codeHandle}
+					)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CodeGenerator">
+		SELECT 
+			<include refid="codeGeneratorColumns"/>
+		FROM bas_code_generator a
+		<include refid="codeGeneratorJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 执行业务锁表操作 -->
+	<select id="findForUpdate" resultType="CodeGenerator">
+		SELECT 
+			<include refid="codeGeneratorColumns"/>
+		FROM bas_code_generator a
+		<include refid="codeGeneratorJoins"/>
+		<where>
+			a.code_handle = #{codeHandle}
+			FOR UPDATE
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bas_code_generator(
+			id,
+			code_handle,
+			code_name,
+			prefix,
+			date_type,
+			date_value,
+			midfix,
+			main_value_type,
+			main_value_length,
+			main_value,
+			postfix,
+			last_code,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{codeHandle},
+			#{codeName},
+			#{prefix},
+			#{dateType},
+			#{dateValue},
+			#{midfix},
+			#{mainValueType},
+			#{mainValueLength},
+			#{mainValue},
+			#{postfix},
+			#{lastCode},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bas_code_generator SET 	
+			code_handle = #{codeHandle},
+			code_name = #{codeName},
+			prefix = #{prefix},
+			date_type = #{dateType},
+			date_value = #{dateValue},
+			midfix = #{midfix},
+			main_value_type = #{mainValueType},
+			main_value_length = #{mainValueLength},
+			main_value = #{mainValue},
+			postfix = #{postfix},
+			last_code = #{lastCode},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bas_code_generator SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

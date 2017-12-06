@@ -1,0 +1,320 @@
+html,body{
+    margin: 0;
+    padding: 0;
+    font-family: 'STXihei';
+}
+.ui-btn{
+    cursor: pointer;
+    //-webkit-transition: box-shadow, -webkit-trnasform, 0.5s;
+    //-moz-transition: box-shadow, -moz-trnasform, 0.5s;
+    //-ms-transition: box-shadow, -ms-trnasform, 0.5s;
+    //-o-transition: box-shadow, -o-trnasform, 0.5s;
+    //transition: box-shadow, trnasform, 0.5s;
+    //&:hover{
+    //    box-shadow: 0 0 5px 5px rgba(0,0,0,0.5);
+    //    z-index: 999;
+    //    transform: scale(1.01,1.01);
+    //    -webkit-transform: scale(1.01,1.01);
+    //}
+}
+.zf-head{
+    position: relative;
+    height: 220/38.4rem;
+    >.img{
+        position: relative;
+        width: 346/38.4rem;
+        left: 780/38.4rem;
+        top: 63/38.4rem;
+        margin: 0 auto;
+    }
+    >.line{
+        position: absolute;
+        width: 1200/38.4rem;
+        left: (1920-1200)/2/38.4rem;
+        bottom: 38/38.4rem;
+        height: 1px;
+        background: #a0a0a0;
+    }
+}
+.banner{
+    position: relative;
+    height: 810/38.4rem;
+    >.img{
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    >.info{
+        position: absolute;
+        left: 380/38.4rem;
+        top: 313/38.4rem;
+        height: 143/38.4rem;
+        width: 454/38.4rem;
+        >.title{
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 44/38.4rem;
+            line-height: 44/38.4rem;
+            font-size: 36/38.4rem;
+            text-align: center;
+            font-weight: bold;
+            color: #FFFFFF;
+            &::after{
+                content: '';
+                position: absolute;
+                bottom: -30/38.4rem;
+                width: 90/38.4rem;
+                height: 2px;
+                left: (454-90)/2/38.4rem;
+                background: #a0a0a0;
+            }
+        }
+        >.content{
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40/38.4rem;
+            line-height: 40/38.4rem;
+            font-size: 30/38.4rem;
+            text-align: center;
+            color: #FFFFFF;
+        }
+    }
+}
+.page-line{
+    position: relative;
+    width: 1200/38.4rem;
+    margin: 162/38.4rem auto 0;
+    height: 1px;
+    background: #a0a0a0;
+    >.zf-word{
+        position: absolute;
+        height: 46/38.4rem;
+        width: 267/38.4rem;
+        left: (1200-267)/2/38.4rem;
+        top: -46/2/38.4rem;
+        background: #FFFFFF url("images/week-fan-word-1.png") center no-repeat;
+        background-size: 60%;
+    }
+    >.content{
+        position: absolute;
+        height: 46/38.4rem;
+        width: 267/38.4rem;
+        left: (1200-267)/2/38.4rem;
+        top: -46/2/38.4rem;
+        line-height: 46/38.4rem;
+        font-size: 24/38.4rem;
+        background: #FFFFFF;
+        color: rgba(0, 0, 0, 0.5);
+        text-align: center;
+    }
+}
+.mode-list{
+    position: relative;
+    width: 1200/38.4rem;
+    height: 1824/38.4rem;
+    margin: 0 auto;
+    >.mode-1{
+        position: absolute;
+        top: 130/38.4rem;
+        right: 0;
+        height: 586/38.4rem;
+        width: 630/38.4rem;
+        background: #FFFFFF url("images/2.png") center no-repeat;
+        background-size: 100%;
+    }
+    >.mode-2{
+        position: absolute;
+        top: 243/38.4rem;
+        left: 0;
+        height: 394/38.4rem;
+        width: 647/38.4rem;
+        background: #FFFFFF url("images/1.png") center no-repeat;
+        background-size: 100%;
+        > .mode-info{
+            position: absolute;
+            left: -100px;
+            bottom: 52%;
+            height: 40px;
+            width: 200px;
+            > .title{
+                position: absolute;
+                top: 0;
+                word-spacing: 5px;
+                letter-spacing: 2px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            >.content{
+                position: absolute;
+                bottom: 0;
+                word-spacing: 5px;
+                letter-spacing: 2px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+        }
+        >.click-btn{
+            position: absolute;
+            top: 51%;
+            left: -70px;
+            height: 30px;
+            width: 110px;
+            text-align: center;
+            line-height: 30px;
+            border: 4px double #000000;
+            font-size: 12px;
+        }
+    }
+    >.mode-3{
+        position: absolute;
+        bottom: 242/38.4rem;
+        left: 0;
+        height: 544/38.4rem;
+        width: 462/38.4rem;
+        background: #FFFFFF url("images/3.png") center no-repeat;
+        background-size: 100%;
+        >.mode-info{
+            position: absolute;
+            width: 160px;
+            height: 48px;
+            bottom: 50%;
+            left: -90px;
+            >.img{
+                position: absolute;
+                top: 0;
+                height: 24px;
+                width: 100%;
+                background: url("images/week-fan-word-2.png") center no-repeat;
+                background-size: cover;
+            }
+            >.content{
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                word-spacing: 5px;
+                letter-spacing: 2px;
+                font-size: 14px;
+            }
+        }
+    }
+    >.mode-4{
+        position: absolute;
+        bottom: 142/38.4rem;
+        right: 0;
+        height: 739/38.4rem;
+        width: 615/38.4rem;
+        background: #FFFFFF url("images/4.png") center no-repeat;
+        background-size: 100%;
+        >.mode-info{
+            position: absolute;
+            width: 160px;
+            height: 48px;
+            bottom: 30%;
+            right: -90px;
+            >.img{
+                position: absolute;
+                top: 0;
+                height: 24px;
+                width: 100%;
+                background: url("images/week-fan-word-2.png") center no-repeat;
+                background-size: cover;
+            }
+            >.content{
+                position: absolute;
+                bottom: 0;
+                width: 120%;
+                word-spacing: 2px;
+                letter-spacing: 1px;
+                font-size: 14px;
+            }
+        }
+    }
+}
+.entrances{
+    position: relative;
+    height: (127 + 617 + 715 + 715 + 617 + 200)/38.4rem;
+    width: 1200/38.4rem;
+    margin: 0 auto;
+    >.item >.title{
+        position: absolute;
+        bottom: 50/38.4rem;
+        left: 25/38.4rem;
+        color: #FFFFFF;
+        font-size: 16px;
+        word-spacing: 8px;
+        letter-spacing: 3px;
+    }
+    >.item >.content{
+        position: absolute;
+        bottom: 15/38.4rem;
+        left: 25/38.4rem;
+        color: #FFFFFF;
+        font-size: 12px;
+        word-spacing: 8px;
+        letter-spacing: 3px;
+    }
+    .i1{
+        position: absolute;
+        top: 127/38.4rem;
+        left: 0;
+        height: 617/38.4rem;
+        width: 1200/38.4rem;
+        background: #000000 url("images/5.png") center no-repeat;
+        background-size: 100%;
+    }
+    .i2{
+        position: absolute;
+        top: (127 + 617 + 30)/38.4rem;
+        right: 0;
+        height: 751/38.4rem;
+        width: 1200/38.4rem;
+        background: #000000 url("images/6.png") center no-repeat;
+        background-size: 100%;
+    }
+    .i3{
+        position: absolute;
+        top: (127 + 617 + 715 + 30 + 60)/38.4rem;
+        left: 0;
+        height: 751/38.4rem;
+        width: 1200/38.4rem;
+        background: #000000 url("images/7.png") center no-repeat;
+        background-size: 100%;
+    }
+    .i4{
+        position: absolute;
+        top: (127 + 617 + 715 + 715 + 30 + 60 + 60)/38.4rem;
+        right: 0;
+        height: 617/38.4rem;
+        width: 1200/38.4rem;
+        background: #000000 url("images/8.png") center no-repeat;
+        background-size: 100%;
+    }
+}
+.footer{
+    position: relative;
+    margin: 0 auto;
+    min-height: 40px;
+    line-height: 30px;
+    background: #000000 url("images/footer-bg.png") center no-repeat;
+    background-size: cover;
+    text-align: center;
+    padding: 10px 10%;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    word-spacing: 8px;
+    >a{
+        white-space:nowrap;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.5);
+        &:hover{
+            color: #FFFFFF;
+        }
+        img{
+            height: 20px;
+            width: 20px;
+            vertical-align: middle;
+        }
+    }
+}

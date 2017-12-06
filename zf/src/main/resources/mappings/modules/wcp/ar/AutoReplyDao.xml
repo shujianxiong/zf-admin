@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.wcp.dao.ar.AutoReplyDao">
+    
+	<sql id="autoReplyColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.code AS "code",
+		a.keywords AS "keywords",
+		a.content_type AS "contentType",
+		a.text AS "text",
+		a.image AS "image",
+		a.voice AS "voice",
+		a.video AS "video",
+		a.active_flag AS "activeFlag",
+		a.order_no AS "orderNo",
+		a.mp AS "mp",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="autoReplyJoins">
+	</sql>
+    
+    <sql id="getByCodeSQL">
+    	a.id AS "id",
+		a.name AS "name",
+		a.code AS "code",
+		a.keywords AS "keywords",
+		a.content_type AS "contentType",
+		a.text AS "text",
+		a.image AS "image",
+		a.voice AS "voice",
+		a.video AS "video",
+		a.active_flag AS "activeFlag",
+		a.order_no AS "orderNo",
+		a.mp AS "mp",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		
+		m.name AS "articleMsg.name",
+		m.title AS "articleMsg.title",
+		m.description AS "articleMsg.description",
+		m.pic AS "articleMsg.pic",
+		m.link_url AS "articleMsg.linkUrl",
+		m.order_weight AS "articleMsg.orderWeight"
+    </sql>
+    <sql id="getByCodeJOIN">
+    	LEFT JOIN wcp_ar_reply_article r ON r.reply_id  = a.id
+    	LEFT JOIN wcp_ar_article_msg m ON m.id = r.article_id
+    </sql>
+    <resultMap type="com.chinazhoufan.admin.modules.wcp.entity.ar.AutoReply" id="getByCodeMap">
+    	<result column="id" property="id"/> 
+    	<result column="name" property="name"/>
+    	<result column="code" property="code"/>
+    	<result column="keywords" property="keywords"/>
+    	<result column="contentType" property="contentType"/>
+    	<result column="text" property="text"/>
+    	<result column="image" property="image"/>
+    	<result column="voice" property="voice"/>
+    	<result column="video" property="video"/>
+		<result column="activeFlag" property="activeFlag"/>
+    	<result column="orderNo" property="orderNo"/>
+		<result column="mp" property="mp"/>
+    	<result column="createBy.id" property="createBy.id"/>
+    	<result column="createDate" property="createDate"/>
+    	<result column="updateBy.id" property="updateBy.id"/>
+		<result column="updateDate" property="updateDate"/>
+		<result column="remarks" property="remarks"/>
+		<result column="delFlag" property="delFlag"/>
+		<collection property="articleMsgList" ofType="ArticleMsg">
+			<result column="articleMsg.name" property="name"/>
+			<result column="articleMsg.title" property="title"/>
+			<result column="articleMsg.description" property="description"/>
+			<result column="articleMsg.pic" property="pic"/>
+			<result column="articleMsg.linkUrl" property="linkUrl"/>
+			<result column="articleMsg.orderWeight" property="orderWeight"/>
+		</collection>
+    </resultMap>
+    
+    
+	<select id="get" resultType="AutoReply">
+		SELECT 
+			<include refid="autoReplyColumns"/>
+		FROM wcp_ar_auto_reply a
+		<include refid="autoReplyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getActivityByCode" resultMap="getByCodeMap">
+		SELECT 
+			<include refid="getByCodeSQL"/>
+		FROM wcp_ar_auto_reply a
+		<include refid="getByCodeJOIN"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.active_flag = #{TRUE_FLAG}
+		AND a.code = #{code}
+	</select>	
+	
+	<select id="getActivityByKeywords" resultMap="getByCodeMap">
+		SELECT 
+			<include refid="getByCodeSQL"/>
+		FROM wcp_ar_auto_reply a
+		<include refid="getByCodeJOIN"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.active_flag = #{TRUE_FLAG}
+		<if test="keywords != null and keywords != ''">
+			AND a.keywords LIKE 
+				<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+		</if>
+		<if test="mp != null and mp != ''">
+			AND a.mp =#{mp}
+		</if>
+	</select>
+	
+	
+	<select id="findList" resultType="AutoReply">
+		SELECT 
+			<include refid="autoReplyColumns"/>
+		FROM wcp_ar_auto_reply a
+		<include refid="autoReplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="keywords != null and keywords != ''">
+				AND a.keywords LIKE 
+					<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="activeFlag != null and activeFlag != ''">
+				AND a.active_flag = #{activeFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AutoReply">
+		SELECT 
+			<include refid="autoReplyColumns"/>
+		FROM wcp_ar_auto_reply a
+		<include refid="autoReplyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wcp_ar_auto_reply(
+			id,
+			code,
+			name,
+			keywords,
+			content_type,
+			text,
+			image,
+			voice,
+			video,
+			active_flag,
+			order_no,
+			mp ,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{code},
+			#{name},
+			#{keywords},
+			#{contentType},
+			#{text},
+			#{image},
+			#{voice},
+			#{video},
+			#{activeFlag},
+			#{orderNo},
+			#{mp},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wcp_ar_auto_reply SET
+			<if test="code != null and code != ''">
+				code = #{code}, 	
+			</if>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="keywords != null and keywords != ''">
+				keywords = #{keywords},
+			</if>
+			<if test="contentType != null and contentType != ''">
+				content_type = #{contentType},
+			</if>
+			<if test="text != null and text != ''">
+				text = #{text},
+			</if>
+			<if test="image != null and image != ''">
+				image = #{image},
+			</if>
+			<if test="voice != null and voice != ''">
+				voice = #{voice},
+			</if>
+			<if test="video != null and video != ''">
+				video = #{video},
+			</if>
+			<if test="activeFlag != null and activeFlag != ''">
+				active_flag = #{activeFlag},
+			</if>
+			<if test="orderNo != null and orderNo != ''">
+				order_no = #{orderNo},
+			</if>
+			<if test="mp != null and mp != ''">
+				mp = #{mp},
+			</if>
+			<if test="remarks != null and remarks != ''">
+				remarks = #{remarks},
+			</if>
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wcp_ar_auto_reply SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove" >
+		DELETE FROM wcp_ar_auto_reply WHERE id = #{id}
+	</delete>
+</mapper>

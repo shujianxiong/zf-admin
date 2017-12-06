@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.ns.MemberNotifyDao">
+    
+	<sql id="memberNotifyColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		m.usercode AS "member.usercode",
+		a.notify_id AS "notify.id",
+		a.notify_type AS "notifyType",
+		a.title AS "title",
+		a.content AS "content",
+		a.read_flag AS "readFlag",
+		a.read_time AS "readTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="memberNotifyJoins">
+	   LEFT JOIN crm_mi_member m ON m.id = a.member_id
+	</sql>
+    
+	<select id="get" resultType="MemberNotify">
+		SELECT 
+			<include refid="memberNotifyColumns"/>
+		FROM crm_ns_member_notify a
+		<include refid="memberNotifyJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MemberNotify">
+		SELECT 
+			<include refid="memberNotifyColumns"/>
+		FROM crm_ns_member_notify a
+		<include refid="memberNotifyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="member != null">
+			    <if test="member.id != null and member.id != ''">
+					AND a.member_id = #{member.id}
+			    </if>
+			    <if test="member.usercode != null and member.usercode != ''">
+			         AND m.usercode = #{member.usercode}
+			    </if>
+			</if>
+			<if test="notify != null and notify.id != null and notify.id != ''">
+				AND a.notify_id = #{notify.id}
+			</if>
+			<if test="notifyType != null and notifyType != ''">
+				AND a.notify_type = #{notifyType}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="readFlag != null and readFlag != ''">
+				AND a.read_flag = #{readFlag}
+			</if>
+			<if test="beginReadTime != null and endReadTime != null and beginReadTime != '' and endReadTime != ''">
+				AND a.read_time BETWEEN #{beginReadTime} AND #{endReadTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MemberNotify">
+		SELECT 
+			<include refid="memberNotifyColumns"/>
+		FROM crm_ns_member_notify a
+		<include refid="memberNotifyJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getLastAnnounce" resultType="MemberNotify">
+        SELECT
+           <include refid="memberNotifyColumns"/>
+        FROM crm_ns_member_notify a
+        <include refid="memberNotifyJoins"/>
+        <where>
+            a.member_id = #{member.id}
+            AND a.notify_type = #{notifyType}
+        </where>
+        ORDER BY a.create_date DESC 
+        LIMIT 1
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_ns_member_notify(
+			id,
+			member_id,
+			notify_id,
+			notify_type,
+			title,
+			content,
+			read_flag,
+			read_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{notify.id},
+			#{notifyType},
+			#{title},
+			#{content},
+			#{readFlag},
+			#{readTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_ns_member_notify SET 	
+			member_id = #{member.id},
+			notify_id = #{notify.id},
+			notify_type = #{notifyType},
+			title = #{title},
+			content = #{content},
+			read_flag = #{readFlag},
+			read_time = #{readTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateToReaded">
+		UPDATE crm_ns_member_notify 
+	   	SET
+	   		read_flag = #{TRUE_FLAG},
+            read_time = #{readTime},
+            update_date = #{readTime}
+        WHERE
+        	1=1
+        	<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+        	<if test="member != null and member.id != null and member.id != ''">
+				AND member_id = #{member.id} 
+			</if>
+			<if test="readFlag != null and readFlag != ''">
+				AND read_flag = #{readFlag}
+			</if>
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_ns_member_notify SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

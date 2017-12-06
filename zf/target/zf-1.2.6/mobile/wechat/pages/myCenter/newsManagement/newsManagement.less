@@ -1,0 +1,175 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------导航栏----------------------------*/
+
+.newsArea{
+    background: @blockbacground;
+    li{
+        height: 70px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        border-bottom: 1px solid @linecolor;
+        line-height: 70px;
+        p{
+            position: relative;
+            line-height: 25px;
+            font-size: 1.4rem;
+            padding: 0 5px;
+            &:last-child{
+                color: #999;
+            }
+            b{
+                position: absolute;
+                top: 0;
+                display: inline-block;
+                margin: 0 5px;
+                width: 6px;
+                height: 6px;
+                .border-radius(100%);
+                line-height: 10px;
+                background: #e41f1f;
+            }
+        }
+        i{
+            float: left;
+            display: block;
+            width: 50px;
+            height: 50px;
+            padding: 0 10px;
+            img{
+                width: 100%;
+                height: 100%;
+            };
+        }
+    }
+}
+.newsList{
+    overflow: hidden;
+    li{
+       background: @blockbacground; 
+       margin-bottom: 10px;
+       img{
+           width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+       }
+       p{
+           padding: 0 10px 5px 10px;
+           line-height: 20px;
+           font-size: 1.2rem;
+            border-bottom: 1px solid @linecolor;
+       }
+       h2{
+            line-height: 40px;
+            padding: 0 10px;
+            border-bottom: 1px solid @linecolor;
+            color: @goldencolor;
+            font-size: 1.4rem;
+            i{
+                color: #fff;
+                float: right;
+                line-height: 40px;
+            }
+       }
+    }
+}
+.logisticsList{
+    overflow: hidden;
+    li{
+        h1{
+            line-height: 40px;
+            text-indent: 10px;
+            font-size: 1.4rem;
+        }
+        .order{
+            background: @blockbacground; 
+            border-top: 1px solid @linecolor;
+            border-bottom: 1px solid @linecolor;
+            overflow: hidden;
+            padding: 0 10px;
+            h3{
+                line-height: 40px;
+                border-bottom: 1px solid @linecolor;
+                font-size: 1.2rem;
+            }
+            div{
+                overflow: hidden;
+                padding: 10px 0;
+                border-bottom: 1px solid @linecolor;
+                img{
+                    float: left;
+                    width: 20%;
+                }
+                p{
+                    float: left;
+                    width: 80%;
+                    overflow:hidden;
+                    font-size: 1.4rem;
+                }
+            }
+            h2{
+                line-height: 40px;
+                padding: 0 10px;
+                color: @goldencolor;
+                font-size: 1.4rem;
+                i{
+                    color: #fff;
+                    float: right;
+                    line-height: 40px;
+                }
+            }
+        }
+    }
+}
+.systemInform{
+    overflow: hidden;
+    li{
+        h1{
+            line-height: 40px;
+            text-indent: 10px;
+            font-size: 1.4rem;
+        }
+        .order{
+            background: @blockbacground; 
+            border-top: 1px solid @linecolor;
+            border-bottom: 1px solid @linecolor;
+            overflow: hidden;
+            padding: 0 10px;
+            h3{
+                line-height: 30px;
+                font-size: 1.5rem;
+            }
+            div{
+                overflow: hidden;
+                padding-bottom: 10px;
+                border-bottom: 1px solid @linecolor;
+                p{
+                    color: #999;
+                    width: 100%;
+                    overflow:hidden;
+                    font-size: 1.2rem;
+                }
+            }
+            h2{
+                line-height: 40px;
+                color: @goldencolor;
+                font-size: 1.4rem;
+                i{
+                    color: #fff;
+                    float: right;
+                    line-height: 40px;
+                }
+            }
+        }
+    }
+}
+
+.messageCenterWrapper{
+    position: fixed;
+    top: -30px;
+    bottom: 0;
+    z-index: 9;
+    width: 100%;
+    overflow: hidden;
+
+}

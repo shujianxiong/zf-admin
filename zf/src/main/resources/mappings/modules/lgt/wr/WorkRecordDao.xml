@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.wr.WorkRecordDao">
+    
+	<select id="findList" resultType="WorkRecord">
+		SELECT su.name AS "name",
+		(SELECT COUNT(*) FROM bus_ol_return_order boro  
+		<where>
+		   boro.update_by = su.id 
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(boro.update_date) = TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND boro.update_date >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND boro.update_date <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'packageCount',
+		(SELECT COUNT(*) FROM lgt_po_purchase_product lppp 
+		<where>
+		   lppp.enter_person =su.id 
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(lppp.enter_time) = TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND lppp.enter_time >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND lppp.enter_time <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'purchaseCount',
+		(SELECT COUNT(*) FROM bus_ol_return_product a JOIN bus_ol_return_order b
+		 ON  a.return_order_id = b.id
+		<where>
+		   b.update_by = su.id
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(b.update_date) = TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND b.update_date >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND b.update_date <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'returnCount',
+		(SELECT COUNT(*) FROM bus_ol_pick_order bopo  JOIN bus_ol_send_order boso  JOIN bus_ol_send_product bosp 
+		<where>
+		     bosp.send_order_id = boso.id AND boso.pick_order_id = bopo.id AND bopo.create_by = su.id
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(bopo.update_date) = TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND bopo.update_date >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND bopo.update_date <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'pickOrderCount',
+		(SELECT COUNT(*) FROM bus_ol_send_order boso JOIN bus_ol_send_product bosp 
+		<where>
+		  bosp.send_order_id = boso.id and  boso.update_by = su.id  
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(boso.express_time)= TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND boso.express_time >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND boso.express_time <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'sendOrderCount',
+		(SELECT COUNT(*) FROM bus_ol_return_product a JOIN bus_ol_return_order b 
+		<where>
+		  a.del_flag = 0 AND a.return_order_id = b.id 
+		  AND b.update_by =su.id 
+		  AND a.responsibility_type in ("C","E")
+			<if test="beginCreateDate == null or endCreateDate == null or beginCreateDate == '' or endCreateDate == ''">
+		    AND TO_DAYS(a.update_date) = TO_DAYS(NOW())
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+              <![CDATA[AND a.update_date >= #{beginCreateDate}]]>
+            </if>
+             <if test="endCreateDate != null and endCreateDate != ''">
+               <![CDATA[AND a.update_date <= #{endCreateDate}]]>
+            </if>
+		</where> ) AS 'errProblemCount'
+		FROM sys_user su WHERE su.office_id ='3' AND su.del_flag='0'
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

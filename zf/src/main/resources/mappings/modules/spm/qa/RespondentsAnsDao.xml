@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.qa.RespondentsAnsDao">
+    
+	<sql id="respondentsAnsColumns">
+		a.id AS "id",
+		a.respondents_id AS "respondents.id",
+		a.questionnaire_que_id AS "questionnaireQue.id",
+		a.base_answer_id AS "baseAnswer.id",
+		a.answer_text AS "answerText",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		b1.name AS "baseAnswer.name",
+		q1.questionnaire_id AS "questionnaireQue.questionnaire.id",
+		q1.base_question_id AS "questionnaireQue.baseQuestion.id",
+		q2.name AS "questionnaireQue.questionnaire.name",
+		q3.name AS "questionnaireQue.baseQuestion.name",
+		q3.answer_type AS "questionnaireQue.baseQuestion.answerType",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="respondentsAnsJoins">
+		LEFT JOIN spm_qa_base_answer b1 ON b1.id=a.base_answer_id
+		LEFT JOIN spm_qa_questionnaire_que q1 ON q1.id=a.questionnaire_que_id
+		LEFT JOIN spm_qa_questionnaire q2 ON q2.id=q1.questionnaire_id
+		LEFT JOIN spm_qa_base_question q3 ON q3.id=q1.base_question_id
+	</sql>
+    
+    <resultMap type="com.chinazhoufan.admin.modules.spm.entity.qa.RespondentsAns" id="RespondentsAnsMap">
+    	<result property="id" 					column="id"/>
+    	<result property="respondents.id" 		column="respondents.id"/>
+    	<result property="baseAnswer.id" 		column="baseAnswer.id"/>
+    	<result property="baseAnswer.name" 		column="baseAnswer.name"/>
+    	<result property="updateDate" 			column="updateDate"/>
+    	<collection property="baseAnswerList" javaType="ArrayList" ofType="baseAnswer">
+    		<result property="id" column="baseAnswer.id"/>
+    		<result property="name" column="baseAnswer.name"/>
+    	</collection>
+    </resultMap>
+    
+	<select id="get" resultType="RespondentsAns">
+		SELECT 
+			<include refid="respondentsAnsColumns"/>
+		FROM spm_qa_respondents_ans a
+		<include refid="respondentsAnsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RespondentsAns">
+		SELECT 
+			<include refid="respondentsAnsColumns"/>
+		FROM spm_qa_respondents_ans a
+		<include refid="respondentsAnsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="questionnaireQue != null and questionnaireQue.questionnaire.name != ''">
+				AND (q2.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{questionnaireQue.questionnaire.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{questionnaireQue.questionnaire.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{questionnaireQue.questionnaire.name},'%')</if>
+				OR q3.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{questionnaireQue.questionnaire.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{questionnaireQue.questionnaire.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{questionnaireQue.questionnaire.name},'%')</if>
+				)
+			</if>
+			<if test="respondents != null and respondents.id != null and respondents.id != ''">
+				AND a.respondents_id = #{respondents.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RespondentsAns">
+		SELECT 
+			<include refid="respondentsAnsColumns"/>
+		FROM spm_qa_respondents_ans a
+		<include refid="respondentsAnsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_qa_respondents_ans(
+			id,
+			respondents_id,
+			questionnaire_que_id,
+			base_answer_id,
+			answer_text,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{respondents.id},
+			#{questionnaireQue.id},
+			#{baseAnswer.id},
+			#{answerText},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_qa_respondents_ans SET 	
+			respondents_id = #{respondents.id},
+			questionnaire_que_id = #{questionnaireQue.id},
+			base_answer_id = #{baseAnswer.id},
+			answer_text = #{answerText},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_qa_respondents_ans SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getCountByRespondents" resultType="long">
+		SELECT COUNT(1)
+		  FROM spm_qa_respondents_ans a
+		 WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		   <if test="id != null and id != '' ">
+		   		AND a.respondents_id = #{id}
+		   </if>
+	</select>
+	
+	<select id="getByQueAndAns" resultType="RespondentsAns">
+		SELECT a.id AS "id"
+		  FROM spm_qa_respondents_ans a
+		 WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		   <if test="questionnaireQue != null and questionnaireQue.id != null and questionnaireQue.id != '' ">
+		   		AND a.questionnaire_que_id = #{questionnaireQue.id}
+		   </if>
+		   <if test="baseAnswer != null and baseAnswer.id != null and baseAnswer.id != '' ">
+		   		AND a.base_answer_id = #{baseAnswer.id}
+		   </if>
+		   <if test="answerText != null and answerText != '' ">
+		   		AND a.answer_text = #{answerText}
+		   </if>
+	</select>
+	
+	<delete id="deleteByQueAndAns">
+		DELETE FROM spm_qa_respondents_ans 
+			<where>
+		        <if test="respondents != null and respondents.id != null and respondents.id != '' ">
+		        	respondents_id = #{respondents.id}
+		        </if>
+		        <if test="questionnaireQue != null and questionnaireQue.id != null and questionnaireQue.id != '' ">
+		   			AND questionnaire_que_id = #{questionnaireQue.id}
+			    </if>
+			    <if test="baseAnswer != null and baseAnswer.id != null and baseAnswer.id != '' ">
+			   		AND base_answer_id = #{baseAnswer.id}
+			    </if>
+			   <if test="answerText != null and answerText != '' ">
+			   		AND answer_text = #{answerText}
+			   </if>
+			</where>
+	</delete>
+	
+	<delete id="remove">
+		DELETE FROM spm_qa_respondents_ans
+		      WHERE id = #{id}
+	</delete>
+	
+</mapper>

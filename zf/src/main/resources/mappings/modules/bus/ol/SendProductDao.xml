@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ol.SendProductDao">
+    
+	<sql id="sendProductColumns">
+		a.id AS "id",
+		a.send_order_id AS "sendOrder.id",
+		a.send_produce_id AS "sendProduce.id",
+		a.product_id AS "product.id",
+		a.out_wareplace_id AS "outWareplace.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sendProductJoins">
+	</sql>
+    
+	<select id="get" resultType="SendProduct">
+		SELECT 
+			<include refid="sendProductColumns"/>
+		FROM bus_ol_send_product a
+		<include refid="sendProductJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SendProduct">
+		SELECT 
+			<include refid="sendProductColumns"/>
+		FROM bus_ol_send_product a
+		<include refid="sendProductJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sendOrder != null and sendOrder.id != null and sendOrder.id != ''">
+				AND a.send_order_id = #{sendOrder.id}
+			</if>
+			<if test="sendProduce != null and sendProduce.id != null and sendProduce.id != ''">
+				AND a.send_produce_id = #{sendProduce.id}
+			</if>
+			<if test="product != null and product.id != null and product.id != ''">
+				AND a.product_id = #{product.id}
+			</if>
+			<if test="outWareplace != null and outWareplace.id != null and outWareplace.id != ''">
+				AND a.out_wareplace_id = #{outWareplace.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SendProduct">
+		SELECT 
+			<include refid="sendProductColumns"/>
+		FROM bus_ol_send_product a
+		<include refid="sendProductJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_ol_send_product(
+			id,
+			send_order_id,
+			send_produce_id,
+			product_id,
+			out_wareplace_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{sendOrder.id},
+			#{sendProduce.id},
+			#{product.id},
+			#{outWareplace.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ol_send_product SET 	
+			send_order_id = #{sendOrder.id},
+			send_produce_id = #{sendProduce.id},
+			product_id = #{product.id},
+			out_wareplace_id = #{outWareplace.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ol_send_product SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findSendProductBySendOrder" resultType="SendProduct">
+        SELECT 
+        sp.product_id AS "product.id",
+        p.status AS "product.status",
+        p.code AS "produce.code",
+        g.name AS "produce.goods.name",
+        g.icon AS "produce.goods.icon"
+        FROM bus_ol_send_product sp
+        LEFT JOIN lgt_ps_product p ON p.id = sp.product_id
+        LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id
+        WHERE sp.send_order_id = #{sendOrderId} AND sp.del_flag = 0
+    </select>
+</mapper>

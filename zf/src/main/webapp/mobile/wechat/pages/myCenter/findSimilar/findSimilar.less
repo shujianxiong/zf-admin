@@ -1,0 +1,131 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------导航栏----------------------------*/
+.completeInformation{
+    height: 40px;
+    padding: 0 10px;
+    line-height: 40px;
+    background: @blockbacground;
+    p{
+        float: left;
+        font-size: 1.2rem
+    }
+    span{
+        float: right;
+        padding: 0 2px;
+    }
+    i{
+        float: right;
+        font-size: 1.6rem;
+    }
+}
+.scanGoodsList{
+    overflow: hidden;
+    .top{
+        height: 45px;
+        background: @blockbacground;
+        ul{
+            width: 100%;
+            height: 100%;
+            li{
+                width: 33.333%;
+                height: 100%;
+                float: left;
+                text-align: center;
+                line-height: 45px;
+                box-sizing: border-box;
+                span{
+                    font-size: @commonText;
+                    line-height: @commonTitle;
+                    padding-bottom: 5px;
+                }
+            }
+            .active{
+                color: @goldencolor;
+                border-bottom: 2px solid @goldencolor;
+            }
+        }
+    }
+}
+
+.goodsItem{
+    .oderCondent{
+        border-top: 1px solid @linecolor;
+        border-bottom: 1px solid @linecolor;
+        background: @blockbacground;
+        .oderItem{
+            position: relative;
+            width: 100%;
+            height: 135px;
+            min-height: 100px;
+            box-sizing: border-box;
+            .img{
+                float: left;
+                width: 30%;
+                height: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+                img{
+                    width: 100%;
+                }
+            }
+            .text{
+                float: left;
+                width: 70%;
+                height: 100%;
+                box-sizing: border-box;
+                padding: 10px; 
+                border-top: 1px solid @linecolor;
+                h2{
+                    font-size: 1.3rem;
+                    line-height: 20px;
+                    span{
+                        font-size: 1.2rem;
+                    }
+                }
+                p{
+                    font-size: 1rem;
+                    color: #999;
+                    line-height: 25px;
+                }
+                span{
+                    font-size: 1rem;
+                    color: #e41f1f;
+                }
+            }
+            &:first-child .text{
+               border: none;
+            }
+            
+        }
+    }
+}
+.goodsDetail_funcBar{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 45px;
+    background-color: @functionBar;
+    z-index: 99;
+   
+    .goodsDetail_funcBar_detail{        
+        float: right;
+        width: 25%;
+        height: 100%;
+        background-color: @goldencolor;
+        color: #999;
+        line-height: 45px;
+        text-align: center;
+
+        font-size: @commonText;
+        &.shopCart{
+            background: #f1f1f1;
+            color: @goldencolor;
+        }
+    }
+}
+.division{
+    line-height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #999;
+}

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.pj.ProduceJudgeDao">
+    
+	<sql id="produceJudgeSimpleColumns">
+		a.id AS "id",
+		a.experience_order_id AS "experienceOrder.id",
+		a.goods_id AS "goods.id",
+		a.produce_id AS "produce.id",
+		a.member_id AS "member.id",
+		a.produce_level AS "produceLevel",
+		a.service_level AS "serviceLevel",
+		a.express_level AS "expressLevel",
+		a.check_status AS "checkStatus",
+		a.check_by AS "checkBy.id",
+		a.check_time AS "checkTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+    
+	<sql id="produceJudgeColumns">
+		a.id AS "id",
+		a.experience_order_id AS "experienceOrder.id",
+		eo.order_no AS "experienceOrder.orderNo",
+		
+		a.goods_id AS "goods.id",
+		g.name AS "goods.name",
+		g.sample_photo AS "goods.samplePhoto",
+		
+		a.produce_id AS "produce.id",
+		p.code AS "produce.code",
+		p.name AS "produce.name",
+		
+		a.member_id AS "member.id",
+		m.usercode AS "member.usercode",
+		
+		a.produce_level AS "produceLevel",
+		a.service_level AS "serviceLevel",
+		a.express_level AS "expressLevel",
+		
+		a.check_status AS "checkStatus",
+		a.check_by AS "checkBy.id",
+		a.check_time AS "checkTime",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		
+		jp.id AS "photo.id",
+		jp.photo_url AS "photo.photoUrl",
+		s.id AS "summary.id",
+		s.name AS "summary.name"
+		
+	</sql>
+	
+	<resultMap type="ProduceJudge" id="produceJudgeMap">
+	   	<result column="id"  property="id"/>
+	   	<result column="experienceOrder.id"  property="experienceOrder.id"/>
+	   	<result column="experienceOrder.orderNo"  property="experienceOrder.orderNo"/>
+	   	<result column="goods.id"  property="goods.id"/>
+	   	<result column="goods.name"  property="goods.name"/>
+	   	<result column="goods.samplePhoto"  property="goods.samplePhoto"/>
+	   	<result column="produce.id"  property="produce.id"/>
+	   	<result column="produce.code"  property="produce.code"/>
+	   	<result column="produce.name"  property="produce.name"/>
+	   	<result column="member.id"  property="member.id"/>
+	   	<result column="member.usercode"  property="member.usercode"/>
+	   	<result column="produceLevel"  property="produceLevel"/>
+	   	<result column="serviceLevel"  property="serviceLevel"/>
+	   	<result column="expressLevel"  property="expressLevel"/>
+	   	<result column="checkStatus"  property="checkStatus"/>
+	   	<result column="checkBy.id"  property="checkBy.id"/>
+	   	<result column="checkTime"  property="checkTime"/>
+	   	<result column="createBy.id"  property="createBy.id"/>
+	   	<result column="createDate"  property="createDate"/>
+	   	<result column="updateBy.id"  property="updateBy.id"/>
+	   	<result column="updateDate"  property="updateDate"/>
+	   	<result column="remarks"  property="remarks"/>
+	   	<result column="delFlag"  property="delFlag"/>
+	   
+		<collection property="photoList" ofType="ProduceJudgePhoto">
+	   		<result column="photo.id"  		property="id"/>
+	       	<result column="photo.photoUrl"	property="photoUrl"/>
+	   </collection>
+	   
+	   <collection property="summaryList" ofType="Summary">
+	       <result column="summary.id" property="id"/>
+	       <result column="summary.name" property="name"/>
+	   </collection>
+	</resultMap>
+	
+	<sql id="produceJudgeJoins">
+	   LEFT JOIN crm_mi_member m ON m.id = a.member_id
+	   LEFT JOIN lgt_ps_goods g ON g.id = a.goods_id
+	   LEFT JOIN lgt_ps_produce p ON p.id = a.produce_id
+	   LEFT JOIN bus_oe_experience_order eo ON eo.id = a.experience_order_id
+	   LEFT JOIN bus_pj_produce_judge_photo jp ON jp.produce_judge_id = a.id
+	   LEFT JOIN bus_pj_produce_judge_summary js ON js.produce_judge_id = a.id
+	   LEFT JOIN bus_pj_summary s ON s.id = js.summary_id
+	</sql>
+    
+	<select id="get" resultMap="produceJudgeMap">
+		SELECT 
+			<include refid="produceJudgeColumns"/>
+		FROM bus_pj_produce_judge a
+		<include refid="produceJudgeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByExperienceOrderId" resultType="ProduceJudge">
+		SELECT 
+			<include refid="produceJudgeSimpleColumns"/>
+		FROM bus_pj_produce_judge a
+		WHERE a.experience_order_id = #{experienceOrderId}
+	</select>
+	
+	<select id="findList" resultMap="produceJudgeMap">
+		SELECT 
+			<include refid="produceJudgeColumns"/>
+		FROM bus_pj_produce_judge a
+		<include refid="produceJudgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="experienceOrder != null and experienceOrder.orderNo != null and experienceOrder.orderNo != ''">
+			     AND eo.order_no = #{experienceOrder.orderNo} 
+			</if>
+			<if test="member != null and member.usercode != null and member.usercode != ''">
+			     AND m.usercode = #{member.usercode}
+			</if>
+			<if test="checkStatus != null and checkStatus != ''">
+			     AND a.check_status = #{checkStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultMap="produceJudgeMap">
+		SELECT 
+			<include refid="produceJudgeColumns"/>
+		FROM bus_pj_produce_judge a
+		<include refid="produceJudgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_pj_produce_judge(
+			id,
+			experience_order_id,
+			goods_id,
+			produce_id,
+			member_id,
+			produce_level,
+			service_level,
+			express_level,
+			
+			check_status,
+			check_by,
+			check_time,
+			
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{experienceOrder.id},
+			#{goods.id},
+			#{produce.id},
+			#{member.id},
+			#{produceLevel},
+			#{serviceLevel},
+			#{expressLevel},
+			
+			#{checkStatus},
+			#{checkBy.id},
+			#{checkTime},
+			
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_pj_produce_judge SET 	
+			experience_order_id = #{experienceOrder.id},
+			goods_id = #{goods.id},
+			produce_id = #{produce.id},
+			member_id = #{member.id},
+			produce_level = #{produceLevel},
+			service_level = #{serviceLevel},
+			express_level = #{expressLevel},
+			
+			check_status= #{checkStatus},
+			check_by = #{checkBy.id},
+			check_time = #{checkTime},
+			
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_pj_produce_judge SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

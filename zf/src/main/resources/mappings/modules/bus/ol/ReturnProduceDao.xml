@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ol.ReturnProduceDao">
+    
+	<sql id="returnProduceColumns">
+		a.id AS "id",
+		a.return_order_id AS "returnOrder.id",
+		a.order_produce_id AS "orderProduceId",
+		a.produce_id AS "produce.id",
+		a.produce_full_name AS "produceFullName",
+		a.num AS "num",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="returnProduceJoins">
+	</sql>
+
+	<resultMap id="ReturnProduceMap" type="ReturnProduce">
+		<result column="id" property="id" />
+		<collection property="returnProductList" ofType="ReturnProduct">
+			<result column="returnProductList.id" property="id" />
+			<result column="returnProductList.damageType" property="damageType" />
+			<result column="returnProductList.decMoney" property="decMoney" />
+		</collection>
+	</resultMap>
+	
+	<select id="getByOrderProduce" resultMap="ReturnProduceMap">
+		SELECT a.id AS "id",
+			   b.id AS "returnProductList.id",
+			   b.damage_type AS "returnProductList.damageType",
+			   b.dec_money AS "returnProductList.decMoney"
+		  FROM bus_ol_return_produce a
+	 LEFT JOIN bus_ol_return_product b ON a.id = b.return_produce_id
+	     WHERE a.order_produce_id = #{orderProduceId}
+	</select>
+	
+	<select id="get" resultType="ReturnProduce">
+		SELECT 
+			<include refid="returnProduceColumns"/>
+		FROM bus_ol_return_produce a
+		<include refid="returnProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ReturnProduce">
+		SELECT 
+			<include refid="returnProduceColumns"/>
+		FROM bus_ol_return_produce a
+		<include refid="returnProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="returnOrder != null and returnOrder.id != null and returnOrder.id != ''">
+				AND a.return_order_id = #{returnOrder.id}
+			</if>
+			<if test="orderProduceId != null and orderProduceId != ''">
+				AND a.order_produce_id = #{orderProduceId}
+			</if>
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				AND a.produce_id = #{produce.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ReturnProduce">
+		SELECT 
+			<include refid="returnProduceColumns"/>
+		FROM bus_ol_return_produce a
+		<include refid="returnProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_ol_return_produce(
+			id,
+			return_order_id,
+			order_produce_id,
+			produce_full_name,
+			produce_id,
+			num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{returnOrder.id},
+			#{orderProduceId},
+			#{produceFullName},
+			#{produce.id},
+			#{num},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ol_return_produce SET 	
+			return_order_id = #{returnOrder.id},
+			order_produce_id = #{orderProduceId},
+			produce_id = #{produce.id},
+			produce_full_name = #{produceFullName},
+			num = #{num},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ol_return_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

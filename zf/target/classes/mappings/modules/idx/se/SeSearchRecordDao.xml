@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.idx.dao.se.SeSearchRecordDao">
+    
+	<sql id="seSearchRecordColumns">
+		a.id AS "id",
+		a.keyword AS "keyword",
+		a.type AS "type",
+		a.search_num AS "searchNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="seSearchRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="SeSearchRecord">
+		SELECT 
+			<include refid="seSearchRecordColumns"/>
+		FROM idx_se_search_record a
+		<include refid="seSearchRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SeSearchRecord">
+		SELECT 
+			<include refid="seSearchRecordColumns"/>
+		FROM idx_se_search_record a
+		<include refid="seSearchRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="keyword != null and keyword != ''">
+				AND a.keyword LIKE 
+					<if test="dbName == 'oracle'">'%'||#{keyword}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{keyword}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{keyword},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SeSearchRecord">
+		SELECT 
+			<include refid="seSearchRecordColumns"/>
+		FROM idx_se_search_record a
+		<include refid="seSearchRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO idx_se_search_record(
+			id,
+			keyword,
+			type,
+			search_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{keyword},
+			#{type},
+			#{searchNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE idx_se_search_record SET 	
+			keyword = #{keyword},
+			type = #{type},
+			search_num = #{searchNum},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE idx_se_search_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.oe.ExperienceOrderDao">
+    
+	<sql id="experienceOrderColumns">
+		a.id AS "id",
+		a.order_no AS "orderNo",
+		a.member_id AS "member.id",
+		m.usercode AS "member.usercode",
+		a.type AS "type",
+		a.status_member AS "statusMember",
+		a.status_system AS "statusSystem",
+		a.status_pay AS "statusPay",
+		a.status_judge AS "statusJudge",
+		a.status_logistical AS "statusLogistical",
+		a.close_type AS "closeType",
+		a.close_time AS "closeTime",
+		a.appoint_date_type AS "appointDateType",
+		a.appoint_date AS "appointDate",
+		a.appoint_stock_status AS "appointStockStatus",
+		a.send_time AS "sendTime",
+		a.express_days AS "expressDays",
+		a.real_exp_date AS "realExpDate",
+		a.appoint_pick_date AS "appointPickDate",
+		a.money_produce AS "moneyProduce",
+		a.money_lgt AS "moneyLgt",
+		a.money_back_lgt AS "moneyBackLgt",
+		a.money_experience AS "moneyExperience",
+		a.money_appoint AS "moneyAppoint",
+		a.money_appoint_service AS "moneyAppointService",
+		a.money_total AS "moneyTotal",
+		a.money_paid AS "moneyPaid",
+		a.pay_time AS "payTime",
+		a.pay_type AS "payType",
+		a.pay_channel AS "payChannel",
+		a.receive_name AS "receiveName",
+		a.receive_tel AS "receiveTel",
+		a.prov AS "prov",
+		a.city AS "city",
+		a.receive_area_str AS "receiveAreaStr",
+		a.receive_area_detail AS "receiveAreaDetail",
+		a.member_remarks AS "memberRemarks",
+		a.out_warehouse_id AS "outWarehouse.id",
+		a.full_refund_flag AS "fullRefundFlag",
+		a.money_sett_src_return AS "moneySettSrcReturn",
+		a.money_sett_dec AS "moneySettDec",
+		a.money_sett_decable_beans AS "moneySettDecableBeans",
+		a.money_sett_dec_beans AS "moneySettDecBeans",
+		a.num_sett_dec_beans AS "numSettDecBeans",
+		a.money_sett_overdue AS "moneySettOverdue",
+		a.money_sett_return_express AS "moneySettReturnExpress",
+		a.money_sett_return AS "moneySettReturn",
+		a.settlement_time AS "settlementTime",
+		a.zmxy_flag AS "zmxyFlag",
+		a.arrearage_amount AS "arrearageAmount",
+		a.experience_pack_id AS "experiencePack.id",
+		a.experience_time AS "experienceTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="experienceOrderJoins">
+	LEFT JOIN crm_mi_member m ON m.id=a.member_id
+	</sql>
+    
+	<select id="get" resultType="ExperienceOrder">
+		SELECT 
+			<include refid="experienceOrderColumns"/>
+		FROM bus_oe_experience_order a
+		<include refid="experienceOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ExperienceOrder">
+		SELECT 
+			<include refid="experienceOrderColumns"/>
+		FROM bus_oe_experience_order a
+		<include refid="experienceOrderJoins"/>
+		     LEFT JOIN bus_pj_produce_judge pj ON pj.experience_order_id = a.id
+		     LEFT JOIN bus_pj_produce_judge_photo pjp ON pjp.produce_judge_id = pj.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderNo != null and orderNo != ''">
+				AND a.order_no = #{orderNo}
+			</if>
+			<if test="member != null and member.id != null and member.id != ''">
+				AND a.member_id = #{member.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="statusSystem != null and statusSystem != ''">
+				AND a.status_system = #{statusSystem}
+			</if>
+			<if test="statusMember != null and statusMember != ''">
+			    AND a.status_member = #{statusMember}
+			</if>
+			<if test="statusPay != null and statusPay != ''">
+				AND a.status_pay = #{statusPay}
+			</if>
+			<if test="statusJudge != null and statusJudge != ''">
+				AND a.status_judge = #{statusJudge}
+			</if>
+			<if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.order_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				OR m.usercode LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+				<![CDATA[AND a.create_date >= #{beginCreateDate}]]>
+			</if>
+			<if test="endCreateDate != null and endCreateDate != ''">
+				<![CDATA[AND a.create_date <= #{endCreateDate}]]>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ExperienceOrder">
+		SELECT 
+			<include refid="experienceOrderColumns"/>
+		FROM bus_oe_experience_order a
+		<include refid="experienceOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListByIds" resultType="ExperienceOrder">
+	    SELECT 
+            <include refid="experienceOrderColumns"/>
+        FROM bus_oe_experience_order a
+        <include refid="experienceOrderJoins"/>
+        <where>
+            a.del_flag = 0
+            AND a.id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </where>
+	</select>
+	
+	<select id="findListByProduceIds" resultType="ExperienceOrder">
+		SELECT
+		<include refid="experienceOrderColumns"/>
+		FROM bus_oe_experience_order a
+		<include refid="experienceOrderJoins"/>
+		<where>
+			a.del_flag = 0
+			AND a.id in (
+			SELECT experience_order_id FROM bus_oe_experience_produce b WHERE b.produce_id
+			IN
+			<foreach collection="ids" item="id" separator="," open="(" close=")">
+				#{id}
+			</foreach>
+			)
+			<if test="statusPay != null and statusPay != ''">
+				AND a.status_pay = #{statusPay}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="appointStockStatus != null and appointStockStatus != ''">
+				AND a.appoint_stock_status = #{appointStockStatus}
+			</if>
+		</where>
+		ORDER BY a.appoint_date ASC
+	</select>
+	
+	<!-- 统计体验单在指定时间内的成交量 -->
+	<select id="statExperienceOrderDayTradingVolume" resultType="java.lang.Integer">
+		SELECT count(a.id) FROM bus_oe_experience_order a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} 
+			AND a.status_pay not in ('1','2')
+			<if test="beginCreateDate != null and beginCreateDate != ''">
+	            <![CDATA[AND a.create_date >= #{beginCreateDate}]]>
+	        </if>
+	        <if test="endCreateDate != null and endCreateDate != ''">
+	            <![CDATA[AND a.create_date <= #{endCreateDate}]]>
+	        </if>
+		</where> 
+	</select>
+
+	<select id="countReturnOverDue" resultType="int">
+		SELECT COUNT(1)
+		FROM  bus_oe_experience_order a
+		WHERE a.member_id = #{memberId}
+		  AND a.status_system != #{STATUSSYSTEM_CLOSE}
+		  <![CDATA[AND DATEDIFF(appoint_pick_date, a.real_exp_date)>=#{CONFIG_EXPERIENCEDAYS}]]>
+	</select>
+	
+	<resultMap id="experienceOrderWithProduceMap" type="ExperienceOrder">
+	   <result column="id"  					property="id"/>
+	   <result column="orderNo"  				property="orderNo"/>
+	   <result column="member.id"  				property="member.id"/>
+	   <result column="experiencePackId"  				property="experiencePackId"/>
+		<result column="member.usercode"  		property="member.usercode"/>
+	   <result column="type"  					property="type"/>
+	   <result column="statusMember"  			property="statusMember"/>
+	   <result column="statusSystem"  			property="statusSystem"/>
+	   <result column="statusPay"  				property="statusPay"/>
+	   <result column="statusJudge"  			property="statusJudge"/>
+		<result column="statusLogistical"  			property="statusLogistical"/>
+	   <result column="closeType"				property="closeType"/>
+       <result column="closeTime"				property="closeTime"/>
+       <result column="appointDateType"			property="appointDateType"/>
+       <result column="appointDate"				property="appointDate"/>
+       <result column="appointStockStatus"		property="appointStockStatus"/>
+       <result column="sendTime"				property="sendTime"/>
+       <result column="expressDays"				property="expressDays"/>
+       <result column="realExpDate"				property="realExpDate"/>
+       <result column="appointPickDate"			property="appointPickDate"/>
+       <result column="moneyProduce"			property="moneyProduce"/>
+       <result column="moneyLgt"				property="moneyLgt"/>
+		<result column="moneyBackLgt"			property="moneyBackLgt"/>
+       <result column="moneyExperience"			property="moneyExperience"/>
+       <result column="moneyAppoint"			property="moneyAppoint"/>
+       <result column="moneyAppointService" 	property="moneyAppointService"/>
+       <result column="moneyTotal"				property="moneyTotal"/>
+	   <result column="moneyPaid"				property="moneyPaid"/>
+	   <result column="payTime"		  			property="payTime"/>
+       <result column="payType"					property="payType"/>
+       <result column="payChannel"				property="payChannel"/>
+       <result column="receiveName"				property="receiveName"/>
+       <result column="receiveTel"				property="receiveTel"/>
+       <result column="receiveAreaStr"			property="receiveAreaStr"/>
+       <result column="receiveAreaDetail"		property="receiveAreaDetail"/>
+	   <result column="memberRemarks"  			property="memberRemarks"/>
+	   <result column="outWarehouse.id" 		property="outWarehouse.id"/>
+	   <result column="fullRefundFlag"  		property="fullRefundFlag"/>
+	   <result column="moneySettSrcReturn"  	property="moneySettSrcReturn"/>
+	   <result column="moneySettDec"  			property="moneySettDec"/>
+	   <result column="moneySettDecableBeans"	property="moneySettDecableBeans"/>
+	   <result column="moneySettDecBeans"  		property="moneySettDecBeans"/>
+	   <result column="numSettDecBeans"  		property="numSettDecBeans"/>
+	   <result column="moneySettOverdue"  		property="moneySettOverdue"/>
+	   <result column="moneySettReturnExpress"	property="moneySettReturnExpress"/>
+	   <result column="moneySettReturn"  		property="moneySettReturn"/>
+	   <result column="settlementTime"  		property="settlementTime"/>
+		<result column="arrearageAmount"  		property="arrearageAmount"/>
+		<result column="experiencePack.id"  		property="experiencePack.id"/>
+		<result column="experienceTime"  		property="experienceTime"/>
+	   <result column="createDate"  			property="createDate"/>
+	   <result column="receiveTime"              property="receiveTime"/>
+        <result column="expressTime"              property="expressTime"/>
+	   <collection property="epList" ofType="ExperienceProduce">
+		   <result column="ep.id"  						property="id"/>
+		   <result column="ep.produce.id"  				property="produce.id"/>
+		   <result column="ep.produce.code"  			property="produce.code"/>
+		   <result column="ep.num"  					property="num"/>
+		   <result column="ep.buyNum"  					property="buyNum"/>
+		   <result column="ep.goodsTitle"  				property="goodsTitle"/>
+		   <result column="ep.produceName"  			property="produceName"/>
+		   <result column="ep.priceSrcExperience"  		property="priceSrcExperience"/>
+		   <result column="ep.scaleExperienceDeposit"  	property="scaleExperienceDeposit"/>
+		   <result column="ep.priceExperienceDeposit"  	property="priceExperienceDeposit"/>
+		   <result column="ep.status"  					property="status"/>
+		   <result column="ep.decisionType"  			property="decisionType"/>
+		   <result column="ep.decisionBuyOrder.id"  	property="decisionBuyOrder.id"/>
+		   <result column="ep.decisionBuyOrder.orderNo"	property="decisionBuyOrder.orderNo"/>
+		   <result column="ep.decisionBuyOrder.moneyLgt"  	property="decisionBuyOrder.moneyLgt"/>
+		   <result column="ep.decisionBuyOrder.moneyAppointService"	property="decisionBuyOrder.moneyAppointService"/>
+		   <result column="ep.moneySettDec"  			property="moneySettDec"/>
+		   <result column="ep.damageType"  				property="damageType"/>
+		   <result column="ep.moneyCheckDec"  			property="moneyCheckDec"/>
+		   <result column="ep.moneySettDecableBeans"  	property="moneySettDecableBeans"/>
+		   <result column="ep.priceSrcBuy"  			property="priceSrcBuy"/>
+		   <result column="ep.discountBuy"  			property="discountBuy"/>
+		   <result column="ep.priceBuy"  				property="priceBuy"/>
+		   <result column="ep.produce.goods.id"			property="produce.goods.id"/>
+		   <result column="ep.produce.code"				property="produce.code"/>
+		   <result column="ep.produce.priceSrc"				property="produce.priceSrc"/>
+		   <result column="ep.produce.scaleExperienceFee"		property="produce.scaleExperienceFee"/>
+		   <result column="ep.produce.scaleExperienceDeposit"		property="produce.scaleExperienceDeposit"/>
+		   <result column="ep.produce.priceSrc"		property="produce.priceSrc"/>
+		   <result column="ep.returnProduct.decMoney"		property="returnProduct.decMoney"/> 
+		   <result column="ep.returnProduct.damageType"		property="returnProduct.damageType"/> 
+		   <result column="ep.produce.goods.icon"		property="produce.goods.icon"/>
+		   <result column="ep.returnProduct.damageType"		property="returnProduct.damageType"/>
+		   <result column="ep.returnProduct.decMoney"		property="returnProduct.decMoney"/>
+	   </collection>
+	</resultMap>
+	<select id="getDetail" resultMap="experienceOrderWithProduceMap">
+	    SELECT 
+		    a.id AS "id",
+	        a.order_no AS "orderNo",
+	        a.member_id AS "member.id",
+	        a.experience_pack_id AS "experiencePackId",
+	        m.usercode AS "member.usercode",
+	        a.type AS "type",
+	        a.status_member AS "statusMember",
+	        a.status_system AS "statusSystem",
+	        a.status_pay AS "statusPay",
+	        a.status_judge AS "statusJudge",
+	        a.status_logistical AS "statusLogistical",
+	        a.close_type AS "closeType",
+	        a.close_time AS "closeTime",
+	        a.appoint_date_type AS "appointDateType",
+	        a.appoint_date AS "appointDate",
+	        a.appoint_stock_status AS "appointStockStatus",
+			a.send_time AS "sendTime",
+			a.express_days AS "expressDays",
+       		a.real_exp_date AS "realExpDate",
+			a.appoint_pick_date AS "appointPickDate",
+	        a.money_produce AS "moneyProduce",
+	        a.money_lgt AS "moneyLgt",
+	        a.money_back_lgt AS "moneyBackLgt",
+	        a.money_experience AS "moneyExperience",
+	        a.money_appoint AS "moneyAppoint",
+	        a.money_appoint_service AS "moneyAppointService",
+	        a.money_total AS "moneyTotal",
+	        a.money_paid AS "moneyPaid",
+	        a.pay_time AS "payTime",
+	        a.pay_type AS "payType",
+	        a.pay_channel AS "payChannel",
+	        a.receive_name AS "receiveName",
+	        a.receive_tel AS "receiveTel",
+	        a.receive_area_str AS "receiveAreaStr",
+	        a.receive_area_detail AS "receiveAreaDetail",
+	        a.member_remarks AS "memberRemarks",
+	        a.out_warehouse_id AS "outWarehouse.id",
+	        a.full_refund_flag AS "fullRefundFlag",
+	       	a.money_sett_src_return AS "moneySettSrcReturn",
+			a.money_sett_dec AS "moneySettDec",
+			a.money_sett_decable_beans AS "moneySettDecableBeans",
+			a.money_sett_dec_beans AS "moneySettDecBeans",
+			a.num_sett_dec_beans AS "numSettDecBeans",
+			a.money_sett_overdue AS "moneySettOverdue",
+			a.money_sett_return_express AS "moneySettReturnExpress",
+			a.money_sett_return AS "moneySettReturn",
+			a.settlement_time AS "settlementTime",
+			a.arrearage_amount AS "arrearageAmount",
+			a.experience_pack_id AS "experiencePack.id",
+			a.experience_time AS "experienceTime",
+	        a.create_date AS "createDate",
+	        ep.id 						AS "ep.id",
+		    ep.produce_id 				AS "ep.produce.id",
+		    p.code 				AS "ep.produce.code",
+		    ep.num 						AS "ep.num",
+		    ep.buy_num 						AS "ep.buyNum",
+	        ep.goods_title 				AS "ep.goodsTitle",
+		    ep.produce_name 			AS "ep.produceName",
+		    ep.price_src_experience		AS "ep.priceSrcExperience",
+		    ep.scale_experience_deposit	AS "ep.scaleExperienceDeposit",
+		    ep.price_experience_deposit	AS "ep.priceExperienceDeposit",
+		    ep.status					AS "ep.status",
+		    ep.decision_type			AS "ep.decisionType",
+		    ep.decision_buy_order_id	AS "ep.decisionBuyOrder.id",
+		    bo.order_no					AS "ep.decisionBuyOrder.orderNo",
+		    bo.money_lgt				AS "ep.decisionBuyOrder.moneyLgt",
+		    bo.money_appoint_service	AS "ep.decisionBuyOrder.moneyAppointService",
+		    ep.money_sett_dec			AS "ep.moneySettDec",
+		    ep.damage_type				AS "ep.damage_type",
+		    ep.money_check_dec			AS "ep.moneyCheckDec",
+		    ep.money_sett_decable_beans	AS "ep.moneySettDecableBeans",
+		    ep.price_src_buy			AS "ep.priceSrcBuy",
+		    ep.discount_buy				AS "ep.discountBuy",
+		    ep.price_buy				AS "ep.priceBuy",
+		    p.goods_id 					AS "ep.produce.goods.id",
+		    p.code 						AS "ep.produce.code",
+		    p.price_src AS "ep.produce.priceSrc",
+            p.scale_experience_fee AS "ep.produce.scaleExperienceFee",
+            p.scale_experience_deposit AS "ep.produce.scaleExperienceDeposit",
+            p.price_src AS "ep.produce.priceSrc",
+           <!--  rp.dec_money AS "ep.returnProduct.decMoney",
+            rp.damage_type AS "ep.returnProduct.damageType", -->
+	        g.icon 						AS "ep.produce.goods.icon",
+	        borp.damage_type AS "ep.returnProduct.damageType",
+            borp.dec_money AS "ep.returnProduct.decMoney"
+		FROM bus_oe_experience_order a
+		LEFT JOIN crm_mi_member m on m.id=a.member_id
+		LEFT JOIN bus_oe_experience_produce ep ON ep.experience_order_id = a.id
+		LEFT JOIN lgt_ps_produce p ON p.id = ep.produce_id
+		LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id
+		LEFT JOIN bus_ob_buy_order bo ON bo.id = ep.decision_buy_order_id
+		LEFT JOIN bus_ol_return_order ro ON ro.order_id = a.id
+		LEFT JOIN bus_ol_return_product borp ON borp.product_id = p.id
+       <!--   LEFT JOIN bus_ol_send_order so ON so.order_id = a.id -->
+       <!--  LEFT JOIN bus_ol_return_product rp  ON rp.return_order_id = ro.id -->
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.id = #{id}
+		<!-- AND so.order_type= 1 -->
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_oe_experience_order(
+			id,
+			order_no,
+			member_id,
+			type,
+			status_member,
+			status_system,
+			status_pay,
+			status_judge,
+			close_type,
+			close_time,
+			appoint_date_type,
+			appoint_date,
+			appoint_stock_status,
+			send_time,
+			express_days,
+       		real_exp_date,
+			appoint_pick_date,
+			money_produce,
+			money_lgt,
+			money_experience,
+			money_appoint,
+			money_appoint_service,
+			money_total,
+			money_paid,
+			pay_time,
+			pay_type,
+			pay_channel,
+			receive_name,
+			receive_tel,
+			receive_area_str,
+			receive_area_detail,
+			member_remarks,
+			out_warehouse_id,
+			full_refund_flag,
+			money_sett_src_return,
+			money_sett_dec,
+			money_sett_decable_beans,
+			money_sett_dec_beans,
+			num_sett_dec_beans,
+			money_sett_overdue,
+			money_sett_return_express,
+			money_sett_return,
+			settlement_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderNo},
+			#{member.id},
+			#{type},
+			#{statusMember},
+			#{statusSystem},
+			#{statusPay},
+			#{statusJudge},
+			#{closeType},
+			#{closeTime},
+			#{appointDateType},
+			#{appointDate},
+			#{appointStockStatus},
+			#{sendTime},
+			#{expressDays},
+       		#{realExpDate},
+			#{appointPickDate},
+			#{moneyProduce},
+			#{moneyLgt},
+			#{moneyExperience},
+			#{moneyAppoint},
+			#{moneyAppointService},
+			#{moneyTotal},
+			#{moneyPaid},
+			#{payTime},
+			#{payType},
+			#{payChannel},
+			#{receiveName},
+			#{receiveTel},
+			#{receiveAreaStr},
+			#{receiveAreaDetail},
+			#{memberRemarks},
+			#{outWarehouse.id},
+			#{fullRefundFlag},
+			#{moneySettSrcReturn},
+			#{moneySettDec},
+			#{moneySettDecableBeans},
+			#{moneySettDecBeans},
+			#{numSettDecBeans},
+			#{moneySettOverdue},
+			#{moneySettReturnExpress},
+			#{moneySettReturn},
+			#{settlementTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_oe_experience_order SET 	
+			order_no = #{orderNo},
+			member_id = #{member.id},
+			type = #{type},
+			status_member = #{statusMember},
+			status_system = #{statusSystem},
+			status_pay = #{statusPay},
+			status_judge = #{statusJudge},
+			close_type = #{closeType},
+			close_time = #{closeTime},
+			appoint_date_type = #{appointDateType},
+			appoint_date = #{appointDate},
+			appoint_stock_status = #{appointStockStatus},
+			send_time = #{sendTime},
+			express_days = #{expressDays},
+			real_exp_date = #{realExpDate},
+			appoint_pick_date = #{appointPickDate},
+			money_produce = #{moneyProduce},
+			money_lgt = #{moneyLgt},
+			money_experience = #{moneyExperience},
+			money_appoint = #{moneyAppoint},
+			money_appoint_service = #{moneyAppointService},
+			money_total = #{moneyTotal},
+			money_paid = #{moneyPaid},
+			pay_time = #{payTime},
+			pay_type = #{payType},
+			pay_channel = #{payChannel},
+			receive_name = #{receiveName},
+			receive_tel = #{receiveTel},
+			receive_area_str = #{receiveAreaStr},
+			receive_area_detail = #{receiveAreaDetail},
+			member_remarks = #{memberRemarks},
+			out_warehouse_id = #{outWarehouse.id},
+			full_refund_flag = #{fullRefundFlag},
+			money_sett_src_return = #{moneySettSrcReturn},
+			money_sett_dec = #{moneySettDec},
+			money_sett_decable_beans = #{moneySettDecableBeans},
+			money_sett_dec_beans = #{moneySettDecBeans},
+			num_sett_dec_beans = #{numSettDecBeans},
+			money_sett_overdue = #{moneySettOverdue},
+			money_sett_return_express = #{moneySettReturnExpress},
+			money_sett_return = #{moneySettReturn},
+			settlement_time = #{settlementTime},
+			arrearage_amount = #{arrearageAmount},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+		
+	<!-- 统计已送达的体验订单 -->
+	<select id="findArrived" resultType="ExperienceOrder">
+		SELECT 
+			a.id AS "id",
+			a.member_id AS "member.id"
+		FROM bus_oe_experience_order a
+		WHERE 
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.status_system = #{STATUSSYSTEM_ARRIVED}
+	</select>
+	<!-- 统计用户历史体验订单 -->
+	<select id="getCountByMem" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM bus_oe_experience_order a
+		WHERE
+		a.member_id = #{member.id}
+	</select>
+
+	<select id="isFirstOrder" resultType="ExperienceOrder">
+		SELECT id AS "id"
+		  FROM bus_oe_experience_order
+		 WHERE member_id = #{memberId}
+	  ORDER BY create_date ASC
+		 LIMIT 1
+	</select>
+	
+	<select id="getMemberTradeInfo" resultType="Map">
+		SELECT MIN(create_date) AS "firstOrderTime",
+			   SUM(IFNULL(money_produce, 0)) AS "experienceTotalMoney",
+			   COUNT(1) AS "experienceTimes"
+		  FROM bus_oe_experience_order
+		 WHERE member_id = #{memberId}
+		   AND status_system != #{STATUSSYSTEM_CLOSE}
+	</select>
+
+	<select id="getFirstOrder" resultType="ExperienceOrder">
+		SELECT
+		<include refid="experienceOrderColumns"/>
+		FROM bus_oe_experience_order a
+		WHERE a.member_id = #{memberId}
+		  AND a.status_system != #{STATUSSYSTEM_CLOSE}
+	 ORDER BY a.create_date ASC
+	    LIMIT 1
+	</select>
+
+	<!-- 统计用户损坏商品订单数 -->
+	<select id="getDamageCount" resultType="java.lang.Integer">
+		SELECT
+		COUNT(*)
+		FROM bus_oe_experience_order a
+		WHERE
+		a.member_id = #{memberId}
+		AND id in
+		<foreach collection="ids" item="item" index="index"
+				 open="(" separator="," close=")">#{item}</foreach>
+	</select>
+	<!-- 对于超期转购买的订单不满足转购买条件更新欠款状态 -->
+	<update id="updateDueStatus">
+		UPDATE bus_oe_experience_order SET
+			<if test="moneySettDec != null and moneySettDec != ''">
+				money_sett_dec = #{moneySettDec},
+			</if>
+			<if test="moneySettOverdue != null and moneySettOverdue != ''">
+				money_sett_overdue = #{moneySettOverdue},
+			</if>
+			<if test="moneySettOverdue != null and moneySettOverdue != ''">
+				money_sett_decable_beans = #{moneySettDecableBeans},
+			</if>
+			<if test="moneySettOverdue != null and moneySettOverdue != ''">
+				num_sett_dec_beans = #{numSettDecBeans},
+			</if>
+			<if test="moneySettOverdue != null and moneySettOverdue != ''">
+				money_sett_dec_beans = #{moneySettDecBeans},
+			</if>
+			status_member = #{statusMember},
+			status_system = #{statusSystem},
+			arrearage_amount = #{arrearageAmount}
+		WHERE
+			id = #{id}
+	</update>
+
+	<update id="updateBuyStatus">
+		UPDATE bus_oe_experience_order SET
+		sett_buy = #{settBuy}
+		WHERE
+		id = #{id}
+	</update>
+	<!-- 对所有已送达的体验订单进行确认收货，同时设置体验开始日期为当前日期 -->
+	<update id="updateArrivedToExperiencing">
+		UPDATE bus_oe_experience_order SET
+		status_member = #{STATUSMEMBER_EXPERIENCING},
+		status_system = #{STATUSSYSTEM_EXPERIENCING},
+		real_exp_date = CURDATE()
+		WHERE
+		del_flag = #{DEL_FLAG_NORMAL}
+		AND status_system = #{STATUSSYSTEM_ARRIVED}
+	</update>
+	<!-- 
+	<update id="updateAppointStockStatusByProduce" parameterType="ExperienceOrder">
+	    UPDATE bus_oe_experience_order oe SET oe.appoint_stock_status = #{APPOINTSTOCKSTATUS_FINISH}
+		WHERE oe.id in 
+		(
+		SELECT ep.experience_order_id FROM bus_oe_experience_produce ep 
+		WHERE ep.produce_id = #{produce.id} 
+		AND ep.del_flag = #{DEL_FLAG_NORMAL}
+		)
+		AND oe.type = #{TYPE_APPOINTEXPERIENCE}
+		AND oe.appoint_stock_status = #{APPOINTSTOCKSTATUS_TODO}  
+		AND oe.del_flag = #{DEL_FLAG_NORMAL}
+	   
+	</update>-->
+	<!-- 取消所有到达预约体验日期、已到货还未支付尾款的预约体验订单 -->
+	<update id="updateAppointToClose">
+		UPDATE bus_oe_experience_order SET
+		status_member = #{STATUSMEMBER_CLOSE},
+		status_system = #{STATUSSYSTEM_CLOSE},
+		close_type = #{CLOSETYPE_SYSTEM},
+		close_time = #{closeTime},
+		update_date = #{updateDate}
+		WHERE
+		del_flag = #{DEL_FLAG_NORMAL}
+		AND status_system = #{STATUSSYSTEM_TOPAY}
+		AND status_pay = #{STATUSPAY_TOPAY_FINAL}
+		AND id=#{id}
+	</update>
+	<update id="delete">
+		UPDATE bus_oe_experience_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<update id="updateOrderStatusByExpress">
+		UPDATE bus_oe_experience_order SET
+		<if test="status != null and status != ''">
+			status_system = #{status},
+		</if>
+		<if test="realExpDate != null and realExpDate != ''">
+			real_exp_date = #{realExpDate},
+		</if>
+		status_logistical = #{statuslogisticalSigned}
+		WHERE order_no = #{orderNo}
+	</update>
+
+</mapper>

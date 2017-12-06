@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.hrm.dao.ei.EmployeeDao">
+    
+	<sql id="employeeColumns">
+		a.id AS "id",
+		a.sys_user_id AS "user.id",
+		
+		u2.login_name AS "user.loginName",
+		u2.name AS "user.name",
+		u2.phone AS "user.phone",
+		u2.mobile AS "user.mobile",
+		a.nation AS "nation",
+		a.political_status AS "politicalStatus",
+		a.marriage_status AS "marriageStatus",
+		a.id_card1 AS "idCard1",
+		a.sex AS "sex",
+		a.born_date AS "bornDate",
+		a.birthday AS "birthday",
+		a.age AS "age",
+		a.live_area_id AS "liveArea.id",
+		a11.name AS "liveArea.name",
+		a.live_area_detail AS "liveAreaDetail",
+		a.household_type AS "householdType",
+		a.household_addr AS "householdAddr.id",
+		a14.name AS "householdAddr.name",
+		a.graduate_college AS "graduateCollege",
+		a.professional AS "professional",
+		a.degree AS "degree",
+		a.employed_date AS "employedDate",
+		a.employed_file_url_1 AS "employedFileUrl1",
+		a.employed_file_url_2 AS "employedFileUrl2",
+		a.employed_file_url_3 AS "employedFileUrl3",
+		a.contract_start_date AS "contractStartDate",
+		a.probation_due_date AS "probationDueDate",
+		a.contract_due_date AS "contractDueDate",
+		a.work_age AS "workAge",
+		a.office_addr AS "officeAddr",
+		a.insurance_date AS "insuranceDate",
+		a.insurance_addr AS "insuranceAddr.id",
+		a28.name AS "insuranceAddr.name",
+		a.cpf_date AS "cpfDate",
+		a.cpf_addr AS "cpfAddr.id",
+		a30.name AS "cpfAddr.name",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="employeeJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.sys_user_id
+		LEFT JOIN sys_area a11 ON a11.id = a.live_area_id
+		LEFT JOIN sys_area a14 ON a14.id = a.household_addr
+		LEFT JOIN sys_area a28 ON a28.id = a.insurance_addr
+		LEFT JOIN sys_area a30 ON a30.id = a.cpf_addr
+	</sql>
+    
+	<select id="get" resultType="Employee">
+		SELECT 
+			<include refid="employeeColumns"/>
+		FROM hrm_ei_employee a
+		<include refid="employeeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Employee">
+		SELECT 
+			<include refid="employeeColumns"/>
+		FROM hrm_ei_employee a
+		<include refid="employeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="null != user">
+			     <if test="user.id != null and user.id != ''">
+			         AND a.sys_user_id = #{user.id}
+			     </if>
+				 <if test="user.name != null and user.name != ''">
+                     AND u2.name like 
+                     <if test="dbName == 'oracle'">'%'||#{user.name}||'%'</if>
+                     <if test="dbName == 'mssql'">'%'+#{user.name}+'%'</if>
+                     <if test="dbName == 'mysql'">concat('%',#{user.name},'%')</if>
+                 </if>
+                 <if test="user.mobile != null and user.mobile != ''">
+                    AND u2.mobile = #{user.mobile} 
+                 </if>
+			</if>
+			
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.sys_user_id in (select id FROM sys_user u where u.login_name = #{searchParameter.keyWord} or u.name=#{searchParameter.keyWord } )
+					or a.id_card1 =#{searchParameter.keyWord}
+				)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Employee">
+		SELECT 
+			<include refid="employeeColumns"/>
+		FROM hrm_ei_employee a
+		<include refid="employeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findEmployeeByUserId" resultType="Employee">
+		SELECT
+			a.id AS "id",
+			a.sys_user_id AS "user.id",
+			a.nation AS "nation",
+			a.political_status AS "politicalStatus",
+			a.marriage_status AS "marriageStatus",
+			a.id_card1 AS "idCard1",
+			a.sex AS "sex",
+			a.born_date AS "bornDate",
+			a.birthday AS "birthday",
+			a.age AS "age",
+			a.live_area_id AS "liveArea.id",
+			a.live_area_detail AS "liveAreaDetail",
+			a.household_type AS "householdType",
+			a.household_addr AS "householdAddr.id",
+			a.graduate_college AS "graduateCollege",
+			a.professional AS "professional",
+			a.degree AS "degree",
+			a.employed_date AS "employedDate",
+			a.employed_file_url_1 AS "employedFileUrl1",
+			a.employed_file_url_2 AS "employedFileUrl2",
+			a.employed_file_url_3 AS "employedFileUrl3",
+			a.contract_start_date AS "contractStartDate",
+			a.probation_due_date AS "probationDueDate",
+			a.contract_due_date AS "contractDueDate",
+			a.work_age AS "workAge",
+			a.office_addr AS "officeAddr",
+			a.insurance_date AS "insuranceDate",
+			a.insurance_addr AS "insuranceAddr.id",
+			a.cpf_date AS "cpfDate",
+			a.cpf_addr AS "cpfAddr.id",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag"
+		FROM hrm_ei_employee a 
+		WHERE a.sys_user_id=#{user.id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hrm_ei_employee(
+			id,
+			sys_user_id,
+			nation,
+			political_status,
+			marriage_status,
+			id_card1,
+			sex,
+			born_date,
+			birthday,
+			age,
+			live_area_id,
+			live_area_detail,
+			household_type,
+			household_addr,
+			graduate_college,
+			professional,
+			degree,
+			employed_date,
+			employed_file_url_1,
+			employed_file_url_2,
+			employed_file_url_3,
+			contract_start_date,
+			probation_due_date,
+			contract_due_date,
+			work_age,
+			office_addr,
+			insurance_date,
+			insurance_addr,
+			cpf_date,
+			cpf_addr,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{nation},
+			#{politicalStatus},
+			#{marriageStatus},
+			#{idCard1},
+			#{sex},
+			#{bornDate},
+			#{birthday},
+			#{age},
+			#{liveArea.id},
+			#{liveAreaDetail},
+			#{householdType},
+			#{householdAddr.id},
+			#{graduateCollege},
+			#{professional},
+			#{degree},
+			#{employedDate},
+			#{employedFileUrl1},
+			#{employedFileUrl2},
+			#{employedFileUrl3},
+			#{contractStartDate},
+			#{probationDueDate},
+			#{contractDueDate},
+			#{workAge},
+			#{officeAddr},
+			#{insuranceDate},
+			#{insuranceAddr.id},
+			#{cpfDate},
+			#{cpfAddr.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hrm_ei_employee SET 	
+			sys_user_id = #{user.id},
+			nation = #{nation},
+			political_status = #{politicalStatus},
+			marriage_status = #{marriageStatus},
+			id_card1 = #{idCard1},
+			sex = #{sex},
+			born_date = #{bornDate},
+			birthday = #{birthday},
+			age = #{age},
+			live_area_id = #{liveArea.id},
+			live_area_detail = #{liveAreaDetail},
+			household_type = #{householdType},
+			household_addr = #{householdAddr.id},
+			graduate_college = #{graduateCollege},
+			professional = #{professional},
+			degree = #{degree},
+			employed_date = #{employedDate},
+			employed_file_url_1 = #{employedFileUrl1},
+			employed_file_url_2 = #{employedFileUrl2},
+			employed_file_url_3 = #{employedFileUrl3},
+			contract_start_date = #{contractStartDate},
+			probation_due_date = #{probationDueDate},
+			contract_due_date = #{contractDueDate},
+			work_age = #{workAge},
+			office_addr = #{officeAddr},
+			insurance_date = #{insuranceDate},
+			insurance_addr = #{insuranceAddr.id},
+			cpf_date = #{cpfDate},
+			cpf_addr = #{cpfAddr.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE hrm_ei_employee SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

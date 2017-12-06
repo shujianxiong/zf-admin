@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.bb.BankbookItemDao">
+    
+	<sql id="bankbookItemColumns">
+		a.id AS "id",
+		a.item_no AS "itemNo",
+		a.balance_id AS "bankbookBalance.id",
+		b.member_id AS "bankbookBalance.member.id",
+		a.change_type AS "changeType",
+		a.money_type AS "moneyType",
+		a.money AS "money",
+		a.usable_balance AS "usableBalance",
+		a.frozen_balance AS "frozenBalance",
+		a.last_item_no AS "lastItemNo",
+		a.last_usable_balance AS "lastUsableBalance",
+		a.last_frozen_balance AS "lastFrozenBalance",
+		a.unique_no AS "uniqueNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="bankbookItemJoins">
+	LEFT JOIN crm_bb_bankbook_balance b on b.id=a.balance_id
+	LEFT JOIN crm_mi_member m on m.id=b.member_id
+	</sql>
+    
+	<select id="get" resultType="BankbookItem">
+		SELECT 
+			<include refid="bankbookItemColumns"/>
+		FROM crm_bb_bankbook_item a
+		<include refid="bankbookItemJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BankbookItem">
+		SELECT 
+			<include refid="bankbookItemColumns"/>
+		FROM crm_bb_bankbook_item a
+		<include refid="bankbookItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="bankbookBalance != null and bankbookBalance.member != null and bankbookBalance.member.usercode != null and bankbookBalance.member.usercode != ''">
+				AND m.usercode = #{bankbookBalance.member.usercode}
+			</if>
+			<if test="bankbookBalance != null and bankbookBalance.id != null and bankbookBalance.id != ''">
+				AND a.balance_id = #{bankbookBalance.id}
+			</if>
+			<if test="changeType != null and changeType != ''">
+				AND a.change_type = #{changeType}
+			</if>
+			<if test="moneyType != null and moneyType != ''">
+				AND a.money_type = #{moneyType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.item_no DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BankbookItem">
+		SELECT 
+			<include refid="bankbookItemColumns"/>
+		FROM crm_bb_bankbook_item a
+		<include refid="bankbookItemJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getByChangeTypeAndUniqueNo" resultType="BankbookItem">
+		SELECT 
+			<include refid="bankbookItemColumns"/>
+		FROM crm_bb_bankbook_item a
+		<include refid="bankbookItemJoins"/>
+		<where>
+			a.change_type = #{changeType}
+			AND a.unique_no = #{uniqueNo}
+		</where>
+	</select>
+	
+	<select id="getLastByMemberId" resultType="BankbookItem">
+		SELECT 
+			<include refid="bankbookItemColumns"/>
+		FROM crm_bb_bankbook_item a
+		<include refid="bankbookItemJoins"/>
+		WHERE b.member_id = #{memberId}
+		ORDER BY a.item_no DESC
+		LIMIT 1
+	</select>
+	
+	<select id="getItemsCountTotal" resultType="Integer">
+		SELECT 
+			COUNT(a.id)
+		FROM crm_bb_bankbook_item a
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_bb_bankbook_item(
+			id,
+			item_no,
+			balance_id,
+			change_type,
+			money_type,
+			money,
+			usable_balance,
+			frozen_balance,
+			last_item_no,
+			last_usable_balance,
+			last_frozen_balance,
+			unique_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{itemNo},
+			#{bankbookBalance.id},
+			#{changeType},
+			#{moneyType},
+			#{money},
+			#{usableBalance},
+			#{frozenBalance},
+			#{lastItemNo},
+			#{lastUsableBalance},
+			#{lastFrozenBalance},
+			#{uniqueNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_bb_bankbook_item SET 	
+			item_no = #{itemNo},
+			balance_id = #{bankbookBalance.id},
+			change_type = #{changeType},
+			money_type = #{moneyType},
+			money = #{money},
+			usable_balance = #{usableBalance},
+			frozen_balance = #{frozenBalance},
+			last_item_no = #{lastItemNo},
+			last_usable_balance = #{lastUsableBalance},
+			last_frozen_balance = #{lastFrozenBalance},
+			unique_no = #{uniqueNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_bb_bankbook_item SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
