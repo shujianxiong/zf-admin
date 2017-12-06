@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.hrm.dao.di.DietDao">
+    
+	<sql id="dietColumns">
+		a.id AS "id",
+		a.date AS "date",
+		a.score AS "score",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="dietJoins">
+	</sql>
+    
+	<select id="get" resultType="Diet">
+		SELECT 
+			<include refid="dietColumns"/>
+		FROM hrm_di_diet a
+		<include refid="dietJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Diet">
+		SELECT 
+			<include refid="dietColumns"/>
+		FROM hrm_di_diet a
+		<include refid="dietJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="date != null and date != ''">
+				AND a.date = #{date}
+			</if>
+			<if test="beginScore != null and endScore != null and beginScore != '' and endScore != ''">
+				AND a.score BETWEEN #{beginScore} AND #{endScore}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询菜谱列表及当前登录人对应的评价 -->
+	<select id="findListWithCurrentJudge" resultType="Diet">
+		SELECT 
+			a.id AS "id",
+			a.date AS "date",
+			a.score AS "score",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			(SELECT dj.id			FROM hrm_di_diet_judge dj WHERE dj.diet_id=a.id AND dj.judge_by=#{dietJudge.judgeBy.id}) AS "dietJudge.id",
+			(SELECT dj.judge_by 	FROM hrm_di_diet_judge dj WHERE dj.diet_id=a.id AND dj.judge_by=#{dietJudge.judgeBy.id}) AS "dietJudge.judgeBy.id",
+			(SELECT dj.judge_level	FROM hrm_di_diet_judge dj WHERE dj.diet_id=a.id AND dj.judge_by=#{dietJudge.judgeBy.id}) AS "dietJudge.judgeLevel"
+		FROM hrm_di_diet a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="date != null and date != ''">
+				AND a.date = #{date}
+			</if>
+			<if test="beginScore != null and endScore != null and beginScore != '' and endScore != ''">
+				AND a.score BETWEEN #{beginScore} AND #{endScore}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.date DESC
+			</otherwise>
+		</choose>
+	</select>	
+	
+	<select id="findAllList" resultType="Diet">
+		SELECT 
+			<include refid="dietColumns"/>
+		FROM hrm_di_diet a
+		<include refid="dietJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 统计一段时间周期内菜谱平均得分 -->
+	<select id="countScore" resultType="BigDecimal">
+		SELECT 
+			ROUND(AVG(a.score),2) AS "score"
+		FROM hrm_di_diet a
+		WHERE 
+			<![CDATA[a.date >= #{beginDate}]]>
+			<![CDATA[AND a.date <= #{endDate}]]>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hrm_di_diet(
+			id,
+			date,
+			score,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{date},
+			#{score},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hrm_di_diet SET 	
+			date = #{date},
+			score = #{score},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE hrm_di_diet SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

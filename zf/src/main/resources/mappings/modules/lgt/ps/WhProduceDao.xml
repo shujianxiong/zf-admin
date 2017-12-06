@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.WhProduceDao">
+    
+	<sql id="whProduceColumns">
+		a.id AS "id",
+		a.warehouse_id AS "warehouse.id",
+		b.name AS "warehouse.name",
+		b.responsible_mobile AS "warehouse.responsibleMobile",
+		u.name AS "warehouse.responsibleUser.name",
+		a.produce_id AS "produce.id",
+		c.code AS "produce.code",
+		c.name AS "produce.name",
+		a.stock_normal AS "stockNormal",
+		a.stock_lock AS "stockLock",
+		a.stock_debt AS "stockDebt",
+		a.motinor_status AS "motinorStatus",
+		a.stock_standard AS "stockStandard",
+		a.stock_safe AS "stockSafe",
+		a.stock_warning AS "stockWarning",
+		g.name AS "produce.goods.name",
+		g.sample_photo AS "produce.goods.samplePhoto",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	<!--  -->
+	<sql id="whProduceJoins">
+		LEFT JOIN lgt_ps_warehouse b ON b.id=a.warehouse_id
+		LEFT JOIN sys_user u ON u.id = b.responsible_user_id
+		LEFT JOIN lgt_ps_produce c ON c.id=a.produce_id
+		LEFT JOIN lgt_ps_goods g ON g.id = c.goods_id
+	</sql>
+    
+	<select id="get" resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<sql id="whProduceColumnsByWidAndPid">
+		a.id AS "id",
+		a.warehouse_id AS "warehouse.id",
+		a.produce_id AS "produce.id",
+		a.stock_standard AS "stockStandard",
+		a.stock_safe AS "stockSafe",
+		a.stock_warning AS "stockWarning",
+		a.stock_normal AS "stockNormal",
+		a.stock_lock AS "stockLock",
+		a.stock_debt AS "stockDebt",
+		a.motinor_status AS "motinorStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	<!-- 根据仓库id和产品id查询仓库产品表数据 -->
+	<select id="getWhProduceByWidAndPid" resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumnsByWidAndPid"/>
+		FROM lgt_ps_wh_produce a
+		WHERE a.warehouse_id = #{warehouseId}
+		and a.produce_id = #{produceId}
+	</select>
+	
+	<!-- 查询产品库存 -->
+	<select id="getByProduce" resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		WHERE a.produce_id = #{id}
+	</select>
+
+	<!-- 根据产品集合查询产品正常库存 -->
+	<select id="getByProduces" resultType="WhProduce">
+		SELECT
+		<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		WHERE a.produce_id in
+		<foreach collection="list" index="index" item="produceId" open="("
+				 separator="," close=")">
+			#{produceId}
+		</foreach>
+
+		a.produce_id = #{produce.id}
+	</select>
+	<!-- 根据产品查询产品总库存 -->
+	<select id="getStockTotalByProduce" resultType="int">
+		SELECT IFNULL(stock_normal,0)
+		  FROM lgt_ps_wh_produce a
+		 WHERE a.produce_id = #{produce.id}
+	</select>
+	
+	<select id="getWhProduceByWarehouseIdAnProduceId" resultType="WhProduce">
+	    SELECT 
+            <include refid="whProduceColumns"/>
+        FROM lgt_ps_wh_produce a
+        <include refid="whProduceJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+	        <if test="warehouse != null and warehouse.id !=null and warehouse.id != ''">
+                AND a.warehouse_id = #{warehouse.id}
+            </if>
+            <if test="produce != null and produce.id != '' and produce.id != null">
+                AND a.produce_id = #{produce.id}
+            </if>
+        </where>
+	</select>
+	
+	<select id="findList" resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		<where>
+			a.del_flag = #{whProduce.DEL_FLAG_NORMAL}
+			<if test="whProduce.warehouse != null and whProduce.warehouse.id !=null and whProduce.warehouse.id != ''">
+				AND a.warehouse_id = #{whProduce.warehouse.id}
+			</if>
+			<if test="whProduce.motinorStatus != null and whProduce.motinorStatus != ''">
+				AND a.motinor_status = #{whProduce.motinorStatus}
+			</if>
+			<if test="whProduce !=null and whProduce.searchParameter.keyWord !=null and whProduce.searchParameter.keyWord != ''">
+				AND ( c.name LIKE 
+<!-- 					<if test="dbName == 'oracle'">'%'||#{whProduce.searchParameter.keyWord}||'%'</if> -->
+<!-- 					<if test="dbName == 'mssql'">'%'+#{whProduce.searchParameter.keyWord}+'%'</if> -->
+<!-- 					<if test="dbName == 'mysql'">concat('%',#{whProduce.searchParameter.keyWord},'%')</if> -->
+						concat('%',#{whProduce.searchParameter.keyWord},'%')
+						OR
+						g.name LIKE 
+							concat('%',#{whProduce.searchParameter.keyWord},'%')
+						)
+			</if>
+			<if test="whProduce !=null and whProduce.produce !=null and whProduce.produce.code !=null and whProduce.produce.code != ''">
+				AND c.code = #{whProduce.produce.code}
+			</if>
+			<if test="stockStatus !=null and stockStatus != ''">
+				<choose>
+					<when test="stockStatus == 1">
+						<![CDATA[AND IFNULL(a.stock_normal,0) >= IFNULL(a.stock_safe,0)]]>
+							
+					</when>
+					<when test="stockStatus == 2">
+						<![CDATA[AND IFNULL(a.stock_normal,0) >= IFNULL(a.stock_warning,0)]]>
+						<![CDATA[AND IFNULL(a.stock_normal,0) < IFNULL(a.stock_safe,0)]]>
+					</when>
+					<otherwise>
+						<![CDATA[AND IFNULL(a.stock_normal,0) < IFNULL(a.stock_warning,0)]]>
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		<where>
+			a.del_flag = 0
+			<if test="whProduce.produce != null and whProduce.produce.id != ''">
+				AND a.produce_id = #{whProduce.produce.id}
+			</if>
+			<if test="whProduce != null and stockNormal != ''">
+				AND a.stock_normal > 0
+ 			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findWarehouseProduce" parameterType="map" resultType="Produce">
+		SELECT 
+			   b.id AS "id",
+			   b.code AS "code",
+			   b.name AS "name",
+			   c.name AS "goods.name",
+			   a.stock_standard AS "stockStandard",
+			   a.stock_safe AS "stockSafe",
+			   a.stock_warning AS "stockWarning"
+		  FROM lgt_ps_wh_produce a
+	 LEFT JOIN lgt_ps_produce b ON a.produce_id = b.id
+	 LEFT JOIN lgt_ps_goods c ON b.goods_id = c.id
+	     WHERE a.warehouse_id = #{whProduce.warehouse.id}
+	       <if test="whProduce != null and whProduce.searchParameter.keyWord != null and whProduce.searchParameter.keyWord !=''">
+<!--        			AND ( -->
+<!--        				 b.name LIKE  -->
+<!-- 		       			<if test="dbName == 'oracle'">'%'||#{whProduce.searchParameter.keyWord}||'%'</if> -->
+<!-- 						<if test="dbName == 'mssql'">'%'+#{whProduce.searchParameter.keyWord}+'%'</if> -->
+<!-- 						<if test="dbName == 'mysql'">concat('%',#{whProduce.searchParameter.keyWord},'%')</if> -->
+<!-- 						OR -->
+<!-- 					 b.code LIKE -->
+<!-- 					 	<if test="dbName == 'oracle'">'%'||#{whProduce.searchParameter.keyWord}||'%'</if> -->
+<!-- 						<if test="dbName == 'mssql'">'%'+#{whProduce.searchParameter.keyWord}+'%'</if> -->
+<!-- 						<if test="dbName == 'mysql'">concat('%',#{whProduce.searchParameter.keyWord},'%')</if> -->
+<!-- 					) -->
+					
+				AND(
+					 b.name LIKE concat('%',#{whProduce.searchParameter.keyWord},'%')
+					 OR
+					 b.code LIKE concat('%',#{whProduce.searchParameter.keyWord},'%')
+				)
+	       </if>
+	       AND a.del_flag="0"
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_wh_produce(
+			id,
+			warehouse_id,
+			produce_id,
+			stock_normal,
+			stock_lock,
+			stock_debt,
+			motinor_status,
+			stock_standard,
+			stock_safe,
+			stock_warning,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{warehouse.id},
+			#{produce.id},
+			#{stockNormal},
+			#{stockLock},
+			#{stockDebt},
+			#{motinorStatus},
+			#{stockStandard},
+			#{stockSafe},
+			#{stockWarning},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_wh_produce SET 	
+			<if test="warehouse != null and warehouse.id != ''">
+				warehouse_id = #{warehouse.id},
+			</if>
+			produce_id = #{produce.id},
+			stock_normal = #{stockNormal},
+			stock_lock = #{stockLock},
+			stock_debt = #{stockDebt},
+			motinor_status = #{motinorStatus},
+			stock_standard = #{stockStandard},
+			stock_safe = #{stockSafe},
+			stock_warning = #{stockWarning},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_wh_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="deleteByProduce" parameterType="Produce">
+        UPDATE lgt_ps_wh_produce SET 
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE produce_id in 
+        (
+        SELECT id FROM lgt_ps_produce  
+        WHERE goods_id = #{goods.id} 
+        AND status = #{status}
+        )
+    </update>
+	
+	
+	<select id="findListByProduceIdArr"  resultType="WhProduce">
+		SELECT 
+			<include refid="whProduceColumns"/>
+		FROM lgt_ps_wh_produce a
+		<include refid="whProduceJoins"/>
+		<where>
+			a.del_flag = 0
+			<if test="produceIdList != null and produceIdList != ''">
+				AND a.produce_id in 
+				<foreach collection="produceIdList" item="eid" open="(" separator=","  close=")">
+					#{eid}
+				</foreach>
+ 			</if>
+ 			<if test="warehouseId != null and warehouseId != ''">
+ 				AND a.warehouse_id != #{warehouseId}
+ 			</if>
+			AND a.stock_normal > 0
+		</where>	
+		ORDER BY a.produce_id, warehouse_id
+	</select>
+	
+    <update id="releaseLockStock">
+    	update lgt_ps_wh_produce set
+    		stock_lock = (IFNULL(stock_lock,0) - #{num})
+    	WHERE produce_id = #{produceId}
+    	  AND warehouse_id = #{warehouseId}
+    </update>
+	
+</mapper>

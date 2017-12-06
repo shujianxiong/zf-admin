@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.wp.WechatPayRecordDao">
+    
+	<sql id="wechatPayRecordColumns">
+		a.id AS "id",
+		a.appid AS "appid",
+		a.mch_id AS "mchId",
+		a.device_info AS "deviceInfo",
+		a.nonce_str AS "nonceStr",
+		a.sign_type AS "signType",
+		a.result_code AS "resultCode",
+		a.err_code AS "errCode",
+		a.err_code_des AS "errCodeDes",
+		a.openid AS "openid",
+		a.is_subscribe AS "isSubscribe",
+		a.trade_type AS "tradeType",
+		a.bank_type AS "bankType",
+		a.total_fee AS "totalFee",
+		a.settlement_total_fee AS "settlementTotalFee",
+		a.fee_type AS "feeType",
+		a.cash_fee AS "cashFee",
+		a.cash_fee_type AS "cashFeeType",
+		a.coupon_fee AS "couponFee",
+		a.coupon_count AS "couponCount",
+		a.coupon_type_$n AS "couponType$n",
+		a.transaction_id AS "transactionId",
+		a.coupon_fee_$n AS "couponFee$n",
+		a.out_trade_no AS "outTradeNo",
+		a.attach AS "attach",
+		a.time_end AS "timeEnd",
+		a.sign AS "sign",
+		a.coupon_id_$n AS "couponId$n",
+		a.refund_no AS "refundNo",
+		a.refund_auto_status AS "refundAutoStatus",
+		a.refund_auto_money AS "refundAutoMoney",
+		a.refund_auto_time AS "refundAutoTime",
+		a.refund_artificial_status AS "refundArtificialStatus",
+		a.refund_artificial_money AS "refundArtificialMoney",
+		a.refund_artificial_time AS "refundArtificialTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="wechatPayRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="WechatPayRecord">
+		SELECT 
+			<include refid="wechatPayRecordColumns"/>
+		FROM bus_wp_wechat_pay_record a
+		<include refid="wechatPayRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WechatPayRecord">
+		SELECT 
+			<include refid="wechatPayRecordColumns"/>
+		FROM bus_wp_wechat_pay_record a
+		<include refid="wechatPayRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="appid != null and appid != ''">
+				AND a.appid = #{appid}
+			</if>
+			<if test="mchId != null and mchId != ''">
+				AND a.mch_id = #{mchId}
+			</if>
+			<if test="resultCode != null and resultCode != ''">
+				AND a.result_code = #{resultCode}
+			</if>
+			<if test="refundNo != null and refundNo != ''">
+				AND a.refund_no = #{refundNo}
+			</if>
+			<if test="outTradeNo != null and outTradeNo != ''">
+				AND a.out_trade_no = #{outTradeNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WechatPayRecord">
+		SELECT 
+			<include refid="wechatPayRecordColumns"/>
+		FROM bus_wp_wechat_pay_record a
+		<include refid="wechatPayRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询涉及退款的微信支付记录(退款编号不为空) -->
+	<select id="findRefundList" resultType="WechatPayRecord">
+		SELECT 
+			<include refid="wechatPayRecordColumns"/>
+		FROM bus_wp_wechat_pay_record a
+		<include refid="wechatPayRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.refund_no != '' 
+			AND a.refund_no IS NOT NULL
+			<if test="appid != null and appid != ''">
+				AND a.appid = #{appid}
+			</if>
+			<if test="mchId != null and mchId != ''">
+				AND a.mch_id = #{mchId}
+			</if>
+			<if test="resultCode != null and resultCode != ''">
+				AND a.result_code = #{resultCode}
+			</if>
+			<if test="refundNo != null and refundNo != ''">
+				AND a.refund_no = #{refundNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<insert id="insert">
+		INSERT INTO bus_wp_wechat_pay_record(
+			id,
+			appid,
+			mch_id,
+			device_info,
+			nonce_str,
+			sign_type,
+			result_code,
+			err_code,
+			err_code_des,
+			openid,
+			is_subscribe,
+			trade_type,
+			bank_type,
+			total_fee,
+			settlement_total_fee,
+			fee_type,
+			cash_fee,
+			cash_fee_type,
+			coupon_fee,
+			coupon_count,
+			coupon_type_$n,
+			transaction_id,
+			coupon_fee_$n,
+			out_trade_no,
+			attach,
+			time_end,
+			sign,
+			coupon_id_$n,
+			refund_no,
+			refund_auto_status,
+			refund_auto_money,
+			refund_auto_time,
+			refund_artificial_status,
+			refund_artificial_money,
+			refund_artificial_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{appid},
+			#{mchId},
+			#{deviceInfo},
+			#{nonceStr},
+			#{signType},
+			#{resultCode},
+			#{errCode},
+			#{errCodeDes},
+			#{openid},
+			#{isSubscribe},
+			#{tradeType},
+			#{bankType},
+			#{totalFee},
+			#{settlementTotalFee},
+			#{feeType},
+			#{cashFee},
+			#{cashFeeType},
+			#{couponFee},
+			#{couponCount},
+			#{couponType$n},
+			#{transactionId},
+			#{couponFee$n},
+			#{outTradeNo},
+			#{attach},
+			#{timeEnd},
+			#{sign},
+			#{couponId$n},
+			#{refund_no},
+			#{refundAutoStatus},
+			#{refundAutoMoney},
+			#{refundAutoTime},
+			#{refundArtificialStatus},
+			#{refundArtificialMoney},
+			#{refundArtificialTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_wp_wechat_pay_record SET 	
+			appid = #{appid},
+			mch_id = #{mchId},
+			device_info = #{deviceInfo},
+			nonce_str = #{nonceStr},
+			sign_type = #{signType},
+			result_code = #{resultCode},
+			err_code = #{errCode},
+			err_code_des = #{errCodeDes},
+			openid = #{openid},
+			is_subscribe = #{isSubscribe},
+			trade_type = #{tradeType},
+			bank_type = #{bankType},
+			total_fee = #{totalFee},
+			settlement_total_fee = #{settlementTotalFee},
+			fee_type = #{feeType},
+			cash_fee = #{cashFee},
+			cash_fee_type = #{cashFeeType},
+			coupon_fee = #{couponFee},
+			coupon_count = #{couponCount},
+			coupon_type_$n = #{couponType$n},
+			transaction_id = #{transactionId},
+			coupon_fee_$n = #{couponFee$n},
+			out_trade_no = #{outTradeNo},
+			attach = #{attach},
+			time_end = #{timeEnd},
+			sign = #{sign},
+			coupon_id_$n = #{couponId$n},
+			refund_no = #{refundNo},
+			refund_auto_status = #{refundAutoStatus},
+			refund_auto_money = #{refundAutoMoney},
+			refund_auto_time = #{refundAutoTime},
+			refund_artificial_status = #{refundArtificialStatus},
+			refund_artificial_money = #{refundArtificialMoney},
+			refund_artificial_time = #{refundArtificialTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_wp_wechat_pay_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

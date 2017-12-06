@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.GoodsPropvalueDao">
+    
+    <resultMap id="goodsPropvalueResult" type="com.chinazhoufan.admin.modules.lgt.entity.ps.GoodsPropvalue">
+    	<result column="id" property="id"/>
+    	<result column="goodsPropId" property="goodsPropId"/>
+    	<result column="pvid" property="pvid"/>
+    	<result column="pvalue" property="pvalue"/>
+    </resultMap>
+    
+	<sql id="goodsPropvalueColumns">
+		a.id AS "id",
+		a.goods_prop_id AS "goodsProp.id",
+		a.pvid AS "propvalue.id",
+		a.pvalue AS "pvalue",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsPropvalueJoins">
+	</sql>
+    
+	<select id="get" resultType="GoodsPropvalue">
+		SELECT 
+			<include refid="goodsPropvalueColumns"/>
+		FROM lgt_ps_goods_propvalue a
+		<include refid="goodsPropvalueJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="GoodsPropvalue">
+		SELECT 
+			<include refid="goodsPropvalueColumns"/>
+		FROM lgt_ps_goods_propvalue a
+		<include refid="goodsPropvalueJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGoodsPropVal" resultMap="goodsPropvalueResult">
+		select
+			id AS "id", 
+			goods_prop_id AS "goodsProp.id", 
+			pvid AS "propvalue.id", 
+			pvalue AS "pvalue" 
+		from lgt_ps_goods_propvalue pv
+		where pv.goods_prop_id=#{goodProp.id}
+	</select>
+	
+	<select id="findAllList" resultType="GoodsPropvalue">
+		SELECT 
+			<include refid="goodsPropvalueColumns"/>
+		FROM lgt_ps_goods_propvalue a
+		<include refid="goodsPropvalueJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_goods_propvalue(
+			id,
+			goods_prop_id,
+			pvid,
+			pvalue,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsProp.id},
+			#{propvalue.id},
+			#{pvalue},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_goods_propvalue SET 	
+			goods_prop_id = #{goodsProp.id},
+			pvid = #{propvalue.id},
+			pvalue = #{pvalue},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_goods_propvalue SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from lgt_ps_goods_propvalue where goods_prop_id=#{0}
+	</delete>
+	
+	
+</mapper>

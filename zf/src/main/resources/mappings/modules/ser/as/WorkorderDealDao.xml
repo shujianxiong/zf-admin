@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.ser.dao.as.WorkorderDealDao">
+    
+	<sql id="workorderDealColumns">
+		a.id AS "id",
+		a.workorder_id AS "workorder.id",
+		a.appointed_user AS "appointedUser.id",
+		a.required_time AS "requiredTime",
+		a.required_dealtype AS "requiredDealtype",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="workorderDealJoins">
+	</sql>
+    
+	<select id="get" resultType="WorkorderDeal">
+		SELECT 
+			<include refid="workorderDealColumns"/>
+		FROM ser_as_workorder_deal a
+		<include refid="workorderDealJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findLatestByWorkOrder" resultType="WorkorderDeal">
+	    SELECT o.workorder_no AS "workorder.workorderNo",
+            <include refid="workorderDealColumns"/>
+        FROM ser_as_workorder_deal a
+        <include refid="workorderDealJoins"/>
+        LEFT JOIN ser_as_workorder o ON o.id = a.workorder_id
+        
+        WHERE a.workorder_id = #{workorder.id}
+        AND a.appointed_user = #{appointedUser.id}
+        ORDER BY a.create_date DESC
+        LIMIT 1
+	</select>
+	
+	<select id="findList" resultType="WorkorderDeal">
+		SELECT 
+			<include refid="workorderDealColumns"/>
+		FROM ser_as_workorder_deal a
+		<include refid="workorderDealJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="workorder != null and workorder.id != null and workorder.id != ''">
+			     AND a.workorder_id = #{workorder.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WorkorderDeal">
+		SELECT 
+			<include refid="workorderDealColumns"/>
+		FROM ser_as_workorder_deal a
+		<include refid="workorderDealJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ser_as_workorder_deal(
+			id,
+			workorder_id,
+			appointed_user,
+			required_time,
+			required_dealtype,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{workorder.id},
+			#{appointedUser.id},
+			#{requiredTime},
+			#{requiredDealtype},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE ser_as_workorder_deal SET 	
+			workorder_id = #{workorder.id},
+			appointed_user = #{appointedUser.id},
+			required_time = #{requiredTime},
+			required_dealtype = #{requiredDealtype},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE ser_as_workorder_deal SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

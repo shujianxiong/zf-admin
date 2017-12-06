@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.tn.ExpressNoSegmentDao">
+    
+	<sql id="expressNoSegmentColumns">
+		a.id AS "id",
+		a.express_no AS "expressNo",
+		a.express_company AS "expressCompany",
+		a.status AS "status",
+		a.use_time AS "useTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="expressNoSegmentJoins">
+	</sql>
+    
+	<select id="get" resultType="ExpressNoSegment">
+		SELECT 
+			<include refid="expressNoSegmentColumns"/>
+		FROM lgt_tn_express_no_segment a
+		<include refid="expressNoSegmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findOneExpressNo" resultType="ExpressNoSegment">
+	    SELECT 
+            <include refid="expressNoSegmentColumns"/>
+        FROM lgt_tn_express_no_segment a
+        <include refid="expressNoSegmentJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.status = #{status}
+        </where>
+        LIMIT 1
+	</select>
+	
+	<select id="findList" resultType="ExpressNoSegment">
+		SELECT 
+			<include refid="expressNoSegmentColumns"/>
+		FROM lgt_tn_express_no_segment a
+		<include refid="expressNoSegmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="status != null and status != ''">
+			   AND a.status = #{status}
+			</if>
+			<if test="expressCompany != null and expressCompany != ''">
+			   AND a.express_company = #{expressCompany}
+			</if>
+			<if test="expressNo != null and expressNo != ''">
+			   AND a.express_no = #{expressNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ExpressNoSegment">
+		SELECT 
+			<include refid="expressNoSegmentColumns"/>
+		FROM lgt_tn_express_no_segment a
+		<include refid="expressNoSegmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_tn_express_no_segment(
+			id,
+			express_no,
+			express_company,
+			status,
+			use_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{expressNo},
+			#{expressCompany},
+			#{status},
+			#{useTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<insert id="batchSaveExpressNoSegment" parameterType="java.util.List">
+	   INSERT INTO lgt_tn_express_no_segment(
+            id,
+            express_no,
+            express_company,
+            status,
+            use_time,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag
+        ) VALUES 
+        <foreach collection="list" item="item" index="index" separator=",">
+	        (
+	            #{item.id},
+	            #{item.expressNo},
+	            #{item.expressCompany},
+	            #{item.status},
+	            #{item.useTime},
+	            #{item.createBy.id},
+	            #{item.createDate},
+	            #{item.updateBy.id},
+	            #{item.updateDate},
+	            #{item.remarks},
+	            #{item.delFlag}
+	        )
+        </foreach>
+	</insert>
+	
+
+	<update id="update">
+		UPDATE lgt_tn_express_no_segment SET 	
+			express_no = #{expressNo},
+			express_company = #{expressCompany},
+			status = #{status},
+			use_time = #{useTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="updateByExpressNo">
+	   UPDATE lgt_tn_express_no_segment SET    
+            status = #{status},
+            use_time = #{useTime},
+            update_by = #{updateBy.id},
+            update_date = #{updateDate}
+        WHERE express_company = #{expressCompany}
+        AND express_no = #{expressNo}
+        AND del_flag = #{DEL_FLAG_NORMAL}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_tn_express_no_segment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

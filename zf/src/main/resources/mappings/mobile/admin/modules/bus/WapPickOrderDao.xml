@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.mobile.admin.modules.bus.dao.WapPickOrderDao">
+	
+    <sql id="pickOrderColumns">
+    	
+    </sql>
+    
+	
+	<select id="listMyPickMission" parameterType="java.lang.String" resultType="Produce">
+	    SELECT 
+			DISTINCT 
+			p.code AS "code",
+			p.name AS 'name',
+			p.goods_id AS 'goods.id',
+			wp.code AS 'fullWareplace',
+			sp.num AS 'num',
+			so.pick_no AS "pickNo",
+			g.icon AS "goods.icon"
+			
+		FROM bus_ol_pick_order pick
+		LEFT JOIN bus_ol_send_order so ON so.pick_order_id = pick.id
+		LEFT JOIN bus_ol_send_produce sp ON sp.send_order_id = so.id
+		LEFT JOIN lgt_ps_produce p ON p.id = sp.produce_id
+		LEFT JOIN lgt_ps_product t ON t.produce_id = p.id
+		LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id
+		
+		LEFT JOIN lgt_ps_wareplace wp ON wp.id = t.wareplace_id
+		WHERE pick.package_by is null
+		AND pick.pick_by = #{0}
+		ORDER BY wp.code ASC, pick_no ASC
+	</select>
+	
+	
+	
+	
+	<select id="countSendOrderByPickBy" resultType="java.lang.Integer">
+       SELECT 
+           count(a.id) 
+       FROM bus_ol_pick_order a
+       <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="statType != null and statType != ''">
+                <!-- 本日 -->
+                <if test="statType == 'CD'">
+                    AND TO_DAYS(a.pick_start_time) =  TO_DAYS(NOW())
+                </if>
+                <!-- 本周 -->
+                <if test="statType == 'CW'">
+                    AND YEARWEEK(DATE_FORMAT(pick_start_time,'%Y-%m-%d'))=YEARWEEK(NOW())
+                </if>
+                <!-- 本月 -->
+                <if test="statType == 'CM'">
+                    AND DATE_FORMAT(pick_start_time,'%Y%m')=DATE_FORMAT(CURDATE(),'%Y%m')
+                </if>
+                <!-- 上一个月本日 -->
+                <if test="statType == 'LD'">
+                    AND (DAY(pick_start_time) =  DAY(NOW()))  AND   PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),DATE_FORMAT(pick_start_time,'%Y%m'))=1
+                </if>
+                <!-- 上一个月本周 -->
+                <if test="statType == 'LW'">
+                    AND PERIOD_DIFF(YEARWEEK(NOW()),   YEARWEEK(DATE_FORMAT(pick_start_time,'%Y-%m-%d')))=4 AND  PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),  DATE_FORMAT(pick_start_time,'%Y%m'))=1
+                </if>
+                <!-- 上一个月 -->
+                <if test="statType == 'LM'">
+                    AND PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),DATE_FORMAT(pick_start_time,'%Y%m'))=1
+                </if>
+                
+            </if>
+            
+       </where>    
+    </select>
+    
+	
+	
+</mapper>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.oe.ExperienceProduceDao">
+    
+	<sql id="experienceProduceColumns">
+		a.id AS "id",
+		a.experience_order_id AS "experienceOrder.id",
+		o.order_no AS "experienceOrder.orderNo",
+		a.produce_id AS "produce.id",
+		p.name AS "produce.name",
+		p.code AS "produce.code",
+		a.num AS "num",
+		a.buy_num AS "buyNum",
+		a.goods_title AS "goodsTitle",
+		a.produce_name AS "produceName",
+		a.price_src_experience AS "priceSrcExperience",
+		a.scale_experience_deposit AS "scaleExperienceDeposit",
+		a.price_experience_deposit AS "priceExperienceDeposit",
+		a.status AS "status",
+		a.decision_type AS "decisionType",
+		a.decision_buy_order_id AS "decisionBuyOrder.id",
+		a.money_check_dec AS "moneyCheckDec",
+		a.damage_type AS "damage_type",
+		a.money_sett_dec AS "moneySettDec",
+		a.money_sett_decable_beans AS "moneySettDecableBeans",
+		a.price_src_buy AS "priceSrcBuy",
+		a.discount_buy AS "discountBuy",
+		a.price_buy AS "priceBuy",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="experienceProduceJoins">
+	LEFT JOIN bus_oe_experience_order o ON o.id=a.experience_order_id
+	LEFT JOIN lgt_ps_produce p ON p.id=a.produce_id
+	</sql>
+    
+	<select id="get" resultType="ExperienceProduce">
+		SELECT 
+			<include refid="experienceProduceColumns"/>
+		FROM bus_oe_experience_produce a
+		<include refid="experienceProduceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getByProduceId" resultType="ExperienceProduce">
+		SELECT
+		<include refid="experienceProduceColumns"/>
+		FROM bus_oe_experience_produce a
+		<include refid="experienceProduceJoins"/>
+		WHERE a.produce_id = #{produceId}
+	</select>
+	<select id="findList" resultType="ExperienceProduce">
+		SELECT 
+			<include refid="experienceProduceColumns"/>
+		FROM bus_oe_experience_produce a
+		<include refid="experienceProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="experienceOrder != null and experienceOrder.id != null and experienceOrder.id != ''">
+				AND a.experience_order_id = #{experienceOrder.id}
+			</if>
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				AND a.produce_id = #{produce.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="decisionType != null and decisionType != ''">
+				AND a.decision_type = #{decisionType}
+			</if>
+			<if test="decisionBuyOrder != null and decisionBuyOrder.id != null and decisionBuyOrder.id != ''">
+				AND a.decision_buy_order_id = #{decisionBuyOrder.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ExperienceProduce">
+		SELECT 
+			<include refid="experienceProduceColumns"/>
+		FROM bus_oe_experience_produce a
+		<include refid="experienceProduceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_oe_experience_produce(
+			id,
+			experience_order_id,
+			produce_id,
+			num,
+			goods_title,
+			produce_name,
+			price_src_experience,
+			scale_experience_deposit,
+			price_experience_deposit,
+			status,
+			decision_type,
+			decision_buy_order_id,
+			money_sett_dec,
+			money_sett_decable_beans,
+			price_src_buy,
+			discount_buy,
+			price_buy,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{experienceOrder.id},
+			#{produce.id},
+			#{num},
+			#{goodsTitle},
+			#{produceName},
+			#{priceSrcExperience},
+			#{scaleExperienceDeposit},
+			#{priceExperienceDeposit},
+			#{status},
+			#{decisionType},
+			#{decisionBuyOrder.id},
+			#{moneySettDec},
+			#{moneySettDecableBeans},
+			#{priceSrcBuy},
+			#{discountBuy},
+			#{priceBuy},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_oe_experience_produce SET 	
+			experience_order_id = #{experienceOrder.id},
+			produce_id = #{produce.id},
+			num = #{num},
+			goods_title = #{goodsTitle},
+			produce_name = #{produceName},
+			price_src_experience = #{priceSrcExperience},
+			scale_experience_deposit = #{scaleExperienceDeposit},
+			price_experience_deposit = #{priceExperienceDeposit},
+			status = #{status},
+			decision_type = #{decisionType},
+			decision_buy_order_id = #{decisionBuyOrder.id},
+			money_check_dec =#{moneyCheckDec},
+			damage_type  =#{damageType},
+			money_sett_dec = #{moneySettDec},
+			money_sett_decable_beans = #{moneySettDecableBeans},
+			price_src_buy = #{priceSrcBuy},
+			discount_buy = #{discountBuy},
+			price_buy = #{priceBuy},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_oe_experience_produce SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="getByExperienceOrder" resultType="ExperienceProduce">
+		SELECT 
+				a.id AS "id",
+				a.num AS "num",
+				a.change_new_num AS "changeNewNum",
+				a.buy_num AS "buyNum",
+				a.produce_id AS "produce.id"
+		 FROM  bus_oe_experience_produce a
+		 WHERE a.experience_order_id = #{experienceOrderId}
+	</select>
+	<select id="updateByExperienceOrderAndProduce" resultType="ExperienceProduce">
+		UPDATE bus_oe_experience_produce SET
+		status = #{status},
+		money_check_dec =#{moneyCheckDec},
+		money_sett_decable_beans =#{decableBeans}
+		WHERE experience_order_id = #{orderId} AND  produce_id =#{produceId}
+	</select>
+	<select id="updateBuyNumByExperienceOrderAndProduce" resultType="ExperienceProduce">
+		UPDATE bus_oe_experience_produce SET
+		buy_num = #{buyNum}
+		<if test="decisionType != null and decisionType != ''">
+			,decision_type = #{decisionType}
+		</if>
+		WHERE experience_order_id = #{orderId} AND produce_id =#{produceId}
+	</select>
+	<select id="updateChangeNumByExperienceOrderAndProduce" resultType="ExperienceProduce">
+		UPDATE bus_oe_experience_produce SET
+		change_new_num = #{changeNewNum}
+		WHERE experience_order_id = #{orderId} AND produce_id =#{produceId}
+	</select>
+	<select id="updateStatusByExperienceOrder" resultType="ExperienceProduce">
+		UPDATE bus_oe_experience_produce SET
+		status = #{status}
+		WHERE experience_order_id = #{orderId}
+	</select>
+	<select id="updateStatus" resultType="ExperienceProduce">
+		UPDATE bus_oe_experience_produce SET
+		status = #{status}
+		WHERE experience_order_id = #{experienceOrder.id}
+	</select>
+
+</mapper>

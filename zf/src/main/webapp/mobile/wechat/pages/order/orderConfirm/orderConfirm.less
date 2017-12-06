@@ -1,0 +1,322 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------收货地址----------------------------*/
+.topText{
+    padding: 10px;
+    line-height: 20px;
+    color: #999;    font-size: 1.2rem;
+}
+.orderConfirm_address{
+    position: relative;
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    padding: 5px 0;
+    .name{
+        line-height: 30px;
+        padding-left: 25px;
+        span{
+            font-size: @commonText;
+            padding: 0 5px ;
+        }
+    }
+    .address{
+        i{
+            display: inline-block;
+            float: left;
+            font-size: @smallIcon;
+            color: @goldencolor;
+        }
+        p{
+            font-size: @viceText;
+            padding:0 30px;
+        }
+    }
+    .more{
+        position: absolute;
+        right: 10px;
+        height: 20px;
+        top: 50%;
+        margin-top: -10px;
+        color: #fff;
+    } 
+}
+.orderConfirm_cont{
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    .order_type{
+        font-size: @commonTitle;
+        line-height: 40px;
+        text-indent: 10px;
+        border-bottom: 1px solid @linecolor;
+    }
+    .order_main{
+        overflow: hidden;
+        border-bottom: 1px solid @linecolor;
+        .img{
+            float: left;
+            width: 35%;
+            img{
+                width: 100%;
+            }
+        }
+        .order_right{
+            width: 65%;
+            float: right;
+            padding: 10px ;
+            box-sizing: border-box;
+            h2{
+                font-size: @commonText;
+                line-height: 20px;
+            }
+            p{
+                
+                font-size: @viceText;
+                color: #999;
+                line-height: 18px;
+            }
+            h3{
+                font-size: @commonText;
+                line-height: 30px;
+                p{
+                	display:inline-block;
+                	font-size: 1.2rem;
+                }
+                span{
+                    font-size: @commonText;
+                    color: #E41F1F;
+                    padding: 0 3px;
+                }
+                b{
+                    font-size: @describText;
+                    text-decoration:line-through;
+                    color: #999;
+                }
+                i{
+                    float: right;
+                    font-size: @commonText;
+                }
+            }
+        }
+    }
+    .hireInsurance{
+        height: 40px;
+        border-bottom: 1px solid @linecolor;
+        p{
+            position: relative;
+            line-height: 40px;
+            padding: 0 10px;
+            font-size: @commonText;
+            b{
+                position: absolute;
+                font-size: 0.9rem;
+                color: #999;
+                padding: 0 0 2px 5px;
+            }
+            span{
+                font-size: @describText;
+                color: #999;
+                padding-right: 20px;
+                float: right;
+            }
+            i{
+                position: absolute;
+                right: 10px;
+                font-size: @smallIcon;
+            }
+        }
+    }
+    .total{
+        height: 40px;
+        line-height: 40px;
+        p{
+            font-size: @viceText;
+            float: right;
+            padding-right: 10px;
+            span{
+                clear: both;
+                padding: 0 5px;
+            }
+            i{
+                font-size: @commonText;
+                color: #E41F1F;
+                padding: 0 3px;
+             }
+        }
+    }
+}
+.delivery{
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    .isDelivery{
+        background: @blockbacground;
+        padding:10px 0;
+        height: 20px;
+        border-bottom: 1px solid @linecolor
+    }
+    .isDelivery .checkbox{
+        width: 50%;
+        float: left;
+    }
+    .checkboxLable{
+        display: block;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        i{
+         font-size: @blockIcon; 
+         vertical-align: top;  
+        }
+        span{
+            font-size: @commonText;
+        }
+    }
+    .time{
+        position:relative;
+         height: 40px;
+        border-bottom: 1px solid @linecolor;
+        p{
+            font-size: @viceText;
+            line-height: 40px;
+            padding-left: 10px;
+            input{
+                background: @blockbacground;
+                border: none;
+                line-height: 30px;
+                color: @goldencolor;
+                font-size: @describText;
+                text-align: center;
+            }
+        }
+        i{
+            position: absolute;
+            right: 10px;
+            line-height: 40px;
+            top: 0;
+        }
+    }
+    .picUpAddress{
+        position:relative;
+         height: 40px;
+          p{
+            font-size: @viceText;
+            line-height: 40px;
+            color: #999;
+            padding-left: 10px;
+        }
+        i{
+            position: absolute;
+            right: 10px;
+            line-height: 40px;
+            top: 0;
+        }
+    }
+}
+.message{
+    overflow: hidden;
+    background: @blockbacground;
+    padding: 0 10px 10px 10px;
+    margin-bottom: 10px;
+    h2{
+        font-size: @commonTitle;
+        line-height: 40px;
+    }
+    textarea{
+        width: 100%;
+        height: 100px;
+        padding: 5px;
+        box-sizing: border-box;
+        line-height: 20px;
+    }
+}
+.discount{
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    .coupon,.loan{
+        position:relative;
+         height: 40px;
+        border-bottom: 1px solid @linecolor;
+        p{
+            font-size: @viceText;
+            line-height: 40px;
+            color: #E41F1F;
+            padding-left: 10px;
+        }
+        i{
+            position: absolute;
+            right: 10px;
+            line-height: 40px;
+            top: 0;
+        }
+    }
+    .loan{
+        border: none;
+        P{
+            color: #fff;
+        }
+    }
+}
+.totalNum{
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    p{
+        line-height: 30px;
+        padding:0 10px;
+        span{
+            color: #e41f1f;
+            float: right;
+        }
+    }
+    h3{
+        display:block;
+        padding:0 10px;
+        line-height: 40px;
+        border-top: 1px solid @linecolor;
+        text-align: right;
+        span{
+            color: #e41f1f;
+        }
+    }
+}
+.submit{
+    overflow: hidden;
+    background: @blockbacground;
+    width: 100%;
+    padding:10px;
+    box-sizing: border-box;
+    span{
+        display: block;
+        width: 100%;
+        line-height: 36px;
+        margin: 20px 0;
+        text-align: center;
+        font-size: @commonText;
+        border: 1px solid;
+        .border-radius(2px);
+        &.confirmPay{
+            border-color:@goldencolor;
+        }
+        &.negotiation{
+            border-color:#2dd6b7;
+        }
+        &.crowdfunding{
+           border-color: #FF6A56;
+        }
+        &.kompanio{
+             border-color: @linecolor;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+

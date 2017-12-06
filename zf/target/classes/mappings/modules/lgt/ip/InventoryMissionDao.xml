@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ip.InventoryMissionDao">
+    
+	<sql id="inventoryMissionColumns">
+		a.id AS "id",
+		a.batch_no AS "batchNo",
+		a.warehouse_id AS "warehouse.id",
+		w.name AS "warehouse.name",
+		a.type AS "type",
+		a.style AS "style",
+		a.status AS "status",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.result_type AS "resultType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="inventoryMissionJoins">
+	LEFT JOIN lgt_ps_warehouse w ON w.id = a.warehouse_id
+	</sql>
+    
+	<select id="get" resultType="InventoryMission">
+		SELECT 
+			<include refid="inventoryMissionColumns"/>
+		FROM lgt_ip_inventory_mission a
+		<include refid="inventoryMissionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询盘点任务详细数据（包含盘点任务数据、盘点明细记录数据及相关数据） -->
+	<resultMap id="inventoryMissionMap" type="com.chinazhoufan.admin.modules.lgt.entity.ip.InventoryMission">
+		<result property="id" 				column="id" />
+		<result property="batchNo" 			column="batchNo" />
+		<result property="warehouse.id" 	column="warehouse.id" />
+		<result property="warehouse.name"	column="warehouse.name" />
+		<result property="type" 			column="type" />
+		<result property="style" 			column="style" />
+		<result property="status" 			column="status" />
+		<result property="startTime" 		column="startTime" />
+		<result property="endTime" 			column="endTime" />
+		<result property="resultType" 		column="resultType" />
+		<result property="createBy.id" 		column="createBy.id" />
+		<result property="createDate" 		column="createDate" />
+		<result property="updateBy.id" 		column="updateBy.id" />
+		<result property="updateDate" 		column="updateDate" />
+		<result property="remarks" 			column="remarks" />
+		<result property="delFlag" 			column="delFlag" />
+		<collection property="inventoryRecordList" javaType="ArrayList" ofType="InventoryRecord">
+			<result property="id" 					column="r.id"/>
+			<result property="inventoryMission.id" 	column="r.inventoryMission.id"/>
+			<result property="wareplace.id" 		column="r.wareplace.id"/>
+			<result property="wareplace.code" 		column="r.wareplace.code"/>
+			<result property="wareplace.warecounter.code" 						column="r.wareplace.warecounter.code"/>
+			<result property="wareplace.warecounter.warearea.code" 				column="r.wareplace.warecounter.warearea.code"/>
+			<result property="wareplace.warecounter.warearea.warehouse.code" 	column="r.wareplace.warecounter.warearea.warehouse.code"/>
+			<result property="wareplace.produce.code"							column="r.wareplace.produce.code"/>
+			<result property="wareplace.produce.name"							column="r.wareplace.produce.name"/>
+			<result property="wareplace.produce.goods.name"						column="r.wareplace.produce.goods.name"/>
+			<result property="inventoryUser.id" 	column="r.inventoryUser.id"/>
+			<result property="status" 				column="r.status"/>
+			<result property="systemNum" 			column="r.systemNum"/>
+			<result property="inventoryNum" 		column="r.inventoryNum"/>
+			<result property="resultType" 			column="r.resultType"/>
+			<result property="inventoryRemarks"		column="r.inventoryRemarks"/>
+			<collection property="productList" javaType="ArrayList" ofType="Product">
+				<result property="id" 					column="r.productList.id"/>
+				<result property="code" 				column="r.productList.code"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="getInfo" resultMap="inventoryMissionMap">
+		SELECT 
+			a.id AS "id",
+			a.batch_no AS "batchNo",
+			a.warehouse_id AS "warehouse.id",
+			w.name AS "warehouse.name",
+			a.type AS "type",
+			a.style AS "style",
+			a.status AS "status",
+			a.start_time AS "startTime",
+			a.end_time AS "endTime",
+			a.result_type AS "resultType",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			r.id AS 					"r.id",
+			r.inventory_mission_id AS 	"r.inventoryMission.id",
+			rwp.id AS 					"r.wareplace.id",
+			rwp.code AS 				"r.wareplace.code",
+			rwc.code AS 				"r.wareplace.warecounter.code",
+			rwa.code AS 				"r.wareplace.warecounter.warearea.code",
+			rwh.code AS 				"r.wareplace.warecounter.warearea.warehouse.code",
+			<!-- 
+			rwpp.code AS 				"r.wareplace.produce.code",
+			rwpp.name AS 				"r.wareplace.produce.name", 
+			rwpg.name AS 				"r.wareplace.produce.goods.name",-->
+			r.inventory_user_id AS 		"r.inventoryUser.id",
+			r.status AS 				"r.status",
+			r.system_num AS 			"r.systemNum",
+			r.inventory_num AS 			"r.inventoryNum",
+			r.result_type AS 			"r.resultType",
+			r.inventory_remarks AS 		"r.inventoryRemarks",
+			rwppt.id AS					"r.productList.id",
+			rwppt.code AS				"r.productList.code"
+		FROM lgt_ip_inventory_mission a
+		LEFT JOIN lgt_ps_warehouse 			w 	ON w.id = a.warehouse_id
+		LEFT JOIN lgt_ip_inventory_record 	r 	ON r.inventory_mission_id = a.id
+		LEFT JOIN lgt_ps_wareplace 			rwp ON rwp.id = r.wareplace_id
+		LEFT JOIN lgt_ps_warecounter 		rwc ON rwc.id = rwp.warecounter_id
+		LEFT JOIN lgt_ps_warearea 			rwa ON rwa.id = rwc.warearea_id
+		LEFT JOIN lgt_ps_warehouse 			rwh	ON rwh.id = rwa.warehouse_id
+		<!-- 
+		LEFT JOIN lgt_ps_produce 			rwpp ON rwpp.id = rwp.produce_id
+		LEFT JOIN lgt_ps_goods 				rwpg ON rwpg.id = rwpp.goods_id -->
+		LEFT JOIN lgt_ps_product			rwppt ON rwppt.wareplace_id = rwp.id
+		<where>
+			a.id = #{id}
+			<if test="inventoryUserId != null and inventoryUserId != ''">
+				AND r.inventory_user_id = #{inventoryUserId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="InventoryMission">
+		SELECT 
+			<include refid="inventoryMissionColumns"/>
+		FROM lgt_ip_inventory_mission a
+		<include refid="inventoryMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="batchNo != null and batchNo != ''">
+				AND a.batch_no = #{batchNo}
+			</if>
+			<if test="warehouse != null and warehouse.id != null and warehouse.id != ''">
+				AND a.warehouse_id = #{warehouse.id}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="style != null and style != ''">
+				AND a.style = #{style}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="resultType != null and resultType != ''">
+				AND a.result_type = #{resultType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InventoryMission">
+		SELECT 
+			<include refid="inventoryMissionColumns"/>
+		FROM lgt_ip_inventory_mission a
+		<include refid="inventoryMissionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据盘点人ID，查询包含的明细中有该盘点人的明细的（非新建状态）盘点任务 -->
+	<select id="findPageNotNewForInventoryUser" resultType="InventoryMission">
+		SELECT 
+			DISTINCT
+			<include refid="inventoryMissionColumns"/>
+		FROM lgt_ip_inventory_mission a
+		LEFT JOIN lgt_ps_warehouse w ON w.id = a.warehouse_id
+		LEFT JOIN lgt_ip_inventory_record r ON r.inventory_mission_id=a.id
+		<where>
+			a.del_flag = #{mission.DEL_FLAG_NORMAL}
+			AND r.inventory_user_id = #{uid}
+			AND a.status != #{mission.STATUS_NEW}
+			<if test="mission.batchNo != null and mission.batchNo != ''">
+				AND a.batch_no = #{mission.batchNo}
+			</if>
+			<if test="mission.warehouse != null and mission.warehouse.id != null and mission.warehouse.id != ''">
+				AND a.warehouse_id = #{mission.warehouse.id}
+			</if>
+			<if test="mission.type != null and mission.type != ''">
+				AND a.type = #{mission.type}
+			</if>
+			<if test="mission.style != null and mission.style != ''">
+				AND a.style = #{mission.style}
+			</if>
+			<if test="mission.status != null and mission.status != ''">
+				AND a.status = #{mission.status}
+			</if>
+			<if test="mission.resultType != null and mission.resultType != ''">
+				AND a.result_type = #{mission.resultType}
+			</if>
+		</where>
+		<choose>
+			<when test="mission.page !=null and mission.page.orderBy != null and mission.page.orderBy != ''">
+				ORDER BY ${mission.page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ip_inventory_mission(
+			id,
+			batch_no,
+			warehouse_id,
+			type,
+			style,
+			status,
+			start_time,
+			end_time,
+			result_type,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{batchNo},
+			#{warehouse.id},
+			#{type},
+			#{style},
+			#{status},
+			#{startTime},
+			#{endTime},
+			#{resultType},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ip_inventory_mission SET 	
+			batch_no = #{batchNo},
+			warehouse_id = #{warehouse.id},
+			type = #{type},
+			style = #{style},
+			status = #{status},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			result_type = #{resultType},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ip_inventory_mission SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM lgt_ip_inventory_mission WHERE id = #{id}
+	</delete>
+	
+</mapper>

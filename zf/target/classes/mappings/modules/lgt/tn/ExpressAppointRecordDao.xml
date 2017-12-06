@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.tn.ExpressAppointRecordDao">
+    
+	<sql id="expressAppointRecordColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		a.express_order_id AS "expressOrderId",
+		a.order_type AS "orderType",
+		a.order_id AS "orderId",
+		a.status AS "status",
+		a.appoint_start_time AS "appointStartTime",
+		a.appoint_end_time AS "appointEndTime",
+		a.area_id AS "area.id",
+		a.area_detail AS "areaDetail",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a8.name AS "area.name"
+	</sql>
+	
+	<sql id="expressAppointRecordJoins">
+		LEFT JOIN sys_area a8 ON a8.id = a.area_id
+	</sql>
+    
+	<select id="get" resultType="ExpressAppointRecord">
+		SELECT 
+			<include refid="expressAppointRecordColumns"/>
+		FROM lgt_tn_express_appoint_record a
+		<include refid="expressAppointRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByExpressOrderId" resultType="ExpressAppointRecord">
+		SELECT
+		<include refid="expressAppointRecordColumns"/>
+		FROM lgt_tn_express_appoint_record a
+		<include refid="expressAppointRecordJoins"/>
+		WHERE a.express_order_id = #{expressOrderId}
+	</select>
+	
+	<select id="findList" resultType="ExpressAppointRecord">
+		SELECT 
+			<include refid="expressAppointRecordColumns"/>
+		FROM lgt_tn_express_appoint_record a
+		LEFT JOIN crm_mi_member m on m.id=a.member_id
+		<include refid="expressAppointRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="status != null  and status != ''">
+			     AND a.status = #{status}
+			</if>
+			<if test="orderType != null and orderType != ''">
+			     AND a.order_type = #{orderType}
+			</if>
+			<if test="member != null  and member.usercode != null and member.usercode != ''">
+				AND m.usercode = #{member.usercode}
+			</if>
+			<if test="appointStartTime != null and appointStartTime != ''">
+			     <![CDATA[AND a.appoint_start_time >= #{appointStartTime}]]>
+			</if>
+			<if test="appointEndTime != null and appointEndTime != ''">
+                 <![CDATA[AND a.appoint_end_time >= #{appointEndTime}]]>
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ExpressAppointRecord">
+		SELECT 
+			<include refid="expressAppointRecordColumns"/>
+		FROM lgt_tn_express_appoint_record a
+		<include refid="expressAppointRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_tn_express_appoint_record(
+			id,
+			member_id,
+			express_order_id,
+			order_type,
+			order_id,
+			status,
+			appoint_start_time,
+			appoint_end_time,
+			area_id,
+			area_detail,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{expressOrderId},
+			#{orderType},
+			#{orderId},
+			#{status},
+			#{appointStartTime},
+			#{appointEndTime},
+			#{area.id},
+			#{areaDetail},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_tn_express_appoint_record SET 	
+			member_id = #{member.id},
+			express_order_id = #{expressOrderId},
+			order_type = #{orderType},
+			order_id = #{orderId},
+			status = #{status},
+			appoint_start_time = #{appointStartTime},
+			appoint_end_time = #{appointEndTime},
+			area_id = #{area.id},
+			area_detail = #{areaDetail},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_tn_express_appoint_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

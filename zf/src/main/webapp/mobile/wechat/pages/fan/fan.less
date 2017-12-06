@@ -1,0 +1,267 @@
+@import "../../baseConfig/config.less";
+/**-----------------------导航栏----------------------------*/
+header{
+    position: fixed;
+    top: 0;
+    display: block;
+    width: 100%;
+    height: 46px;
+    background: #fff;
+    line-height: 46px;
+    z-index: 9999;
+    div{
+        position: relative;
+        display: inline-block;
+        width: 80%;
+        height: 28px;
+        margin: 9px 0;
+        margin-left: 5%;
+        border: 1px;
+        .border-radius(14px) ;
+        background: #dddddd;
+        input{
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 28px;
+            border: 1px;
+            padding-right:32px;
+            .border-radius(14px) ;
+            background: url(images/search.png) no-repeat right;
+            background-size: 31px;
+            color: #000;
+            text-indent: 10px;
+            &::-webkit-input-placeholder {
+                color: #F9F9F9;
+            }
+        }
+    }
+    span{
+        width: 15%;
+        float: right;
+        line-height: 45px;
+        text-align: center;
+        font-size: @commonText;
+        color: #333;
+    }
+}
+
+/**----------------------内容头部-----------------------------*/
+
+
+.content_main_top{
+    position: fixed;
+    top: 45px;
+    padding: 10px 0;
+    height: 50px;
+    width: 100%;
+    line-height: 30px;
+    box-sizing: border-box;
+    background: @blockbacground;
+    border-bottom: 1px solid @linecolor;
+        z-index: 999;
+    .content_main_top_tap{
+        li{
+            width: 30%;
+            float: left;
+            height: 100%;
+            color: @fontcolor;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: @commonText;
+            &:first-child{
+          	 width:40%;
+           }
+           i{
+               font-size: 0.8rem;
+               padding: 2px;
+           }
+        }
+        li.current{
+           color: @goldencolor;
+           border: none;
+        }
+    }
+}
+/**-----------------------内容区----------------------------*/
+.content_main{
+    overflow: hidden;position: relative;
+    top: 95px;
+}
+.content_main_match_warp{
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid @linecolor;
+    
+}  
+.content_main_match_pic{
+    position: relative;
+    width: 100%;
+    height: auto;
+    img{
+        width: 100%;
+    }
+    .likeNum{
+        position: absolute;
+        bottom: 10px;
+        right: 20px;
+        i{
+            font-size: @blockIcon;
+            color: #e41f1f;
+        }
+        b{
+            font-size: 1.3rem;
+        }
+    }
+}
+.content_main_match_subpic{
+    padding:0;
+    overflow: hidden;
+    li{
+        width: 50%;
+        padding: 5px 2.5px 0 0;
+        float: left;
+        position: relative;
+        box-sizing: border-box;
+        img{
+            width: 100%;
+        }
+        &:last-child{
+            padding: 5px 0 0 2.5px ;
+        }
+    }
+}
+
+/**-----------------------综合排序----------------------------*/
+.zonghe{
+    position: fixed;;
+    top:50px;
+    z-index: 99;
+        width: 100%;
+    overflow: hidden;
+    background: @blockbacground;
+    li{
+        width: 100%;
+        box-sizing: border-box;
+        height: 36px;
+        border-bottom: 1px solid @linecolor;
+        line-height: 36px;
+        padding: 0 10px;
+        font-size: @viceText;
+         &.active{
+            color: @goldencolor;
+	        i{
+	            float: right;
+	            display:block;
+	        }
+            
+        }
+        i{
+            float: right;
+            display:none;
+        }
+    }
+}
+#listWrapper{
+	position: fixed;
+    top: 95px;
+    bottom: 0;
+    z-index: 9;
+    width: 100%;
+    overflow: hidden;
+}
+/**----------------------筛选-----------------------------*/
+.scene_filtrate{
+ 	 position: fixed;
+    top:95px;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+    width: 100%;
+    overflow: hidden;
+    background: @backgroundcolor;
+    box-sizing: border-box;
+    .sub_content{
+        width: 100%;
+        box-sizing: border-box;
+        border-bottom: 1px solid @linecolor;
+        padding:0 10px 10px 10px;
+        overflow: hidden;
+        .top{
+            height: 40px;
+            line-height: 40px;
+            .name{
+                float:left;
+                font-size: 1.4rem;
+                line-height: 40px;
+            }
+        }
+        .content{
+            overflow: hidden;
+            ul{
+                width: 100%;
+                overflow: hidden;
+                li{
+                    float: left;
+                    min-width: 25%;
+                    padding: 5px;
+                    box-sizing: border-box;
+                    span{
+                        display: block;
+                        padding: 5px 10px;
+                        background: @blockbacground;
+                        text-align: center;
+                        .border-radius(5px);
+                        &.active{
+                            background: @goldencolor;
+                            color: #fff;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    .button{
+        overflow: hidden;
+        width: 50%;
+        margin: 20px auto;
+        span{
+            color: @goldencolor;
+            font-size: @viceText;
+            padding: 3px 15px;
+            margin: 3px;
+            border: 1px solid @goldencolor;
+            .border-radius(5px);
+            &.reInput{
+                float: left;
+            }
+            &.confirm{
+                float: right;
+            }
+        }
+    }
+}
+    
+.fanWrapper_vertical{
+	position: fixed;
+    top: 97px;
+    bottom: 0;
+    z-index: 9;
+    width: 100%;
+    overflow: hidden;
+    #listLoadingLi{
+        padding: 0;
+        height: 30px;
+        width: 100%;
+        font-size: 1.2rem;
+        text-align: center;
+        color: #dddddd;
+        line-height: 30px;
+    }
+}
+    
+    
+    
+    
+    

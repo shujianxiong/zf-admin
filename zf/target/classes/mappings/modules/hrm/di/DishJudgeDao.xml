@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.hrm.dao.di.DishJudgeDao">
+    
+	<sql id="dishJudgeColumns">
+		a.id AS "id",
+		a.dish_id AS "dish.id",
+		a.judge_by AS "judgeBy.id",
+		a.judge_level AS "judgeLevel",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="dishJudgeJoins">
+	</sql>
+    
+    <!-- 根据菜品ID获取该菜品评价级别的平均值（四舍五入保留两位小数） -->
+	<select id="getComputedScoreByDishId" resultType="BigDecimal">
+		SELECT 
+			ROUND(SUM(a.judge_level)/COUNT(a.judge_level),2)
+		FROM hrm_di_dish_judge a
+		WHERE a.dish_id = #{dishId}
+	</select>
+    
+	<select id="get" resultType="DishJudge">
+		SELECT 
+			<include refid="dishJudgeColumns"/>
+		FROM hrm_di_dish_judge a
+		<include refid="dishJudgeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="DishJudge">
+		SELECT 
+			<include refid="dishJudgeColumns"/>
+		FROM hrm_di_dish_judge a
+		<include refid="dishJudgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="dish != null and dish.id != null and dish.id != ''">
+				AND a.dish_id = #{dish.id}
+			</if>
+			<if test="judgeBy != null and judgeBy.id != null and judgeBy.id != ''">
+				AND a.judge_by = #{judgeBy.id}
+			</if>
+			<if test="judgeLevel != null and judgeLevel != ''">
+				AND a.judge_level = #{judgeLevel}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DishJudge">
+		SELECT 
+			<include refid="dishJudgeColumns"/>
+		FROM hrm_di_dish_judge a
+		<include refid="dishJudgeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hrm_di_dish_judge(
+			id,
+			dish_id,
+			judge_by,
+			judge_level,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{dish.id},
+			#{judgeBy.id},
+			#{judgeLevel},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hrm_di_dish_judge SET 	
+			dish_id = #{dish.id},
+			judge_by = #{judgeBy.id},
+			judge_level = #{judgeLevel},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE hrm_di_dish_judge SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

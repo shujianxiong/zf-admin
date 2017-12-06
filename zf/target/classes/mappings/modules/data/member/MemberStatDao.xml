@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.data.dao.member.MemberStatDao">
+    
+    <select id="statMemberRegisterBar" resultType="com.chinazhoufan.admin.modules.data.vo.member.MemberRegStat">
+        SELECT 
+        DATE_FORMAT(a.register_time , '%Y-%m') AS 'label', 
+        COUNT(a.id) AS 'num' 
+        FROM crm_mi_member a 
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="beginRegisterTime != null and beginRegisterTime != ''">
+                <![CDATA[AND a.register_time >= #{beginRegisterTime}]]>
+            </if>
+            <if test="endRegisterTime != null and endRegisterTime != ''">
+                <![CDATA[AND a.register_time <= #{endRegisterTime}]]>
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(a.register_time, '%Y-%m')
+        LIMIT 6
+    </select>
+    
+</mapper>

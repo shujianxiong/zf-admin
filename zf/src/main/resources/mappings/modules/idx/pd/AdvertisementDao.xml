@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.idx.dao.pd.AdvertisementDao">
+    
+	<sql id="advertisementColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.type AS "type",
+		a.display_area AS "displayArea",
+		a.dp_photo AS "dpPhoto",
+		a.url AS "url",
+		a.order_no AS "orderNo",
+		a.usable_flag AS "usableFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="advertisementJoins">
+	</sql>
+    
+	<select id="get" resultType="Advertisement">
+		SELECT 
+			<include refid="advertisementColumns"/>
+		FROM idx_pd_advertisement a
+		<include refid="advertisementJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Advertisement">
+		SELECT 
+			<include refid="advertisementColumns"/>
+		FROM idx_pd_advertisement a
+		<include refid="advertisementJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Advertisement">
+		SELECT 
+			<include refid="advertisementColumns"/>
+		FROM idx_pd_advertisement a
+		<include refid="advertisementJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO idx_pd_advertisement(
+			id,
+			name,
+			type,
+			display_area,
+			dp_photo,
+			url,
+			order_no,
+			usable_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{type},
+			#{displayArea},
+			#{dpPhoto},
+			#{url},
+			#{orderNo},
+			#{usableFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE idx_pd_advertisement SET 	
+			name = #{name},
+			type = #{type},
+			display_area = #{displayArea},
+			dp_photo = #{dpPhoto},
+			url = #{url},
+			order_no = #{orderNo},
+			usable_flag = #{usableFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE idx_pd_advertisement SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

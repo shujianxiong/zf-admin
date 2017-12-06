@@ -1,0 +1,1375 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.GoodsDao" >
+
+    <resultMap id="goodsResult" type="com.chinazhoufan.admin.modules.lgt.entity.ps.Goods">
+		<id property="id" 					column="id" />
+		<result property="code" 			column="code" />
+		<result property="factoryCode" 		column="factoryCode" />
+		<result property="name" 			column="name" />
+		<result property="englishName" 		column="englishName" />
+		<result property="title" 			column="title" />
+		<result property="price" 			column="price" />
+		<result property="icon" 			column="icon" />
+		<result property="photo" 			column="photo" />
+		<result property="story" 			column="story" />
+		<result property="introduction"	 	column="introduction" />
+		<result property="showVideo"	 	column="showVideo" />
+		<result property="status" 			column="status" />
+		
+		<result property="samplePhoto"      column="samplePhoto"/>
+
+		<result property="singlePhoto"      column="singlePhoto"/>
+
+		<result property="propertyStr"      column="propertyStr"/>
+
+		<result property="origin"      column="origin"/>
+		
+		<result property="isCouponUsable" 	column="isCouponUsable" />
+		<result property="relateGoodsIds" 	column="relateGoodsIds" />
+		<result property="brand.id" 		column="brand.id" />
+		<result property="brand.name" 		column="brand.name" />
+		<result property="designer.id" 		column="designer.id" />
+		<result property="designer.name" 	column="designer.name" />
+		<result property="isRecommend" 		column="isRecommend" />
+		
+		<result property="sellNum" 			column="sellNum" />
+		<result property="remarks" 			column="remarks" />
+		<result property="createBy.id" 		column="createBy.id" />
+		<result property="createDate" 		column="createDate" />
+		<result property="updateBy.id" 		column="updateBy.id" />
+		<result property="updateDate" 		column="updateDate" />
+		<result property="delFlag" 			column="delFlag" />
+		<result property="category.id" 		column="category.id"/>
+		<result property="category.categoryName" column="category.categoryName"/>
+		
+		<result property="useRange" column="useRange"/>
+		<result property="modelPhoto" column="modelPhoto"/>
+		<result property="certificatePhoto"  column="certificatePhoto"/>
+		
+		<collection property="goodsProp" javaType="ArrayList" ofType="GoodsProp">
+			<result column="goodsProp.id" 		property="id"/>
+	    	<result column="goodsProp.goods.id" property="goodsProp.goods.id"/>
+	    	<result column="goodsProp.pid" 		property="pid"/>
+	    	<collection property="goodsPropvalue" ofType="GoodsPropvalue">
+   				<result column="goodsProp.goodsPropvalue.id" 			property="id"/>
+		    	<result column="goodsProp.goodsPropvalue.goodsPropId" 	property="goodsPropId"/>
+		    	<result column="goodsProp.goodsPropvalue.pvid" 			property="pvid"/>
+		    	<result column="goodsProp.goodsPropvalue.pvalue" 		property="pvalue"/>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<resultMap id="goodsByCategoryResult" type="com.chinazhoufan.admin.modules.lgt.entity.ps.Goods">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<collection property="produces" javaType="ArrayList" ofType="Produce">
+			<result column="produce.id" property="id"/>
+	    	<result column="produce.name" property="name"/>
+		</collection>
+	</resultMap>
+	
+    <resultMap id="goodsAndProduceResult" type="Goods" >
+    	<id property="id" column="id" />
+		<result property="code" 		column="code" />
+		<result property="name" 		column="name" />
+		<result property="englishName" 	column="englishName" />
+		<result property="status" 		column="status" />
+		<result property="icon" 		column="icon" />
+		<result property="samplePhoto"  column="samplePhoto"/>
+		<result property="singlePhoto"      column="singlePhoto"/>
+		<result property="propertyStr"      column="propertyStr"/>
+		
+		<result property="photo" 		column="photo" />
+		<result property="category.id"	column="category.id" />
+		<result property="createBy.id" 	column="createBy.id" />
+		<result property="createDate" 	column="createDate" />
+		<result property="updateBy.id" 	column="updateBy.id" />
+		<result property="updateDate" 	column="updateDate" />
+		<result property="remarks" 		column="remarks" />
+		<result property="category.categoryTag" 	column="category.categoryTag" />
+		<result property="category.categoryName"	column="category.categoryName" />
+		
+		<result property="useRange" column="useRange"/>
+        <result property="modelPhoto" column="modelPhoto"/>
+		<result property="certificatePhoto"  column="certificatePhoto"/>
+		
+    	<collection property="produces" javaType="ArrayList" ofType="Produce">
+    		<result property="id" 				column="produces.id"/>
+	    	<result property="code" 			column="produces.code"/>
+	    	<result property="name" 			column="produces.name"/>
+	    	<result property="status" 			column="produces.status"/>
+	    	<result property="stockStandard"	column="produces.stockStandard" />
+	    	<result property="stockSafe" 		column="produces.stockSafe" />
+	    	<result property="stockWarning" 	column="produces.stockWarning" />
+	    	<result property="stockNormal" 		column="produces.stockNormal" />
+	    	<result property="stockSell" 		column="produces.stockSell" />
+	    	<result property="stockLock" 	column="produces.stockLock" />
+	    	<result property="goods.id" 		column="produces.goods.id"/>
+	    	<result property="createBy.id" 		column="produces.createBy.id" />
+			<result property="createDate" 		column="produces.createDate" />
+			<result property="updateBy.id" 		column="produces.updateBy.id" />
+			<result property="updateDate" 		column="produces.updateDate" />
+			<result property="remarks" 			column="produces.remarks" />
+    	</collection>
+    </resultMap>
+    
+    <sql id="goodsAndProduce">
+    	a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.icon AS "icon",
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+		a.property_str AS "propertyStr",
+		
+		a.photo AS "photo",
+		a.status AS "status",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		p.id AS "produces.id",
+		p.goods_id AS "produces.goods.id",
+		p.name AS "produces.name",
+		p.code AS "produces.code",
+		p.status AS "produces.status",
+		<choose>
+			<when test="warehouseId != null and warehouseId !=''">
+				(select iFnull(sum(w.stock_standard),0) from lgt_ps_wh_produce w where w.produce_id = p.id AND w.warehouse_id = #{warehouseId}) "produces.stockStandard",
+				(select iFnull(sum(w.stock_safe),0) from lgt_ps_wh_produce w where w.produce_id = p.id AND w.warehouse_id = #{warehouseId}) "produces.stockSafe",
+				(select iFnull(sum(w.stock_warning),0) from lgt_ps_wh_produce w where w.produce_id = p.id AND w.warehouse_id = #{warehouseId}) "produces.stockWarning",
+				(select iFnull(sum(w.stock_normal),0) from lgt_ps_wh_produce w where w.produce_id = p.id AND w.warehouse_id = #{warehouseId}) "produces.stockNormal",
+				(select iFnull(sum(w.stock_sell_locked),0) from lgt_ps_wh_produce w where w.produce_id = p.id AND w.warehouse_id = #{warehouseId}) "produces.stockLock",
+			</when>
+			<otherwise>
+				(select iFnull(sum(w.stock_standard),0) from lgt_ps_wh_produce w where w.produce_id = p.id) AS "produces.stockStandard",
+				(select iFnull(sum(w.stock_safe),0) from lgt_ps_wh_produce w where w.produce_id = p.id) AS "produces.stockSafe",
+				(select iFnull(sum(w.stock_warning),0) from lgt_ps_wh_produce w where w.produce_id = p.id) AS "produces.stockWarning",
+				(select iFnull(sum(w.stock_normal),0) from lgt_ps_wh_produce w where w.produce_id = p.id) AS "produces.stockNormal",
+				(select iFnull(sum(w.stock_sell_locked),0) from lgt_ps_wh_produce w where w.produce_id = p.id) AS "produces.stockLock",
+			</otherwise>
+		</choose>
+		p.create_by AS "produces.createBy.id",
+		p.create_date AS "produces.createDate",
+		p.update_by AS "produces.updateBy.id",
+		p.update_date AS "produces.updateDate",
+		p.remarks AS "produces.remarks",
+		c.id AS "category.id",
+		c.category_tag AS "category.categoryTag",
+		c.category_name AS "category.categoryName"
+    </sql>
+    
+	<sql id="goodsColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.title AS "title",
+		a.price AS "price",
+		a.icon AS "icon",
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+
+		a.show_video AS "showVideo",
+		a.property_str AS "propertyStr",
+		
+		a.story AS "story",
+		a.status AS "status",
+		
+		a.is_coupon_usable AS "isCouponUsable",
+		a.relate_goods_ids AS "relateGoodsIds",
+		
+		a.sell_num AS "sellNum",
+		a.brand_id AS "brand.id",
+		a.designer_id AS "designer.id",
+		a.is_recommend AS "isRecommend",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		c.category_name AS "category.categoryName",
+		c.id AS "category.id"
+		c.category_name AS "category.categoryName",
+		c.id AS "categoryList.id",
+		c.apcid AS "categoryList.allParentId"
+	</sql>
+	
+	<sql id="goodsListColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.title AS "title",
+		a.price AS "price",
+		a.icon AS "icon",
+		
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+		a.show_video AS "showVideo",
+		a.property_str AS "propertyStr",
+		
+		a.photo AS "photo",
+		a.story AS "story",
+		a.introduction AS "introduction",
+		a.status AS "status",
+		
+		a.is_coupon_usable AS "isCouponUsable",
+		a.relate_goods_ids AS "relateGoodsIds",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.sell_num AS "sellNum",
+		a.brand_id AS "brand.id",
+		a.designer_id AS "designer.id",
+		d.name AS "designer.name",
+		a.is_recommend AS "isRecommend",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		c.category_name AS "category.categoryName",
+		c.id AS "category.id"
+	</sql>
+	
+	<sql id="goodsJoins">
+		right join lgt_ps_category c ON c.id = a.category_id
+	</sql>
+    
+	<select id="get" resultMap="goodsResult">
+		SELECT 
+		a.id AS "id",
+		a.category_id AS "category.id",
+		a.code AS "code",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.title AS "title",
+		a.price AS "price",
+		a.icon AS "icon",
+		
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+		a.show_video AS "showVideo",
+		a.property_str AS "propertyStr",
+
+		a.origin AS "origin",
+		a.photo AS "photo",
+		a.story AS "story",
+		a.introduction AS "introduction",
+		a.status AS "status",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.is_coupon_usable AS "isCouponUsable",
+		a.relate_goods_ids AS "relateGoodsIds",
+		(SELECT SUM(wp.stock_normal) FROM lgt_ps_wh_produce wp LEFT JOIN lgt_ps_produce p ON wp.produce_id = p.id  WHERE p.goods_id=#{id}) AS "allExistStock",
+		a.sell_num AS "sellNum",
+		
+		a.brand_id AS "brand.id",
+		(select b.name from lgt_bs_brand b where b.id=a.brand_id) AS "brand.name",
+		a.designer_id AS "designer.id",
+		(select c.name from lgt_bs_designer c where c.id=a.designer_id) AS "designer.name",
+		a.is_recommend AS "isRecommend",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+		from lgt_ps_goods a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Goods">
+		SELECT DISTINCT 
+			<include refid="goodsListColumns"/>
+		FROM lgt_ps_goods a 
+		right join lgt_ps_category c ON c.id = a.category_id
+		left join lgt_bs_designer d ON d.id = a.designer_id
+		left join lgt_ps_goods_tags gt ON gt.goods_id = a.id
+		left join lgt_ps_tags t ON t.id = gt.tags_id
+		left join lgt_ps_goods_prop gp on gp.goods_id = a.id
+        join lgt_ps_goods_propvalue gpp on gpp.goods_prop_id = gp.id
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR a.factory_code LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR a.title LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="code !=null and code != ''">
+				AND a.code = #{code}
+			</if>
+			<if test="category != null and category.id !=null and category.id != ''">
+				AND a.category_id = #{category.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="name != null and name != ''">
+			    AND a.name like 
+                     <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                     <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                     <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="designer != null and designer.id != null and designer.id != ''">
+			    AND a.designer_id = #{designer.id}
+			</if>
+			<if test="brand != null and brand.id != null and brand.id !=''">
+			     AND a.brand_id = #{brand.id}
+			</if>
+			<if test="isCouponUsable != null and isCouponUsable != ''"><!-- 可优惠 -->
+			     AND a.is_coupon_usable = #{isCouponUsable}
+			</if>
+			<if test="isRecommend != null and isRecommend != ''"><!-- 可推荐 -->
+			     AND a.is_recommend = #{isRecommend}
+			</if>
+			<if test="tags != null and tags.name != null and tags.name != ''">
+			     AND t.name like 
+			         <if test="dbName == 'oracle'">'%'||#{tags.name}||'%'</if>
+                     <if test="dbName == 'mssql'">'%'+#{tags.name}+'%'</if>
+                     <if test="dbName == 'mysql'">concat('%',#{tags.name},'%')</if>
+			</if>
+            <!-- 主要用于商品选择器查询 非新建状态的商品 -->
+			<if test="isSelectedGoods != null and isSelectedGoods != ''">
+			     AND a.status != #{STATUS_NEW}
+			</if>
+			<if test="useRange != null and useRange != ''">
+			     AND a.use_range = #{useRange}
+			</if>
+			<if test="goodsProp != null and goodsProp.size >0">
+			     <foreach collection="goodsProp" item="gp" >
+		             <if test="gp.goodsPropvalue != null  and gp.goodsPropvalue.size >0">
+		                  <foreach collection="gp.goodsPropvalue" item="gpp" index="index" separator=" AND ">
+		                      <if test="gpp.propvalue != null and gpp.propvalue.id != null and gpp.propvalue.id != ''">
+		                          AND gpp.pvid = #{gpp.propvalue.id}
+		                      </if>
+		                  </foreach>
+		             </if> 	     
+			     </foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 商品列表查询   包含详情  END -->
+	
+	<select id="listWaitRelatedGoods" resultType="Goods">
+	   SELECT 
+            <include refid="goodsListColumns"/>
+        FROM lgt_ps_goods a 
+        right join lgt_ps_category c ON c.id = a.category_id
+        left join lgt_bs_designer d ON d.id = a.designer_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+                AND (a.code LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR a.factory_code LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR a.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR a.title LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                )
+            </if>
+            <if test="category != null and category.id !=null and category.id != ''">
+                AND a.category_id =#{category.id}
+            </if>
+            <if test="designer != null and designer.id != null and designer.id != ''">
+                AND a.designer_id = #{designer.id}
+            </if>
+            <if test="brand != null and brand.id != null and brand.id !=''">
+                 AND a.brand_id = #{brand.id}
+            </if>
+            
+            <if test="isCouponUsable != null and isCouponUsable != ''"><!-- 可优惠 -->
+                 AND a.is_coupon_usable = #{isCouponUsable}
+            </if>
+            <if test="isRecommend != null and isRecommend != ''"><!-- 可推荐 -->
+                 AND a.is_recommend = #{isRecommend}
+            </if>
+            <if test="tags != null and tags.name != null and tags.name != ''">
+                 AND t.name like 
+                     <if test="dbName == 'oracle'">'%'||#{tags.name}||'%'</if>
+                     <if test="dbName == 'mssql'">'%'+#{tags.name}+'%'</if>
+                     <if test="dbName == 'mysql'">concat('%',#{tags.name},'%')</if>
+            </if>
+            <if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+            AND a.status != #{status}<!-- 非新建状态，穿过的status的值应为新建状态 -->
+            AND a.id != #{id} <!-- 且商品列表里面过滤掉自己 -->
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.code DESC
+            </otherwise>
+        </choose>
+	</select>
+	
+	
+	<select id="findGoodsByCategory" resultMap="goodsByCategoryResult">
+		SELECT
+			a.id AS "id",
+			a.name AS "name",
+			b.id AS "produce.id",
+			b.produce_name AS "produce.produceName"
+		FROM lgt_ps_goods a
+		LEFT JOIN lgt_ps_produce b ON b.goods_id=a.id
+		WHERE a.del_flag = #{0}
+		AND a.category_id = #{1}
+		ORDER BY a.code DESC
+	</select>
+	
+	<select id="findAllList" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM lgt_ps_goods a
+		<include refid="goodsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGoodsAndProduceList" resultMap="goodsAndProduceResult">
+		SELECT 
+		<include refid="goodsAndProduce"/>
+		FROM lgt_ps_goods a 
+		left join lgt_ps_produce p ON a.id = p.goods_id
+		left join lgt_ps_category c ON a.category_id=c.id
+		left join lgt_ps_wh_produce d ON d.produce_id = p.id
+		<where>
+			a.del_flag = #{goods.DEL_FLAG_NORMAL}
+			AND a.status!=#{goods.GOODS_NEW}
+			AND p.produce_status != #{produce.PRODUCE_FREEZE}
+			<if test="goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.factory_code LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.title LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="goods.name != null and goods.name != ''">
+				AND a.name = #{goods.name}
+			</if>
+			<if test="goods.category != null and goods.category.id!=null and goods.category.id != ''">
+				AND a.category_id =#{goods.category.id}
+			</if>
+			<if test="goods.status != null and goods.status != ''">
+				AND a.status =#{goods.status}
+			</if>
+			<if test="warehouseId !=null and warehouseId !=''">
+				AND d.warehouse_id = #{warehouseId}
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+		<choose>
+			<when test="goods.page !=null and goods.page.orderBy != null and goods.page.orderBy != ''">
+				ORDER BY ${goods.page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询货品数据 -->
+	<resultMap id="goodsAndProductResult" type="Goods" >
+    	<id property="id" 				column="id" />
+		<result property="code" 		column="code" />
+		<result property="name" 		column="name" />
+		<result property="englishName" 	column="englishName" />
+		<result property="status" 		column="status" />
+		<result property="icon" 		column="icon" />
+		<result property="samplePhoto"  column="samplePhoto"/>
+		<result property="singlePhoto"  column="singlePhoto"/>
+		<result property="propertyStr"      column="propertyStr"/>
+		
+		<result property="photo" 		column="photo" />
+		
+		<result property="useRange" column="useRange"/>
+        <result property="modelPhoto" column="modelPhoto"/>
+        <result property="certificatePhoto"  column="certificatePhoto"/>
+        
+		<result property="category.id" 	column="category.id" />
+		<result property="createBy.id" 	column="createBy.id" />
+		<result property="createDate"	column="createDate" />
+		<result property="updateBy.id" 	column="updateBy.id" />
+		<result property="updateDate" 	column="updateDate" />
+		<result property="remarks" 		column="remarks" />
+		<result property="category.categoryTag" column="category.categoryTag" />
+		<result property="category.categoryName" column="category.categoryName" />
+    	<collection property="produces" javaType="ArrayList" ofType="Produce">
+    		<result property="id" 				column="produces.id"/>
+	    	<result property="code" 			column="produces.code"/>
+	    	<result property="name" 			column="produces.name"/>
+	    	<result property="status" 			column="produces.status"/>
+	    	<result property="stockStandard" 	column="produces.stockStandard" />
+	    	<result property="stockSafe" 		column="produces.stockSafe" />
+	    	<result property="stockWarning" 	column="produces.stockWarning" />
+	    	<result property="stockNormal" 		column="produces.stockNormal" />
+	    	<result property="stockLock" 	column="produces.stockLock" />
+	    	<result property="goods.id" 		column="produces.goods.id"/>
+	    	<result property="createBy.id" 		column="produces.createBy.id" />
+			<result property="createDate" 		column="produces.createDate" />
+			<result property="updateBy.id" 		column="produces.updateBy.id" />
+			<result property="updateDate" 		column="produces.updateDate" />
+			<result property="remarks" 			column="produces.remarks" />
+			<collection property="products" javaType="ArrayList" ofType="Product">
+	    		<result property="id" 		column="products.id"/>
+		    	<result property="code" 	column="products.code"/>
+		    	<result property="goods.id" column="products.goods.id"/>
+		    	<result property="status" 	column="products.status"/>
+		    	<result property="remarks" 	column="products.remarks"/>
+    		</collection>
+    	</collection>
+    </resultMap>
+    <sql id="goodsAndProduct">
+    	a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.icon AS "icon",
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+		a.property_str AS "propertyStr",
+		
+		a.photo AS "photo",
+		a.status AS "status",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		p.id AS "produces.id",
+		p.goods_id AS "produces.goods.id",
+		p.name AS "produces.name",
+		p.code AS "produces.code",
+		p.status AS "produces.status",
+		(select iFnull(sum(w.stock_standard),0) from lgt_ps_wh_produce w where w.produce_id = p.id) 	AS "produces.stockStandard",
+		(select iFnull(sum(w.stock_safe),0) from lgt_ps_wh_produce w where w.produce_id = p.id) 		AS "produces.stockSafe",
+		(select iFnull(sum(w.stock_warning),0) from lgt_ps_wh_produce w where w.produce_id = p.id) 		AS "produces.stockWarning",
+		(select iFnull(sum(w.stock_sell_locked),0) from lgt_ps_wh_produce w where w.produce_id = p.id) 	AS "produces.stockLock",
+		p.create_by AS "produces.createBy.id",
+		p.create_date AS "produces.createDate",
+		p.update_by AS "produces.updateBy.id",
+		p.update_date AS "produces.updateDate",
+		p.remarks AS "produces.remarks",
+		t.id AS "products.id",
+		t.code AS "products.code",
+		t.goods_id AS "products.goods.id",
+		t.status AS "products.status",
+		t.remarks AS "products.remarks",
+		c.id AS "category.id",
+		c.category_tag AS "category.categoryTag",
+		c.category_name AS "category.categoryName"
+    </sql>
+	<select id="findGoodsAndProductList" resultMap="goodsAndProductResult">
+		SELECT 
+		<include refid="goodsAndProduct"/>
+		FROM lgt_ps_goods a 
+		left join lgt_ps_produce p ON a.id = p.goods_id
+		left join lgt_ps_product t ON t.produce_id = p.id
+		left join lgt_ps_category c ON a.category_id=c.id
+		left join lgt_ps_wh_produce d ON d.produce_id = p.id
+		<where>
+			a.del_flag = #{goods.DEL_FLAG_NORMAL}
+			and 
+			t.del_flag = #{goods.DEL_FLAG_NORMAL}
+			AND a.status!=#{goods.GOODS_NEW}
+			<if test="goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="goods.dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="goods.dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="goods.dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.factory_code LIKE
+					<if test="goods.dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="goods.dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="goods.dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.name LIKE
+					<if test="goods.dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="goods.dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="goods.dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.title LIKE
+					<if test="goods.dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="goods.dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="goods.dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="goods.category != null and goods.category.id!=null and goods.category.id != ''">
+				AND a.category_id =#{goods.category.id}
+			</if>
+			<if test="goods.status != null and goods.status != ''">
+				AND a.status =#{goods.status}
+			</if>
+			<if test="produceId !=null and produceId !=''">
+				AND t.produce_id = #{produceId}
+			</if>
+			<if test="warehouseId != null and warehouseId !=''">
+				AND d.warehouse_id = #{warehouseId}
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findCount" resultType="Integer">
+		select count(id) from lgt_ps_goods
+	</select>
+	
+	<select id="findProduceList" resultMap="goodsAndProduceResult">
+		SELECT 
+		<include refid="goodsAndProduce"></include>
+		FROM lgt_ps_goods a 
+		left join lgt_ps_produce p ON a.id = p.goods_id
+		left join lgt_ps_category c ON a.category_id=c.id
+		<where>
+			a.del_flag = #{goods.DEL_FLAG_NORMAL}
+			<if test="goods.searchParameter.keyWord != null and goods.searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.factory_code LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+					or
+					a.title LIKE
+					<if test="dbName == 'oracle'">'%'||#{goods.searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goods.searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goods.searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="goods.category != null and goods.category.id!=null and goods.category.id != ''">
+				AND a.category_id =#{goods.category.id}
+			</if>
+			<if test="goods.status != null and goods.status != ''">
+				AND a.status =#{goods.status}
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+		<choose>
+			<when test="goods.page !=null and goods.page.orderBy != null and goods.page.orderBy != ''">
+				ORDER BY ${goods.page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByBarCode" resultMap="goodsResult">
+		SELECT 
+		a.id AS "id",
+		a.category_id AS "category.id",
+		a.code AS "code",
+		a.factory_code AS "factoryCode",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.title AS "title",
+		a.price AS "price",
+		a.icon AS "icon",
+		a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+
+		a.property_str AS "propertyStr",
+		
+		a.photo AS "photo",
+		a.story AS "story",
+		a.introduction AS "introduction",
+		a.status AS "status",
+		
+		a.is_coupon_usable AS "isCouponUsable",
+		a.relate_goods_ids AS "relateGoodsIds",
+		
+		a.use_range AS "useRange",
+		a.model_photo AS "modelPhoto",
+		a.certificate_photo AS "certificatePhoto",
+		
+		a.sell_num AS "sellNum",
+		a.brand_id AS "brand.id",
+		a.designer_id AS "designer.id",
+		a.is_recommend AS "isRecommend",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+		from lgt_ps_goods a
+		WHERE a.code = #{0}
+	</select>
+	
+	<select id="findAllListNoNew" resultType="Goods">
+		SELECT
+			a.id AS "id",
+			a.code AS "code",
+			a.factory_code AS "factoryCode",
+			a.name AS "name",
+			a.english_name AS "englishName",
+			a.title AS "title",
+			a.price AS "price",
+			a.icon AS "icon",
+			a.sample_photo AS "samplePhoto",
+			a.single_photo AS "singlePhoto",
+
+			a.property_str AS "propertyStr",
+			
+			a.story AS "story",
+			a.introduction AS "introduction",
+			a.status AS "status",
+			
+			a.is_coupon_usable AS "isCouponUsable",
+			a.relate_goods_ids AS "relateGoodsIds",
+			
+			a.use_range AS "useRange",
+			a.model_photo AS "modelPhoto",
+			a.certificate_photo AS "certificatePhoto",
+			
+			a.sell_num AS "sellNum",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag"
+		FROM lgt_ps_goods a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="null != status and '' != status">
+				AND a.status != #{status}
+			</if>
+			<if test="null != category and null != category.id and '' != category.id">
+				AND a.category_id = #{category.id}
+			</if>
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					or
+					a.factory_code LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					or
+					a.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					or
+					a.title LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+	
+	</select>
+	
+	
+	<select id="findSimpleGoodsById" resultType="Goods">
+		SELECT 
+				a.id AS "id",
+				a.title AS "title",
+				a.price AS "price",
+				a.photo AS "photo",
+				a.story AS "story",
+				a.introduction AS "introduction",
+				(select min(p.price_buy) from lgt_ps_produce p where p.goods_id= a.id) as "minBuyPrice"
+			FROM  lgt_ps_goods a 
+		where a.id = #{id} 
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+		AND a.status = #{GOODS_UP}
+	</select>
+
+	<resultMap id="findGoodsByIdResult" type="Goods">
+		<result column="id" 			property="id"/>
+		<result column="category.id" 	property="category.id"/>
+		<result column="designer.id" 	property="designer.id"/>
+		<result column="code" 			property="code"/>
+		<result column="name" 			property="name"/>
+		<result column="englishName" 	property="englishName"/>
+		<result column="title" 			property="title"/>
+		<result column="price" 			property="price"/>
+		<result column="icon" 			property="icon"/>
+		<result column="samplePhoto"    property="samplePhoto"/>
+		
+		<result property="propertyStr"      column="propertyStr"/>
+		
+		<result column="photo" 			property="photo"/>
+		<result column="story" 			property="story"/>
+		<result column="introduction" 	property="introduction"/>
+		
+		<result column="isCouponUsable" property="isCouponUsable"/>
+		<result column="createDate" 	property="createDate"/>
+		<result column="relateGoodsIds" property="relateGoodsIds"/>
+		<result column="sellNum" 		property="sellNum"/>
+		
+		<result property="useRange" column="useRange"/>
+        <result property="modelPhoto" column="modelPhoto"/>
+        <result property="certificatePhoto"  column="certificatePhoto"/>
+		
+		<collection property="goodsProp" ofType="GoodsProp">
+			<result column="goodsProp.property.id" property="property.id"/>
+			<collection property="goodsPropvalue" ofType="GoodsPropvalue">
+				<result column="goodsProp.goodsPropvalue.pvalue" property="pvalue"/>
+				<result column="goodsProp.goodsPropvalue.propvalue.id"  property="propvalue.id"/>
+				<result column="goodsProp.goodsPropvalue.propvalue.pvalue"  property="propvalue.pvalue"/>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<select id="findDetailGoodsById" resultMap="findGoodsByIdResult">
+		SELECT 	
+			a.id AS "id",
+			a.designer_id AS "designer.id",
+			a.code AS "code",
+			a.name AS "name",
+			a.english_name AS "englishName",
+			a.title AS "title",
+			a.price AS "price",
+			a.icon AS "icon",
+			a.sample_photo AS "samplePhoto",
+			a.single_photo AS "singlePhoto",
+			a.property_str AS "propertyStr",
+			
+			a.photo AS "photo",
+			a.story AS "story",
+			a.introduction AS "introduction",
+			a.status AS "status",
+			
+			a.is_coupon_usable AS "isCouponUsable",
+			a.relate_goods_ids AS "relateGoodsIds",
+			
+			a.use_range AS "useRange",
+			a.model_photo AS "modelPhoto",
+			a.certificate_photo AS "certificatePhoto",
+			
+			a.sell_num AS "sellNum",
+			gp.pid AS "goodsProp.property.id",
+			(select min(p.price_buy) from lgt_ps_produce p where p.goods_id= a.id) as "minBuyPrice",
+			(select max(p.price_buy) from lgt_ps_produce p where p.goods_id= a.id) as "maxBuyPrice",
+			gpv.pvid AS "goodsProp.goodsPropvalue.propvalue.id",
+			gpv.pvalue AS "goodsProp.goodsPropvalue.propvalue.pvalue",
+			gpv.pvalue AS "goodsProp.goodsPropvalue.pvalue"
+		FROM lgt_ps_goods a 
+		LEFT JOIN lgt_ps_goods_prop gp ON a.id = gp.goods_id 
+		Left Join lgt_ps_goods_propvalue gpv ON gp.id = gpv.goods_prop_id
+		<where>
+			a.id = #{id}
+			AND
+			a.status = #{GOODS_UP}
+			AND 
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+	
+	<resultMap id="findGoodsSearchResult" type="Goods">
+		<result column="id" 			property="id"/>
+		<result column="category.id" 	property="category.id"/>
+		<result column="name" 			property="name"/>
+		<result column="englishName" 	property="englishName"/>
+		<result column="price" 			property="price"/>
+		<result column="icon" 			property="icon"/>
+		<result column="samplePhoto"    property="samplePhoto"/>
+		<result column="singlePhoto"    property="singlePhoto"/>
+		<result property="propertyStr"      column="propertyStr"/>
+		
+		<result column="createDate" 	property="createDate"/>
+		<result column="sellNum" 		property="sellNum"/>
+		
+		<collection property="goodsProp" ofType="GoodsProp">
+			<result column="goodsProp.property.id" property="property.id"/>
+			<collection property="goodsPropvalue" ofType="GoodsPropvalue">
+				<result column="goodsProp.goodsPropvalue.pvalue" property="pvalue"/>
+				<result column="goodsProp.goodsPropvalue.propvalue.id"  property="propvalue.id"/>
+				<result column="goodsProp.goodsPropvalue.propvalue.pvalue"  property="propvalue.pvalue"/>
+			</collection>
+		</collection>
+	</resultMap>
+	
+	<select id="findGoodsSearch" resultMap="findGoodsSearchResult">
+		select 
+			a.id AS "id",
+			a.category_id AS "category.id",
+			a.name AS "name",
+			a.english_name AS "englishName",
+			a.price AS "price",
+			a.icon AS "icon",
+			a.sample_photo AS "samplePhoto",
+			a.single_photo AS "singlePhoto",
+			a.property_str AS "propertyStr",
+			
+			a.create_date AS "createDate",
+			<if test="page !=null and page.orderBy != null and page.orderBy != '' and (page.orderBy  == 'shoucang DESC' or page.orderBy  == 'shoucang ASC')">
+				(select count(1) from crm_cl_goods_collect gc where gc.goods_id=a.id GROUP BY gc.goods_id ) as "shoucang",
+			</if> 
+			
+			a.sell_num AS "sellNum"
+		 from lgt_ps_goods a 
+		 <if test="keyWorlds.size() > 0">
+			left join lgt_ps_goods_tags gt ON gt.goods_id = a.id 
+			left JOIN lgt_ps_tags t ON t.id = gt.tags_id 
+			left join idx_navigate_category_goods cateGood ON cateGood.goods_id = a.id
+			left join idx_navigate_category navCate ON navCate.id = cateGood.navigate_category_id 
+		 </if>
+		 <if test="navigateCategoryId != null and navigateCategoryId !='' and keyWorlds.size() == 0">
+		 	left join idx_navigate_category_goods cateGood ON cateGood.goods_id = a.id
+			left join idx_navigate_category navCate ON navCate.id = cateGood.navigate_category_id
+		 </if>
+		 <if test="goodsPropValueIds.size() > 0">
+			left join lgt_ps_goods_prop gp on a.id = gp.goods_id 
+			left join lgt_ps_goods_propvalue gpv on gp.id = gpv.goods_prop_id 
+		 </if>
+		<where>
+			a.del_flag = #{DELFLAG}
+	  		AND a.status = #{GOODS_STATUS}
+			<if test="goodsPropValueIds.size() > 0">
+				AND gpv.pvid IN
+				<foreach collection="goodsPropValueIds" item="gpvid" separator="," open="(" close=")">
+					#{gpvid}
+				</foreach>
+			 </if>
+			<if test="navigateCategoryId != null and navigateCategoryId !='' ">
+				AND navCate.id = #{navigateCategoryId} 
+			</if>
+			<if test="keyWorlds.size() > 0 and (navigateCategoryId == null or navigateCategoryId =='')">
+				AND <foreach collection="keyWorlds" item="keyWord" separator="or" open="(" close=")">
+						a.title like concat('%',#{keyWord},'%')
+					OR
+						a.name like concat('%',#{keyWord},'%')
+					OR 
+						navCate.name like concat('%',#{keyWord},'%')
+					OR
+						t.name like concat('%',#{keyWord},'%')
+				</foreach>
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+		ORDER BY ${page.orderBy} 
+	</select>
+	
+	<select id="findGoodsAllCategories" resultType="Goods">
+			select 
+			a.id AS "id",
+			a.category_id AS "category.id"
+		 from lgt_ps_goods a 
+		 <if test="keyWorlds.size() > 0">
+			left join lgt_ps_goods_tags gt ON gt.goods_id = a.id 
+			left JOIN lgt_ps_tags t ON t.id = gt.tags_id 
+			left join idx_navigate_category_goods cateGood ON cateGood.goods_id = a.id
+			left join idx_navigate_category navCate ON navCate.id = cateGood.navigate_category_id 
+		 </if>
+		 <if test="goodsPropValueIds.size() > 0">
+			left join lgt_ps_goods_prop gp on a.id = gp.goods_id 
+			left join lgt_ps_goods_propvalue gpv on gp.id = gpv.goods_prop_id 
+		 </if>
+		<where>
+			a.del_flag = #{DELFLAG}
+  		 	AND a.status = #{GOODS_STATUS}
+			<if test="goodsPropValueIds.size() > 0">
+			 	AND gpv.pvid IN
+			 	<foreach collection="goodsPropValueIds" item="gpvid" separator="," open="(" close=")">
+					#{gpvid}
+				</foreach>
+			</if>
+			<if test="keyWorlds.size() > 0">
+				AND 
+				<foreach collection="keyWorlds" item="keyWord" separator="or" open="(" close=")">
+					t.name like concat('%',#{keyWord},'%')
+				</foreach>
+				OR
+				<foreach collection="keyWorlds" item="keyWord" separator="or" open="(" close=")">
+					a.title like concat('%',#{keyWord},'%')
+					OR
+					a.name like concat('%',#{keyWord},'%')
+					OR 
+					navCate.name like concat('%',#{keyWord},'%')
+				</foreach>
+				AND navCate.del_flag =#{DELFLAG}
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>
+		group by a.category_id
+	</select>
+	
+	<!-- 查找关联商品Sta -->
+	<resultMap id="relateGoodsResult" type="com.chinazhoufan.admin.modules.lgt.entity.ps.Goods">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="price" column="price" />
+		<result property="photo" column="photo" />
+		<result property="samplePhoto" column="samplePhoto"/>
+		<result property="propertyStr"      column="propertyStr"/>
+		<result property="allExistStock" column="allExistStock" />
+	</resultMap>
+	<select id="findRelateGoods" resultMap="relateGoodsResult">
+		SELECT 
+			a.id AS "id",
+			a.name AS "name",
+			a.price AS "price",
+			a.photo AS "photo",
+			a.sample_photo AS "samplePhoto",
+			a.property_str AS "propertyStr",
+			(SELECT SUM(p.stock_exist) FROM lgt_ps_produce p WHERE p.goods_id = a.id) AS "allExistStock",
+			a.del_flag AS "delFlag"
+		FROM lgt_ps_goods a 
+		WHERE
+			a.del_flag = 0
+			AND a.id in 
+			<foreach collection="relateGoodsIds" item="list" separator="," open="(" close=")">
+				#{list}
+			</foreach>
+	</select>
+	<!-- END -->
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_goods(
+			id,
+			category_id,
+			code,
+			factory_code,
+			name,
+			english_name,
+			title,
+			price,
+			icon,
+			sample_photo,
+			single_photo,
+
+			origin,
+			property_str,
+			
+			photo,
+			story,
+			introduction,
+			show_video,
+			status,
+			is_coupon_usable,
+			relate_goods_ids,
+			sell_num,
+			brand_id,
+			designer_id,
+			is_recommend,
+			use_range,
+			model_photo,
+			certificate_photo,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{category.id},
+			#{code},
+			#{factoryCode},
+			#{name},
+			#{englishName},
+			#{title},
+			#{price},
+			#{icon},
+			#{samplePhoto},
+			#{singlePhoto},
+
+			#{origin},
+
+			#{propertyStr},
+			
+			#{photo},
+			#{story},
+			#{introduction},
+			#{showVideo},
+			#{status},
+			
+			#{isCouponUsable},
+			#{relateGoodsIds},
+			
+			#{sellNum},	
+			#{brand.id},
+			#{designer.id},
+			#{isRecommend},
+			#{useRange},
+			#{modelPhoto},
+			#{certificatePhoto},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_goods SET 	
+			code = #{code},
+			factory_code = #{factoryCode},
+			name = #{name},
+			english_name = #{englishName},
+			title = #{title},
+			price = #{price},
+			icon = #{icon},
+			sample_photo = #{samplePhoto},
+			single_photo = #{singlePhoto},
+
+			origin = #{origin},
+			property_str = #{propertyStr},
+			
+			story = #{story},
+			photo = #{photo},
+			introduction = #{introduction},
+			show_video = #{showVideo},
+			status = #{status},
+			
+			is_coupon_usable = #{isCouponUsable},
+			relate_goods_ids = #{relateGoodsIds},
+			
+			sell_num = #{sellNum},
+			brand_id = #{brand.id},
+			designer_id=#{designer.id},
+			is_recommend=#{isRecommend},
+			
+			use_range = #{useRange},
+			model_photo = #{modelPhoto},
+			certificate_photo = #{certificatePhoto},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateGoodsStatus">
+	   UPDATE lgt_ps_goods SET     
+            status = #{status},
+            update_by = #{updateBy.id},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_goods SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="listGoodsByIds" resultMap="goodsResult">
+	   SELECT 
+        a.id AS "id",
+        a.category_id AS "category.id",
+        a.code AS "code",
+        a.factory_code AS "factoryCode",
+        a.name AS "name",
+        a.english_name AS "englishName",
+        a.title AS "title",
+        a.price AS "price",
+        a.icon AS "icon",
+        a.sample_photo AS "samplePhoto",
+		a.single_photo AS "singlePhoto",
+        a.property_str AS  "propertyStr",
+        
+        a.photo AS "photo",
+        a.story AS "story",
+        a.introduction AS "introduction",
+        a.status AS "status",
+       
+        a.is_coupon_usable AS "isCouponUsable",
+        a.relate_goods_ids AS "relateGoodsIds",
+        (SELECT SUM(wp.stock_normal) FROM lgt_ps_wh_produce wp LEFT JOIN lgt_ps_produce p ON wp.produce_id = p.id  WHERE p.goods_id=#{id}) AS "allExistStock",
+        a.sell_num AS "sellNum",
+        
+        a.brand_id AS "brand.id",
+        (select b.name from lgt_bs_brand b where b.id=a.brand_id) AS "brand.name",
+        a.designer_id AS "designer.id",
+        (select c.name from lgt_bs_designer c where c.id=a.designer_id) AS "designer.name",
+        a.is_recommend AS "isRecommend",
+        
+        a.use_range AS "useRange",
+        a.model_photo AS "modelPhoto",
+        a.certificate_photo AS "certificatePhoto",
+        
+        
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+        from lgt_ps_goods a
+        WHERE a.id in 
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+             #{id}
+        </foreach>
+	</select>
+	
+	<!-- Wap  Select Interface Start -->
+	<select id="getBySearchKey" resultMap="goodsResult" parameterType="java.lang.String">
+	   SELECT 
+	        a.id AS "id",
+	        a.category_id AS "category.id",
+	        a.code AS "code",
+	        a.factory_code AS "factoryCode",
+	        a.name AS "name",
+	        a.english_name AS "englishName",
+	        a.title AS "title",
+	        a.icon AS "icon",
+	        
+	        a.sample_photo AS "samplePhoto",
+			a.sample_photo AS "samplePhoto",
+	        
+	        a.single_photo AS "singlePhoto",
+	        
+	        a.status AS "status",
+	        a.is_coupon_usable AS "isCouponUsable",
+	        a.model_photo AS "modelPhoto",
+	        a.certificate_photo AS "certificatePhoto",
+	        a.sell_num AS "sellNum",
+	        a.brand_id AS "brand.id",
+	        a.designer_id AS "designer.id",
+	        a.is_recommend AS "isRecommend",
+	        
+	        a.factory_code AS "goods.factoryCode",
+            (select b.name from lgt_bs_brand b where b.id=a.brand_id) AS "brand.name",
+            (select c.name from lgt_bs_designer c where c.id=a.designer_id) AS "designer.name",
+	        
+	        a.create_by AS "createBy.id",
+	        a.create_date AS "createDate",
+	        a.update_by AS "updateBy.id",
+	        a.update_date AS "updateDate",
+	        a.remarks AS "remarks",
+	        a.del_flag AS "delFlag"
+        FROM lgt_ps_goods a
+        WHERE a.del_flag = 0 
+        AND (a.code = #{searchKey}
+        OR  a.name LIKE concat('%',#{searchKey},'%')
+           <!--
+            <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+           --> 
+        )
+	</select>
+	
+	<!-- Wap  Select Interface End -->
+	
+	
+	<update id="updateGoodsPropertyStr">
+	   update lgt_ps_goods set property_str = #{propertyStr} where id = #{id}
+	</update>
+</mapper>

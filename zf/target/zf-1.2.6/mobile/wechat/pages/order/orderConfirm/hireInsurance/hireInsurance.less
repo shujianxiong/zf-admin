@@ -1,0 +1,104 @@
+@import "../../../../baseConfig/config.less";
+/**-----------------------收货地址----------------------------*/
+.warpper{
+    overflow: hidden;
+    min-height: 100%;
+    .tip{
+        width: 100%;
+        min-height: 40px;
+        background: #000;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        p{
+           color: #fff;
+            line-height: 24px;
+            font-size: 1rem; 
+            span{
+                color: @goldencolor;
+            }
+        }
+    }
+    .content{
+        overflow: hidden;
+        width: 100%;
+        min-height: 100%;
+        .con_head{
+            width: 90%;
+            height: 40px;
+            padding: 10px;
+            box-sizing: border-box;
+            span{
+                float: left;
+                font-size: 1.2rem;
+                width: 30%;
+                line-height: 20px;
+                color: #fff;
+            }
+        }
+    }
+    .con_warp{
+        width: 100%;
+        overflow: hidden;
+        border-top: 1px solid @linecolor;
+        li{
+            overflow: hidden;
+            background: @blockbacground;
+            border-bottom: 1px solid @linecolor;
+            .con_left{
+                min-height: 80px;
+                width: 90%;
+                float: left;
+                padding: 10px;
+                box-sizing: border-box;
+                .top{
+                    height: 20px;
+                    line-height: 20px;
+                    box-sizing: border-box;
+                    span{
+                         float: left;
+                        font-size: 1.2rem;
+                        width: 30%;
+                        line-height: 20px;
+                        color: #fff;
+                    }
+                }
+                p{
+                    line-height: 20px;
+                    color: #a2a2a2;
+                }
+            }
+            i{
+                width: 10%;
+                float: right;
+                line-height: 80px;
+                text-align: center;
+                font-size: 2.0rem;
+            }
+        }
+    }
+}
+.footer{
+    position: fixed;
+    bottom: 0;
+    min-height: 60px;
+    width: 100%;
+    padding: 15px 0;
+    box-sizing: border-box;
+    border-top: 1px solid @linecolor;
+    span{
+        float: left;
+        display: block;
+        width: 46%;
+        margin: 0 2%;
+        line-height: 40px;
+        text-align: center;
+        font-size: 1.4rem;
+        border: 1px solid #eee;
+        box-sizing: border-box;
+        .border-radius(2px);
+        &.active{
+            background: @goldencolor;
+        }
+    }
+    
+}

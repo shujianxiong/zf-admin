@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.pd.DiscountDao">
+    
+	<sql id="discountColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.scale_experience_deposit AS "scaleExperienceDeposit",
+		a.discount_filter_scale AS "discountFilterScale",
+		a.discount_filter_start AS "discountFilterStart",
+		a.discount_filter_end AS "discountFilterEnd",
+		a.price_dec_point AS "priceDecPoint",
+		a.produce_num AS "produceNum",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="discountJoins">
+	</sql>
+    
+	<select id="get" resultType="Discount">
+		SELECT 
+			<include refid="discountColumns"/>
+		FROM spm_pd_discount a
+		<include refid="discountJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Discount">
+		SELECT 
+			<include refid="discountColumns"/>
+		FROM spm_pd_discount a
+		<include refid="discountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="title != null and title != ''">
+			     AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="discountFilterStart != null and discountFilterStart != ''">
+			     <![CDATA[AND a.discount_filter_start >= #{discountFilterStart}]]>
+			</if>
+			<if test="discountFilterEnd != null and discountFilterEnd != ''">
+                 <![CDATA[AND a.discount_filter_end <= #{discountFilterEnd}]]>
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Discount">
+		SELECT 
+			<include refid="discountColumns"/>
+		FROM spm_pd_discount a
+		<include refid="discountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<resultMap type="Discount" id="discountWithPropAndValue">
+		<result column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="scaleExperienceDeposit" property="scaleExperienceDeposit"/>
+	   	<result column="discountFilterScale" property="discountFilterScale"/>
+	   	<result column="discountFilterStart" property="discountFilterStart"/>
+	   	<result column="discountFilterEnd" property="discountFilterEnd"/>
+	   	<result column="priceDecPoint" property="priceDecPoint"/>
+	   	<result column="produceNum" property="produceNum"/>
+	   	<result column="createDate" property="createDate"/>
+	   	<result column="createBy.id" property="createBy.id"/>
+	   	<result column="remarks" property="remarks"/>
+	   	<collection property="propertyList" ofType="Property">
+			<result column="propName"  property="propName"/>
+		   	<collection property="propvalueList" ofType="Propvalue">
+		       <result column="pvalueName"  property="pvalueName"/>
+		       <result column="pvalueNickname"  property="pvalueNickname"/>
+		   	</collection>
+	   	</collection>
+	</resultMap>
+	<select id="getDiscountDetail" resultMap="discountWithPropAndValue">
+	   SELECT 
+	   		d.id	AS "id",
+	   		d.title AS "title",
+	   		d.scale_experience_deposit AS "scaleExperienceDeposit",
+	        d.discount_filter_scale AS "discountFilterScale",
+			d.discount_filter_start AS "discountFilterStart",
+			d.discount_filter_end AS "discountFilterEnd",
+			d.price_dec_point AS "priceDecPoint",
+			d.produce_num AS "produceNum",
+			d.create_by AS "createBy.id",
+			d.create_date AS "createDate",
+	        d.remarks AS "remarks",
+			pro.prop_name AS "propName",
+			ppv.pvalue_name AS "pvalueName",
+			ppv.pvalue_nickname AS "pvalueNickname"
+		FROM spm_pd_discount d
+		LEFT JOIN spm_pd_discount_property  dp ON dp.discount_id = d.id
+		LEFT JOIN spm_pd_discount_propvalue dpv ON dpv.discount_property_id = dp.id
+		LEFT JOIN lgt_ps_property pro ON pro.id = dp.pid
+		LEFT JOIN lgt_ps_propvalue ppv ON ppv.id = dpv.pvid
+		WHERE d.id = #{id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_pd_discount(
+			id,
+			title,
+			scale_experience_deposit,
+			discount_filter_scale,
+			discount_filter_start,
+			discount_filter_end,
+			price_dec_point,
+			produce_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{title},
+			#{scaleExperienceDeposit},
+			#{discountFilterScale},
+			#{discountFilterStart},
+			#{discountFilterEnd},
+			#{priceDecPoint},
+			#{produceNum},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_pd_discount SET
+			title = #{title},
+			scale_experience_deposit = #{scaleExperienceDeposit},
+			discount_filter_scale = #{discountFilterScale},
+			discount_filter_start = #{discountFilterStart},
+			discount_filter_end = #{discountFilterEnd},
+			price_dec_point = #{priceDecPoint},
+			produce_num = #{produceNum},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_pd_discount SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

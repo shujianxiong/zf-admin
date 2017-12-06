@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.si.SupplierContractDao">
+    
+	<sql id="supplierContractColumns">
+		a.id AS "id",
+		a.supplier_id AS "supplier.id",
+		a.type AS "type",
+		s.name AS "supplier.name",
+		a.purchase_order_id AS "purchaseOrder.id",
+		p.order_no AS "purchaseOrder.orderNo",
+		a.file_library_id AS "fileLibrary.id",
+		
+		f.name AS "fileLibrary.name",
+		f.postfix AS "fileLibrary.postfix",
+		f.file_url AS "fileLibrary.fileUrl",
+		
+		a.name AS "name",
+		a.contract_no AS "contractNo",
+		a.effect_start_time AS "effectStartTime",
+		a.effect_end_time AS "effectEndTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="supplierContractJoins">
+		LEFT JOIN lgt_si_supplier s ON s.id = a.supplier_id
+		LEFT JOIN lgt_po_purchase_order p ON p.id = a.purchase_order_id
+		LEFT JOIN bas_file_library f ON f.id = a.file_library_id 
+	</sql>
+    
+	<select id="get" resultType="SupplierContract">
+		SELECT 
+			<include refid="supplierContractColumns"/>
+		FROM lgt_si_supplier_contract a
+		<include refid="supplierContractJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SupplierContract">
+		SELECT 
+			<include refid="supplierContractColumns"/>
+		FROM lgt_si_supplier_contract a
+		<include refid="supplierContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<if test="supplier != null and supplier.id != null and supplier.id != ''">
+			AND a.supplier_id = #{supplier.id}
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name like 
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{name}, '%')</if>
+		</if>
+		<if test="beginRequiredTime != null and beginRequiredTime != ''">
+			  <![CDATA[AND a.effect_end_time >= #{beginRequiredTime}]]>
+		</if>
+		<if test="endRequiredTime != null and endRequiredTime != ''">
+			  <![CDATA[AND a.effect_end_time <= #{endRequiredTime}]]>
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SupplierContract">
+		SELECT 
+			<include refid="supplierContractColumns"/>
+		FROM lgt_si_supplier_contract a
+		<include refid="supplierContractJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<if test="supplier != null and supplier.id != null and supplier.id != ''">
+			AND a.supplier_id = #{supplier.id}
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name like 
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{name}, '%')</if>
+		</if>
+		<if test="beginRequiredTime != null and beginRequiredTime != ''">
+			  <![CDATA[AND a.effect_end_time >= #{beginRequiredTime}]]>
+		</if>
+		<if test="endRequiredTime != null and endRequiredTime != ''">
+			  <![CDATA[AND a.effect_end_time <= #{endRequiredTime}]]>
+		</if>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_si_supplier_contract(
+			id,
+			supplier_id,
+			purchase_order_id,
+			file_library_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			type,
+			name,
+			contract_no,
+		    effect_start_time,
+		    effect_end_time
+		) VALUES (
+			#{id},
+			#{supplier.id},
+			#{purchaseOrder.id},
+			#{fileLibrary.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{type},
+			#{name},
+			#{contractNo},
+			#{effectStartTime},
+			#{effectEndTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_si_supplier_contract SET 	
+			supplier_id = #{supplier.id},
+			purchase_order_id = #{purchaseOrder.id},
+			file_library_id = #{fileLibrary.id},
+			name = #{name},
+			type = #{type},
+			contract_no = #{contractNo},
+		    effect_start_time = #{effectStartTime},
+		    effect_end_time = #{effectEndTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_si_supplier_contract SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

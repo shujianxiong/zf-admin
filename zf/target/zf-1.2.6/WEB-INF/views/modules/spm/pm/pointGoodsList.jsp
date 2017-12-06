@@ -1,0 +1,225 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+    <title>积分商品管理</title>
+    <meta name="decorator" content="adminLte"/>
+    <style type="text/css">
+        tr{ 
+            cursor: pointer;    /*手形*/   
+        } 
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            
+        });
+        function page(n,s){
+            $("#pageNo").val(n);
+            $("#pageSize").val(s);
+            $("#searchForm").submit();
+            return false;
+        }
+    </script>
+</head>
+<body>
+<div class="content-wrapper sub-content-wrapper">
+    <section class="content-header content-header-menu">
+        <h1>
+            <small class="menu-active"><i class="fa fa-repeat"></i><a href="${ctx}/spm/pm/pointGoods/">积分商品列表</a></small>
+            <shiro:hasPermission name="spm:pm:pointGoods:edit">
+	            <small>|</small>
+                <small>
+                    <i class="fa-form-edit"></i><a href="${ctx}/spm/pm/pointGoods/form">积分商品添加</a>
+                </small>
+            </shiro:hasPermission>
+        </h1>
+    </section>
+    <sys:tip content="${message}"/>
+    <section class="content">
+        <div class="box box-info">
+            <div class="box-header with-border zf-query">
+                <h5>查询条件</h5>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool"data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button type="button" class="btn btn-box-tool"data-widget="remove"><i class="fa fa-remove"></i></button>
+                </div>
+            </div>
+            
+            <form:form id="searchForm" modelAttribute="pointGoods" action="${ctx}/spm/pm/pointGoods/" method="post" class="form-horizontal">
+                <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+                <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div  class="form-group">
+                                <label for="name" class="col-sm-3 control-label">编号</label>
+                                <div class="col-sm-7">  
+                                    <sys:inputverify name="code" id="code" verifyType="0" isSpring="true" isMandatory="false" tip="请输入编号"></sys:inputverify>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div class="pull-right box-tools">
+                        <button type="button" class="btn btn-default btn-sm" onclick="ZF.resetForm()"><i class="fa fa-refresh"></i>重置</button>
+                        <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-search"></i>查询</button>
+                    </div>
+                </div>
+            </form:form>
+        </div>
+    
+        <div class="box box-soild">
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table id="contentTable" class="table table-bordered table-hover table-striped zf-tbody-font-size">
+                        <thead>
+                            <tr>
+                                <th class="zf-dataTables-multiline"></th>
+                                <th>编号</th>
+                                <th>名称</th>
+                                <th>上架标记</th>
+                                <th>来源类型</th>
+                                <th>获取限制类型</th>
+                                <th>列表图片</th>
+                                <th>主图片</th>
+                                <th>展示金额</th>
+                                <th>所需积分</th>
+                                <th>总库存数量</th>
+                                <th>可用库存数量</th>
+                                <th style="display: none;">创建者</th>
+                                <th style="display: none;">创建时间</th>
+                                <th style="display: none;">更新者</th>
+                                <th style="display: none;">更新时间</th>
+                                <th style="display: none;">备注信息</th>
+                                <shiro:hasPermission name="spm:pm:pointGoods:edit"><th>操作</th></shiro:hasPermission>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${page.list}" var="pointGoods" varStatus="status">
+                                <tr data-index="${status.index }">
+                                    <td class="details-control text-center">
+                                        <i class="fa fa-plus-square-o text-success"></i>
+                                    </td>
+										<td>${pointGoods.code}</td>
+										<td title="${pointGoods.name }">${fns:abbr(pointGoods.name, 20)}</td>
+										<td>
+										    <c:choose>
+										        <c:when test="${pointGoods.upFlag eq '0' }">
+										            <span class="label label-primary">${fns:getDictLabel(pointGoods.upFlag, 'yes_no', '') }</span>
+										        </c:when>
+										        <c:when test="${pointGoods.upFlag eq '1' }">
+										            <span class="label label-success">${fns:getDictLabel(pointGoods.upFlag, 'yes_no', '') }</span>
+										        </c:when>
+										    </c:choose>
+										</td>
+										<td>
+										    <c:choose>
+										         <c:when test="${pointGoods.srcType eq '1'}">
+										              <span class="label label-primary">${fns:getDictLabel(pointGoods.srcType, 'spm_pm_point_goods_srcType', '') }</span>
+										         </c:when>
+										         <c:otherwise>
+										              <span class="label label-success">${fns:getDictLabel(pointGoods.srcType, 'spm_pm_point_goods_srcType', '') }</span>    
+										         </c:otherwise>
+										    </c:choose>
+										</td>
+										<td>
+										    <c:choose>
+										        <c:when test="${pointGoods.gainType eq '1' }">
+										             <span class="label label-primary">${fns:getDictLabel(pointGoods.gainType, 'spm_pm_point_goods_gainType', '') }</span> 
+										        </c:when>
+										        <c:otherwise>
+                                                      <span class="label label-success">${fns:getDictLabel(pointGoods.gainType, 'spm_pm_point_goods_gainType', '') }</span>    
+                                                 </c:otherwise>
+										    </c:choose>
+										</td>
+										<td><img data-big data-src="${imgHost }${pointGoods.listPhoto}" onerror="imgOnerror(this);" src="${imgHost }${pointGoods.listPhoto}" width="20px" height="20px"/></td>
+										<td><img data-big data-src="${imgHost }${pointGoods.mainPhoto}" onerror="imgOnerror(this);" src="${imgHost }${pointGoods.mainPhoto}"  width="20px" height="20px"/></td>
+										<td>${pointGoods.displayPrice}</td>
+										<td>${pointGoods.point}</td>
+										<td>${pointGoods.totalNum}</td>
+										<td>${pointGoods.usableNum}</td>
+										<td data-hide="true">${fns:getUserById(pointGoods.createBy.id).name}</td>
+										<td data-hide="true"><fmt:formatDate value="${pointGoods.createDate}"
+												pattern="yyyy-MM-dd HH:mm:ss" /></td>
+										<td data-hide="true">${fns:getUserById(pointGoods.updateBy.id).name}</td>
+										<td data-hide="true"><fmt:formatDate value="${pointGoods.updateDate}"
+												pattern="yyyy-MM-dd HH:mm:ss" /></td>
+										<td data-hide="true">${fns:abbr(pointGoods.remarks, 30)}</td>
+										<shiro:hasPermission name="spm:pm:pointGoods:edit"><td>
+                                        <div class="btn-group zf-tableButton">
+                                            <button type="button" class="btn btn-sm btn-info"
+                                                onclick="window.location.href='${ctx}/spm/pm/pointGoods/info?id=${pointGoods.id}'">详情</button>
+                                            <button type="button"
+                                                class="btn btn-sm btn-info dropdown-toggle"
+                                                data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu btn-info zf-dropdown-width" role="menu">
+                                                <c:if test="${pointGoods.upFlag eq '0' }">
+	                                                <li><a href="${ctx}/spm/pm/pointGoods/form?id=${pointGoods.id}" target="">修改</a></li>
+	                                                <li><a href="${ctx}/spm/pm/pointGoods/delete?id=${pointGoods.id}" style="color: #fff" onclick="return ZF.delRow('确定要删除该积分商品吗？',this.href)">删除</a></li>
+                                                </c:if>
+                                                
+                                                <li><a href="${ctx}/spm/pm/pointGoods/updateUpFlag?id=${pointGoods.id}">${pointGoods.upFlag eq '0'?'上架':'下架' }</a></li>
+                                            </ul>
+                                        </div>
+                                    </td></shiro:hasPermission>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="dataTables_paginate paging_simple_numbers">${page}</div>
+            </div>
+        </div>
+     </section>
+    </div>
+    
+    <script>
+      $(function () {
+        
+        ZF.bigImg();
+         
+        $('input').iCheck({
+            checkboxClass : 'icheckbox_minimal-blue',
+            radioClass : 'iradio_minimal-blue'
+        });
+          
+        //表格初始化
+        ZF.parseTable("#contentTable", {
+            "paging" : false,
+            "lengthChange" : false,
+            "searching" : false,
+            "ordering" : true,
+            "order": [[ 15, "desc" ]],//指定默认初始化按第几列排序，默认排序升序，降序
+            "columnDefs":[
+                {"orderable":false,targets:0},
+                {"orderable":false,targets:1},
+                {"orderable":false,targets:2},
+                {"orderable":false,targets:3},
+                {"orderable":false,targets:4},
+                {"orderable":false,targets:5},
+                {"orderable":false,targets:6},
+                {"orderable":false,targets:7},
+                {"orderable":false,targets:8},
+                {"orderable":false,targets:17}
+            ],
+            "info" : false,
+            "autoWidth" : false,
+            "multiline" : true,//是否开启多行表格
+            "isRowSelect" : true,//是否开启行选中
+            "rowSelect" : function(tr) {
+                
+            },
+            "rowSelectCancel" : function(tr) {
+                
+            }
+        })
+      });
+      
+   </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.bb.RechargeOrderDao">
+    
+	<sql id="rechargeOrderColumns">
+		a.id AS "id",
+		a.no AS "no",
+		a.member_id AS "member.id",
+		a.money AS "money",
+		a.status AS "status",
+		a.recharge_time AS "rechargeTime",
+		a.serial_no AS "serialNo",
+		a.receive_time AS "receiveTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="rechargeOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="RechargeOrder">
+		SELECT 
+			<include refid="rechargeOrderColumns"/>
+		FROM crm_bb_recharge_order a
+		<include refid="rechargeOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RechargeOrder">
+		SELECT 
+			<include refid="rechargeOrderColumns"/>
+		FROM crm_bb_recharge_order a
+		<include refid="rechargeOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="no != null and no != ''">
+				AND a.no = #{no}
+			</if>
+			<if test="member != null and member.id != null and member.id != ''">
+				AND a.member_id = #{member.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="serialNo != null and serialNo != ''">
+				AND a.serial_no = #{serialNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RechargeOrder">
+		SELECT 
+			<include refid="rechargeOrderColumns"/>
+		FROM crm_bb_recharge_order a
+		<include refid="rechargeOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_bb_recharge_order(
+			id,
+			no,
+			member_id,
+			money,
+			status,
+			recharge_time,
+			serial_no,
+			receive_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{no},
+			#{member.id},
+			#{money},
+			#{status},
+			#{rechargeTime},
+			#{serialNo},
+			#{receiveTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_bb_recharge_order SET 	
+			no = #{no},
+			member_id = #{member.id},
+			money = #{money},
+			status = #{status},
+			recharge_time = #{rechargeTime},
+			serial_no = #{serialNo},
+			receive_time = #{receiveTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_bb_recharge_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

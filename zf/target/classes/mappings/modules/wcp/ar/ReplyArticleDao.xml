@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.wcp.dao.ar.ReplyArticleDao">
+    
+	<sql id="replyArticleColumns">
+		a.reply_id AS "autoReply.id",
+		a.article_id AS "articleMsg.id",
+		m.name AS "articleMsg.name",
+		m.pic AS "articleMsg.pic",
+		m.link_url AS "articleMsg.linkUrl"
+	</sql>
+	
+	<sql id="replyArticleJoins">
+		LEFT JOIN wcp_ar_article_msg m ON m.id = a.article_id
+	</sql>
+    
+	<select id="get" resultType="ReplyArticle">
+		<!-- SELECT 
+			<include refid="replyArticleColumns"/>
+		FROM wcp_ar_reply_article a
+		<include refid="replyArticleJoins"/>
+		WHERE a.id = #{id} -->
+	</select>
+	
+	<select id="findList" resultType="ReplyArticle">
+		SELECT 
+			<include refid="replyArticleColumns"/>
+		FROM wcp_ar_reply_article a
+		<include refid="replyArticleJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ReplyArticle">
+		SELECT 
+			<include refid="replyArticleColumns"/>
+		FROM wcp_ar_reply_article a
+		<include refid="replyArticleJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wcp_ar_reply_article(
+			reply_id,
+			article_id
+		) VALUES (
+			#{autoReply.id},
+			#{articleMsg.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wcp_ar_reply_article SET 	
+			article_id = #{articleMsg.id}
+		WHERE reply_id = #{autoReply.id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM wcp_ar_reply_article
+		WHERE reply_id = #{autoReply.id}
+	</update>
+	
+	<delete id="removeReplyArticleByAutoReplyId">
+		DELETE FROM wcp_ar_reply_article WHERE reply_id = #{autoReply.id} 
+	</delete>
+	
+	<select id="listByReply" resultType="ReplyArticle">
+		SELECT 
+			<include refid="replyArticleColumns"/>
+		FROM wcp_ar_reply_article a
+		<include refid="replyArticleJoins"/>
+		WHERE a.reply_id = #{autoReply.id} 
+	</select>
+	
+</mapper>

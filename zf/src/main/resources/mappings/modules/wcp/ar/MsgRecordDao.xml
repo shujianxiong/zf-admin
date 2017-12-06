@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.wcp.dao.ar.MsgRecordDao">
+    
+	<sql id="msgRecordColumns">
+		a.id AS "id",
+		a.platform_type AS "platformType",
+		a.send_type AS "sendType",
+		a.reply_type AS "replyType",
+		a.from_user_name AS "fromUserName",
+		a.from_user_id AS "fromUserId",
+		a.to_user_name AS "toUserName",
+		a.to_user_id AS "toUserId",
+		a.content_type AS "contentType",
+		a.content AS "content",
+		a.auto_reply_id AS "autoReply.id",
+		b.name AS "autoReply.name",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="msgRecordJoins">
+		LEFT JOIN wcp_ar_auto_reply b ON b.id = a.auto_reply_id
+	</sql>
+    
+	<select id="get" resultType="MsgRecord">
+		SELECT 
+			<include refid="msgRecordColumns"/>
+		FROM wcp_ar_msg_record a
+		<include refid="msgRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MsgRecord">
+		SELECT 
+			<include refid="msgRecordColumns"/>
+		FROM wcp_ar_msg_record a
+		<include refid="msgRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="sendType != null and sendType != ''">
+				AND a.send_type = #{sendType}
+			</if>
+			<if test="fromUserId != null and fromUserId != ''">
+				AND a.from_user_id = #{fromUserId}
+			</if>
+			<if test="toUserId != null and toUserId != ''">
+				AND a.to_user_id = #{toUserId}
+			</if>
+			<if test="contentType != null and contentType != ''">
+				AND a.content_type = #{contentType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MsgRecord">
+		SELECT 
+			<include refid="msgRecordColumns"/>
+		FROM wcp_ar_msg_record a
+		<include refid="msgRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO wcp_ar_msg_record(
+			id,
+			platform_type,
+			send_type,
+			reply_type,
+			from_user_name,
+			from_user_id,
+			to_user_name,
+			to_user_id,
+			content_type,
+			content,
+			auto_reply_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{platformType},
+			#{sendType},
+			#{replyType},
+			#{fromUserName},
+			#{fromUserId},
+			#{toUserName},
+			#{toUserId},
+			#{contentType},
+			#{content},
+			#{autoReply.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE wcp_ar_msg_record SET 	
+			platform_type = #{platformType},
+			send_type = #{sendType},
+			reply_type = #{replyType},
+			from_user_name = #{fromUserName},
+			from_user_id = #{fromUserId},
+			to_user_name = #{toUserName},
+			to_user_id = #{toUserId},
+			content_type = #{contentType},
+			content = #{content},
+			auto_reply_id = #{autoReply.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE wcp_ar_msg_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

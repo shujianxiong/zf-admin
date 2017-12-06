@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.crm.dao.mi.MemberSignDao">
+    
+	<sql id="memberSignColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		m.usercode AS "member.usercode",
+		a.last_sign_date AS "lastSignDate",
+		a.times_series AS "timesSeries",
+		a.times_total AS "timesTotal",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="memberSignJoins">
+	   LEFT JOIN crm_mi_member m ON m.id = a.member_id
+	</sql>
+    
+	<select id="get" resultType="MemberSign">
+		SELECT 
+			<include refid="memberSignColumns"/>
+		FROM crm_mi_member_sign a
+		<include refid="memberSignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MemberSign">
+		SELECT 
+			<include refid="memberSignColumns"/>
+		FROM crm_mi_member_sign a
+		<include refid="memberSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="member != null and member.usercode != null and member.usercode != ''">
+			   AND m.usercode = #{member.usercode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MemberSign">
+		SELECT 
+			<include refid="memberSignColumns"/>
+		FROM crm_mi_member_sign a
+		<include refid="memberSignJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crm_mi_member_sign(
+			id,
+			member_id,
+			last_sign_date,
+			times_series,
+			times_total,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{lastSignDate},
+			#{timesSeries},
+			#{timesTotal},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crm_mi_member_sign SET 	
+			member_id = #{member.id},
+			last_sign_date = #{lastSignDate},
+			times_series = #{timesSeries},
+			times_total = #{timesTotal},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crm_mi_member_sign SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.GoodsPropDao">
+    
+    
+    <resultMap id="goodsPropResult" type="com.chinazhoufan.admin.modules.lgt.entity.ps.GoodsProp">
+    	<result column="id" property="id"/>
+    	<result column="goodsId" property="goods.id"/>
+    	<result column="pid" property="property.id"/>
+    	<result column="pName" property="property.propName"/>
+    	<collection property="goodsPropvalue" ofType="GoodsPropvalue">
+			<result column="goodsPropvalue.id" property="id"/>
+	    	<result column="goodsPropvalue.goodsPropId" property="goodsProp.id" />
+	    	<result column="goodsPropvalue.pvid" property="propvalue.id"/>
+	    	<result column="goodsPropvalue.pvalue" property="pvalue"/>
+   		</collection>
+    </resultMap>
+    
+	<sql id="goodsPropColumns">
+		a.id AS "id",
+		a.goods_id AS "goods.id",
+		a.pid AS "property.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsPropJoins">
+	</sql>
+    
+	<select id="get" resultType="GoodsProp">
+		SELECT 
+			<include refid="goodsPropColumns"/>
+		FROM lgt_ps_goods_prop a
+		<include refid="goodsPropJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getGoodsId" resultMap="goodsPropResult">
+		SELECT  
+		p.id AS "id",
+		p.goods_id AS "goods.id",
+		p.pid AS "property.id", 
+		v.id AS "goodsPropvalue.id",
+		v.goods_prop_id AS "goodsPropvalue.goodsPropId",
+		v.pvid AS "goodsPropvalue.pvid",
+		v.pvalue AS "goodsPropvalue.pvalue" 
+		
+		FROM lgt_ps_goods_prop p 
+		LEFT JOIN lgt_ps_goods_propvalue v ON p.id = v.goods_prop_id
+		LEFT JOIN lgt_ps_goods g ON g.id = p.goods_id 
+		WHERE p.goods_id= #{goodsId} AND g.del_flag = #{delFlag}
+	</select>
+	
+	<select id="findByGoodsProp" resultMap="goodsPropResult">
+		SELECT 
+		<include refid="goodsPropColumns"/>
+		FROM lgt_ps_goods_prop a
+		WHERE a.goods_id= #{goods.id} AND a.del_flag = '1'
+	</select>
+	
+	
+	<select id="getGoodsPropByGoodIdAnPid" parameterType="java.util.Map" resultType="GoodsProp">
+		SELECT  
+			p.id AS "id",
+			p.goods_id AS "goods.id",
+			p.pid AS "property.id"
+		FROM lgt_ps_goods_prop p 
+		where p.goods_id =#{goods.id} and p.pid=#{property.id}
+	</select>
+	
+	<select id="findList" resultType="GoodsProp">
+		SELECT 
+			<include refid="goodsPropColumns"/>
+		FROM lgt_ps_goods_prop a
+		<include refid="goodsPropJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="GoodsProp">
+		SELECT 
+			<include refid="goodsPropColumns"/>
+		FROM lgt_ps_goods_prop a
+		<include refid="goodsPropJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByGoodsId" resultMap="goodsPropResult">
+		SELECT
+			a.id AS "id",
+			a.goods_id AS "goodsId",
+			a.pid AS "pid",
+			b.prop_name AS "pName",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag",
+			p.id AS "goodsPropvalue.id",
+			p.goods_prop_id AS "goodsPropvalue.goodsPropId",
+			p.pvid AS "goodsPropvalue.pvid",
+			ifnull(p.pvalue, pv.pvalue_name) AS "goodsPropvalue.pvalue"
+		FROM lgt_ps_goods_prop a
+		LEFT JOIN lgt_ps_property b ON b.id = a.pid
+		LEFT JOIN lgt_ps_goods_propvalue p ON p.goods_prop_id=a.id
+		LEFT JOIN lgt_ps_propvalue pv ON pv.id = p.pvid
+		WHERE
+			a.goods_id=#{0} AND a.del_flag=#{1}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_goods_prop(
+			id,
+			goods_id,
+			pid,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goods.id},
+			#{property.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<insert id="saveGoodsProp">
+		INSERT INTO lgt_ps_goods_prop(
+			id,
+			goods_id,
+			pid,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goods.id},
+			#{property.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	<update id="update">
+		UPDATE lgt_ps_goods_prop SET 	
+			goods_id = #{goods.id},
+			pid = #{property.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateDelFlag" parameterType="java.util.Map">
+		UPDATE lgt_ps_goods_prop SET 
+			del_flag = '0' 
+		WHERE id=#{goodPropId}
+	</update>
+	
+	
+	<update id="delete">
+		UPDATE lgt_ps_goods_prop SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="remove">
+		DELETE FROM lgt_ps_goods_prop WHERE goods_id = #{0}
+	</delete>
+	
+	<delete id="removeById">
+	   DELETE FROM lgt_ps_goods_prop WHERE id = #{id}
+	</delete>
+</mapper>

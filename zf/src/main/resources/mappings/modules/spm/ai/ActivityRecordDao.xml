@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ai.ActivityRecordDao">
+    
+	<sql id="activityRecordColumns">
+		a.id AS "id",
+		a.activity_id AS "activity.id",
+		a.member_id AS "member.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="activityRecordJoins">
+		LEFT JOIN crm_mi_member b ON a.member_id = b.id
+		LEFT JOIN spm_ai_activity c ON a.activity_id = c.id
+	</sql>
+    
+	<select id="get" resultType="ActivityRecord">
+		SELECT 
+			<include refid="activityRecordColumns"/>
+		FROM spm_ai_activity_record a
+		<include refid="activityRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ActivityRecord">
+		SELECT
+			b.usercode AS "member.usercode",
+			c.code AS "activity.code",
+			c.name AS "activity.name",
+			<include refid="activityRecordColumns"/>
+		FROM spm_ai_activity_record a
+		<include refid="activityRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (c.name LIKE
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR
+					c.code LIKE
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR
+					b.usercode LIKE
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ActivityRecord">
+		SELECT 
+			<include refid="activityRecordColumns"/>
+		FROM spm_ai_activity_record a
+		<include refid="activityRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_ai_activity_record(
+			id,
+			activity_id,
+			member_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{activity.id},
+			#{member.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ai_activity_record SET 	
+			activity_id = #{activity.id},
+			member_id = #{member.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_ai_activity_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

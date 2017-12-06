@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ol.PickOrderDao">
+    
+	<sql id="pickOrderColumns">
+		a.id AS "id",
+		a.pick_order_no AS "pickOrderNo",
+		a.plate_no AS "plateNo",
+		a.pick_by AS "pickBy.id",
+		a.pick_start_time AS "pickStartTime",
+		a.pick_end_time AS "pickEndTime",
+		a.package_by AS "packageBy.id",
+		a.package_start_time AS "packageStartTime",
+		a.package_end_time AS "packageEndTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="pickOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="PickOrder">
+		SELECT 
+			<include refid="pickOrderColumns"/>
+		FROM bus_ol_pick_order a
+		<include refid="pickOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="export" resultType="PickOrder">
+		SELECT
+		<include refid="pickOrderColumns"/>
+		FROM bus_ol_pick_order a
+		<include refid="pickOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="findList" resultType="PickOrder">
+		SELECT 
+			<include refid="pickOrderColumns"/>
+		FROM bus_ol_pick_order a
+		<include refid="pickOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="pickOrderNo != null and pickOrderNo != ''">
+				AND a.pick_order_no = #{pickOrderNo}
+			</if>
+			<if test="pickBy != null and pickBy.id != null and pickBy.id != ''">
+				AND a.pick_by = #{pickBy.id}
+			</if>
+			<if test="beginPickStartTime != null and endPickStartTime != null and beginPickStartTime != '' and endPickStartTime != ''">
+				AND a.pick_start_time BETWEEN #{beginPickStartTime} AND #{endPickStartTime}
+			</if>
+			<if test="packageBy != null and packageBy.id != null and packageBy.id != ''">
+				AND a.package_by = #{packageBy.id}
+			</if>
+			<if test="beginPackageStartTime != null and endPackageStartTime != null and beginPackageStartTime != '' and endPackageStartTime != ''">
+				AND a.package_start_time BETWEEN #{beginPackageStartTime} AND #{endPackageStartTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PickOrder">
+		SELECT 
+			<include refid="pickOrderColumns"/>
+		FROM bus_ol_pick_order a
+		<include refid="pickOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 列出打包待接单的拣货单列表（拣货人不为空、打包人为空） -->
+	<resultMap id="listForPackageToGetMap" type="PickOrder">
+	   <result property="id"  column="id"/>
+	   <result property="pickOrderNo"  column="pickOrderNo"/>
+	   <result property="createDate"  column="createDate"/>
+	   <result property="pickBy.id"  column="pickBy.id"/>
+	   <collection property="sendOrderList" ofType="SendOrder">
+		   <result property="pickNo"  column="pickNo"/>
+		   <result property="sendOrderNo"  column="sendOrderNo"/>
+		   <result property="createDate"  column="sendOrder.createDate"/>
+		   <result property="status"  column="status"/>
+	   </collection>
+	</resultMap>
+	<select id="listForPackageToGet" parameterType="PickOrder" resultMap="listForPackageToGetMap">
+	   SELECT 
+			pk.id AS "id",
+			pk.pick_order_no AS "pickOrderNo",
+			pk.create_date AS "createDate",
+			pk.pick_by AS "pickBy.id",
+			s.pick_no AS "pickNo",
+			s.send_order_no AS "sendOrderNo",
+			s.create_date AS "sendOrder.createDate",
+			s.status AS "status"
+	  FROM bus_ol_pick_order pk
+	  LEFT JOIN bus_ol_send_order s ON s.pick_order_id = pk.id AND s.status = '2'
+	  WHERE pk.del_flag = #{DEL_FLAG_NORMAL}
+	  AND pk.package_by is null
+	  <if test="pickBy == null">
+	     AND pk.pick_by is not null
+	  </if>
+	  <if test="pickBy != null and pickBy.id != null and pickBy.id != ''">
+		  AND pk.pick_by = #{pickBy.id} 
+	  </if>
+	  ORDER BY s.create_date ASC, s.pick_no ASC
+	</select>
+	
+	<!-- 根据打包人（当前用户）列出该打包人的拣货单 -->
+	<select id="listForPackage" resultType="PickOrder">
+	    SELECT 
+            <include refid="pickOrderColumns"/>
+        FROM bus_ol_pick_order a
+        <include refid="pickOrderJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="packageBy != null and packageBy.id != null and packageBy.id != ''">
+                AND a.package_by = #{packageBy.id}
+            </if>
+            <if test="plateNo != null and plateNo != ''">
+                AND a.plate_no = #{plateNo}
+            </if>
+        </where>
+        ORDER BY a.create_date DESC
+	</select>
+	
+	<select id="findPickOrderByPlateNo" resultType="PickOrder">
+	    SELECT 
+            <include refid="pickOrderColumns"/>
+        FROM bus_ol_pick_order a
+        <include refid="pickOrderJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.pick_by IS NOT NULL
+            AND a.package_end_time IS NULL
+            AND a.plate_no = #{plateNo}
+        </where>
+        ORDER BY a.update_date DESC
+	</select>
+	
+	
+	<resultMap type="PickOrder" id="pickOrderWithSendOrderDetailMap">
+       <result property="id"  column="id"/>
+       <result property="pickOrderNo"  column="pickOrderNo"/>
+       <result property="plateNo" column="plateNo"/>
+       <result property="pickBy.id"  column="pickBy.id"/>
+       <result property="pickStartTime"  column="pickStartTime"/>
+       <result property="pickEndTime"  column="pickEndTime"/>
+       <result property="packageBy.id"  column="packageBy.id"/>
+       <result property="packageStartTime"  column="packageStartTime"/>
+       <result property="packageEndTime" column="packageEndTime"/>
+       
+       <collection property="sendOrderList" ofType="SendOrder">
+           <result property="id" column="sendOrder.id"/>
+           <result property="sendOrderNo"  column="sendOrderNo"/>
+           <result property="orderType"  column="orderType"/>
+           <result property="orderNo"  column="orderNo"/>
+           <result property="receiveName"  column="receiveName"/>
+           <result property="receiveTel"  column="receiveTel"/>
+           <result property="receiveAreaStr"  column="receiveAreaStr"/>
+           <result property="receiveAreaDetail" column="receiveAreaDetail"/>
+           <result property="createDate"  column="createDate"/>
+           <result property="status"  column="status"/>
+           <result property="activeFlag" column="activeFlag"/>
+       </collection>
+    </resultMap>
+    
+	<select id="getDetailWithSendOrder" resultMap="pickOrderWithSendOrderDetailMap">
+	   SELECT 
+			a.id AS "id",
+			a.pick_order_no AS "pickOrderNo",
+			a.plate_no AS "plateNo",
+			a.pick_by AS "pickBy.id",
+			a.pick_start_time AS "pickStartTime",
+			a.pick_end_time AS "pickEndTime",
+			a.package_by AS "packageBy.id",
+			a.package_start_time AS "packageStartTime",
+			a.package_end_time AS "packageEndTime",
+			
+			s.id AS "sendOrder.id",
+			s.send_order_no AS "sendOrderNo",
+			s.order_type AS "orderType",
+			s.order_no AS "orderNo",
+			s.receive_name AS "receiveName",
+			s.receive_tel AS "receiveTel",
+			s.receive_area_str AS "receiveAreaStr",
+			s.receive_area_detail AS "receiveAreaDetail",
+			s.create_date AS "createDate",
+			s.status AS "status",
+			s.active_flag AS "activeFlag"
+		FROM bus_ol_pick_order a
+		LEFT JOIN bus_ol_send_order s ON s.pick_order_id = a.id
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 根据拣货人列出该拣货人还未拣货完成的拣货单数量 -->
+	<select id="countUnCompletePickWithPickBy" resultType="java.lang.Integer">
+	    SELECT count(a.id) AS 'count' 
+	    FROM bus_ol_pick_order a 
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        AND a.pick_by = #{pickBy.id} 
+        AND a.package_by is null
+	</select>
+	
+	<!-- 根据拣货单ID获取对应的拣货任务明细，按照货位分组显示 -->
+	<select id="getMissionDetailByPickOrder" resultType="Produce">
+	   SELECT 
+	        DISTINCT 
+	        p.code AS "code",
+	        p.name AS 'name',
+	        p.goods_id AS 'goods.id',
+	        sp.num AS 'num',
+	        so.pick_no AS "pickNo",
+	        pick.plate_no AS "plateNo",
+	        g.name AS "goods.name",
+	        g.code AS "goods.code",
+	        g.sample_photo AS "goods.samplePhoto",
+            CONCAT(wa.code,'-',wc.code,'-',wp.code) AS 'fullWareplace'
+		FROM bus_ol_pick_order pick
+		LEFT JOIN bus_ol_send_order so ON so.pick_order_id = pick.id
+		LEFT JOIN bus_ol_send_produce sp ON sp.send_order_id = so.id
+		LEFT JOIN lgt_ps_produce p ON p.id = sp.produce_id
+		LEFT JOIN lgt_ps_product t ON t.produce_id = p.id
+		LEFT JOIN lgt_ps_goods g ON g.id = t.goods_id
+		LEFT JOIN lgt_ps_wareplace wp ON wp.id = t.wareplace_id
+		LEFT JOIN lgt_ps_warecounter wc ON wc.id = wp.warecounter_id
+		LEFT JOIN lgt_ps_warearea wa ON wa.id=wc.warearea_id
+		LEFT JOIN lgt_ps_warehouse wh ON wh.id=wa.warehouse_id
+        WHERE pick.id = #{id} AND wa.type = '1'
+        ORDER BY CONCAT(wa.code, '-', wc.code, '-', wp.code)
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_ol_pick_order(
+			id,
+			pick_order_no,
+			plate_no,
+			pick_by,
+			pick_start_time,
+			pick_end_time,
+			package_by,
+			package_start_time,
+			package_end_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{pickOrderNo},
+			#{plateNo},
+			#{pickBy.id},
+			#{pickStartTime},
+			#{pickEndTime},
+			#{packageBy.id},
+			#{packageStartTime},
+			#{packageEndTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ol_pick_order SET 	
+			pick_order_no = #{pickOrderNo},
+			plate_no = #{plateNo},
+			pick_by = #{pickBy.id},
+			pick_start_time = #{pickStartTime},
+			pick_end_time = #{pickEndTime},
+			package_by = #{packageBy.id},
+			package_start_time = #{packageStartTime},
+			package_end_time = #{packageEndTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ol_pick_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

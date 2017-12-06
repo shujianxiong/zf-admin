@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.CategoriesDao">	
+	
+	<sql id="categoriesColumns">
+		a.id AS "id",
+		a.pcid AS "parent.id",
+		p.category_name AS "parent.categoryName",
+		a.apcid AS "allParentId",
+		a.category_name AS "categoryName",
+		a.category_tag AS "categoryTag",
+		a.category_icon AS "categoryIcon",
+		a.order_no AS "orderNo",
+		a.use_range AS "useRange",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="categoriesJoins">
+		LEFT JOIN lgt_ps_category p ON p.id=a.pcid
+	</sql>
+    
+	<select id="get" resultType="Categories">
+		SELECT 
+			<include refid="categoriesColumns"/>
+		FROM lgt_ps_category a
+		<include refid="categoriesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Categories">
+		SELECT 
+			<include refid="categoriesColumns"/>
+		FROM lgt_ps_category a
+		<include refid="categoriesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="categoryName != null and categoryName != ''">
+				AND a.category_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{categoryName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{categoryName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{categoryName},'%')</if>
+			</if>
+			<if test="useRange != null and useRange != ''">
+			     AND a.use_range = #{useRange}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="Categories">
+		SELECT
+			a.id,
+			a.pcid AS "parent.id",
+			a.apcid
+		FROM lgt_ps_category a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND a.apcid LIKE #{allParentId}
+		ORDER BY a.order_no
+	</select> 
+	
+	<select id="findAllList" resultType="Categories">
+		SELECT 
+			a.id AS "id",
+			a.pcid AS "parent.id",
+			a.apcid AS "allParentId",
+			a.category_name AS "categoryName",
+			a.category_tag AS "categoryTag",
+			a.category_icon AS "categoryIcon",
+			a.order_no AS "orderNo",
+			a.use_range AS "useRange",
+			a.create_by AS "createBy.id",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag"
+			FROM lgt_ps_category a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		ORDER BY a.order_no
+	</select>
+	
+	<select id="findListBySearch" resultType="Categories">
+		SELECT 
+			<include refid="categoriesColumns"/>
+		FROM lgt_ps_category a
+		<include refid="categoriesJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="categoryName != null and categoryName != ''">
+				AND (a.category_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{categoryName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{categoryName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{categoryName},'%')</if>
+				OR a.category_tag LIKE 
+					<if test="dbName == 'oracle'">'%'||#{categoryTag}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{categoryTag}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{categoryTag},'%')</if>
+				)
+			</if>
+			<if test="useRange != null and useRange != ''">
+                 AND a.use_range = #{useRange}
+            </if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findChildListById" resultType="Categories">
+		SELECT
+			a.id AS "id",
+			a.pcid AS "parent.id",
+			a.apcid AS "allParentId",
+			a.category_name AS "categoryName",
+			a.use_range AS "useRange"
+		FROM lgt_ps_category a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.pcid = #{id}
+		</where>		
+	</select>
+	
+	<select id="findListByPropertyId" resultType="Categories">
+		SELECT 
+			a.id AS "id",
+			a.pcid AS "parent.id",
+			a.category_name AS "parent.categoryName",
+			a.apcid AS "allParentId",
+			a.category_name AS "categoryName",
+			a.category_tag AS "categoryTag",
+			a.category_icon AS "categoryIcon",
+			a.order_no AS "orderNo",
+			a.use_range AS "useRange"
+		FROM lgt_ps_category a
+		LEFT JOIN lgt_ps_category_prop p ON p.cid=a.id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND p.pid=#{id}
+	</select>
+	<!-- 根据关键词模糊匹配分类 -->
+	<select id="findListBySearchKeyWorld" resultType="Categories">
+		select * from lgt_ps_category a 
+		 where  a.del_flag = #{delFlag}
+		<if test="keyWordList.size() > 0">
+			AND
+			<foreach collection="keyWordList" item="keyWord" separator="or" open="(" close=")">
+				 a.category_name like concat('%',#{keyWord},'%') 
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="findCategiryByIds" resultType="Categories">
+		select
+			a.id AS "id",
+			a.category_name AS "categoryName"
+		from lgt_ps_category a 
+		where  a.del_flag = #{delFlag}
+		<if test="ids.size() > 0">
+			AND a.id in
+			<foreach collection="ids" item="id" separator="," open="(" close=")">
+				 #{id}
+			</foreach>
+		</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_category(
+			id,
+			pcid,
+			apcid,
+			category_name,
+			category_tag,
+			category_icon,
+			order_no,
+			use_range,
+			create_by, 
+			create_date, 
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			NULL,
+			#{parent.id},
+			#{allParentId},
+			#{categoryName},
+			#{categoryTag},
+			#{categoryIcon},
+			#{orderNo},
+			#{useRange},
+			#{createBy.id}, 
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_category SET 	
+			pcid = #{parent.id},
+			apcid = #{allParentId},
+			category_name = #{categoryName},
+			category_tag = #{categoryTag},
+			category_icon = #{categoryIcon},
+			order_no = #{orderNo},
+			use_range = #{useRange},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE lgt_ps_category SET 
+			pcid = #{parent.id}, 
+			apcid = #{allParentId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_category SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.ac.ActivityResearchRcDao">
+    
+	<sql id="activityResearchRcColumns">
+		a.id AS "id",
+		a.member_id AS "member.id",
+		m.usercode AS "member.usercode",
+		m.name AS "member.name",
+		a.activity_research_id AS "activityResearch.id",
+		a.status AS "status",
+		c.name AS "activityResearch.activity.name",
+		c.title AS "activityResearch.activity.title",
+		c.activity_type AS "activityResearch.activity.activityType",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="activityResearchRcJoins">
+		LEFT JOIN crm_mi_member m ON m.id = a.member_id
+		LEFT JOIN spm_ac_activity_research b ON b.id = a.activity_research_id
+		LEFT JOIN spm_ac_activity c ON c.id = b.activity_id
+	</sql>
+    
+	<select id="get" resultType="ActivityResearchRc">
+		SELECT 
+			<include refid="activityResearchRcColumns"/>
+		FROM spm_ac_activity_research_rc a
+		<include refid="activityResearchRcJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getCountByArIdAndStatus" resultType="Integer">
+		SELECT COUNT(a.id) FROM spm_ac_activity_research_rc a WHERE a.activity_research_id=#{arId} AND a.status=#{status}
+	</select>
+	
+	<select id="findList" resultType="ActivityResearchRc">
+		SELECT 
+			<include refid="activityResearchRcColumns"/>
+		FROM spm_ac_activity_research_rc a
+		<include refid="activityResearchRcJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND ( c.name LIKE 
+						<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR
+					m.usercode LIKE
+						<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+						<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+						<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+				)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ActivityResearchRc">
+		SELECT 
+			<include refid="activityResearchRcColumns"/>
+		FROM spm_ac_activity_research_rc a
+		<include refid="activityResearchRcJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findByMemberAndAr" resultType="ActivityResearchRc">
+		SELECT 
+			<include refid="activityResearchRcColumns"/>
+		FROM spm_ac_activity_research_rc a
+		<include refid="activityResearchRcJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.member_id = #{memberId}
+			AND a.activity_research_id = #{arId}
+		</where>
+		ORDER BY a.update_date DESC
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_ac_activity_research_rc(
+			id,
+			member_id,
+			activity_research_id,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{member.id},
+			#{activityResearch.id},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_ac_activity_research_rc SET 	
+			member_id = #{member.id},
+			activity_research_id = #{activityResearch.id},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE spm_ac_activity_research_rc SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

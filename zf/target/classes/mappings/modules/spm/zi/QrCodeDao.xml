@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.spm.dao.zi.QrCodeDao">
+    
+	<sql id="qrCodeColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.summary AS "summary",
+		a.qr_code AS "qrCode",
+		a.openids AS "openids",
+		a.random_code AS "randomCode",
+		a.follow_times AS "followTimes",
+		a.active_flag AS "activeFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="qrCodeJoins">
+	</sql>
+    
+	<select id="get" resultType="QrCode">
+		SELECT 
+			<include refid="qrCodeColumns"/>
+		FROM spm_zi_qr_code a
+		<include refid="qrCodeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="QrCode">
+		SELECT 
+			<include refid="qrCodeColumns"/>
+		FROM spm_zi_qr_code a
+		<include refid="qrCodeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="QrCode">
+		SELECT 
+			<include refid="qrCodeColumns"/>
+		FROM spm_zi_qr_code a
+		<include refid="qrCodeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO spm_zi_qr_code(
+			id,
+			name,
+			summary,
+			qr_code,
+			openids,
+			random_code,
+			follow_times,
+			active_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{summary},
+			#{qrCode},
+			#{openids},
+			#{randomCode},
+			#{followTimes},
+			#{activeFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE spm_zi_qr_code SET 	
+			name = #{name},
+			summary = #{summary},
+			qr_code = #{qrCode},
+			openids = #{openids},
+			random_code = #{randomCode},
+			follow_times = #{followTimes},
+			active_flag = #{activeFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateByRandomCode">
+		UPDATE spm_zi_qr_code SET
+		follow_times =follow_times+1,
+		openids = openids+#{openId}
+		WHERE random_code = #{randomCode}
+	</update>
+
+	<update id="delete">
+		UPDATE spm_zi_qr_code SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

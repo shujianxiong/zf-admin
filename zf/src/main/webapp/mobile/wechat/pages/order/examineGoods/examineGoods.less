@@ -1,0 +1,99 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------收货地址----------------------------*/
+.Title{
+    background: @blockbacground;
+    overflow: hidden;
+    p{
+        line-height: 45px;
+        font-size: 1.4rem;
+        text-indent: 10px;
+        color: #fff;
+        &:last-child{
+            border-top: 1px solid @linecolor;
+        }
+    }
+}
+.goodsPic{
+    overflow: hidden;
+    background: @blockbacground;
+    margin-bottom: 10px;
+    ul{
+        width: 100%;
+        li{
+            float: left;
+            width: 33.333%;
+            img{
+                width: 100%;
+            }
+            P{
+                line-height: 60px;
+                font-size: 1.2rem;
+                text-align: center;
+            }
+        }
+    }
+}
+.goodsDetail{
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    min-height: 100px;
+    box-sizing: border-box;
+    border-bottom: 1px solid @linecolor;
+    background: @blockbacground;
+    .img{
+        float: left;
+        width: 30%;
+        padding: 10px;
+        box-sizing: border-box;
+        img{
+            width: 100%;
+        }
+    }
+    .text{
+        float: left;
+        width: 70%;
+        box-sizing: border-box;
+        padding: 10px; 
+        h2{
+            font-size: 1.4rem;
+            line-height: 30px;
+            max-height: 40px;
+        }
+        p{
+            font-size: 1.2rem;
+            line-height: 20px;
+        }
+    }
+}
+.WaitEarnest_button{
+    padding: 20px 5px;
+    box-sizing: border-box;
+    .button{
+        overflow: hidden;
+        box-sizing: border-box;
+        div{
+            width: 48%;
+            margin: 5px 1%;
+            float: left;
+        }
+    }
+    span{
+        display: block;
+        width: 98%;
+        margin: 5px 1% ;
+        line-height: 32px;
+        color: #fff;
+        text-align: center;
+        .border-radius(2px);
+        border:1px solid #fff;
+        &.reject{
+            border:1px solid @redcolor;
+            color: @redcolor;
+        }
+        &.comfirm{
+            border:1px solid @goldencolor;
+            color: @goldencolor;
+        }
+    }
+}

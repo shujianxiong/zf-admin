@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.or.RepairOrderDao">
+    
+	<sql id="repairOrderColumns">
+		a.id AS "id",
+		a.product_id AS "product.id",
+		a.status AS "status",
+		a.apply_by AS "applyBy.id",
+		a.apply_time AS "applyTime",
+		a.breakdown_type AS "breakdownType",
+		a.breakdown_description AS "breakdownDescription",
+		a.breakdown_photos AS "breakdownPhotos",
+		a.money_loss AS "moneyLoss",
+		a.apply_type AS "applyType",
+		a.deal_by AS "dealBy.id",
+		a.deal_start_time AS "dealStartTime",
+		a.deal_end_time AS "dealEndTime",
+		a.deal_type AS "dealType",
+		a.deal_description AS "dealDescription",
+		a.deal_photos AS "dealPhotos",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="repairOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="RepairOrder">
+		SELECT 
+			<include refid="repairOrderColumns"/>
+		FROM bus_or_repair_order a
+		<include refid="repairOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="RepairOrder">
+		SELECT 
+			<include refid="repairOrderColumns"/>
+		FROM bus_or_repair_order a
+		<include refid="repairOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="product != null and product.id != null and product.id != ''">
+				AND a.product_id = #{product.id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="RepairOrder">
+		SELECT 
+			<include refid="repairOrderColumns"/>
+		FROM bus_or_repair_order a
+		<include refid="repairOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_or_repair_order(
+			id,
+			product_id,
+			status,
+			apply_by,
+			apply_time,
+			breakdown_type,
+			breakdown_description,
+			breakdown_photos,
+			money_loss,
+			apply_type,
+			deal_by,
+			deal_start_time,
+			deal_end_time,
+			deal_type,
+			deal_description,
+			deal_photos,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{product.id},
+			#{status},
+			#{applyBy.id},
+			#{applyTime},
+			#{breakdownType},
+			#{breakdownDescription},
+			#{breakdownPhotos},
+			#{moneyLoss},
+			#{applyType},
+			#{dealBy.id},
+			#{dealStartTime},
+			#{dealEndTime},
+			#{dealType},
+			#{dealDescription},
+			#{dealPhotos},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_or_repair_order SET 	
+			product_id = #{product.id},
+			status = #{status},
+			apply_by = #{applyBy.id},
+			apply_time = #{applyTime},
+			breakdown_type = #{breakdownType},
+			breakdown_description = #{breakdownDescription},
+			breakdown_photos = #{breakdownPhotos},
+			money_loss = #{moneyLoss},
+			apply_type = #{applyType},
+			deal_by = #{dealBy.id},
+			deal_start_time = #{dealStartTime},
+			deal_end_time = #{dealEndTime},
+			deal_type = #{dealType},
+			deal_description = #{dealDescription},
+			deal_photos = #{dealPhotos},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_or_repair_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

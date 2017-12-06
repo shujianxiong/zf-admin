@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.bus.dao.ir.InvoiceRecordDao">
+    
+	<sql id="invoiceRecordColumns">
+		a.id AS "id",
+		a.buy_order_id AS "buyOrder.id",
+		o.order_no AS "buyOrder.orderNo",
+		a.money AS "money",
+		a.status AS "status",
+		a.type AS "type",
+		a.title_type AS "titleType",
+		a.title AS "title",
+		a.tax_no AS "taxNo",
+		a.content_type AS "contentType",
+		a.receive_name AS "receiveName",
+		a.receive_tel AS "receiveTel",
+		a.receive_area_str AS "receiveAreaStr",
+		a.receive_area_detail AS "receiveAreaDetail",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="invoiceRecordJoins">
+	LEFT JOIN bus_ob_buy_order o ON o.id=a.buy_order_id
+	</sql>
+    
+	<select id="get" resultType="InvoiceRecord">
+		SELECT 
+			<include refid="invoiceRecordColumns"/>
+		FROM bus_ir_invoice_record a
+		<include refid="invoiceRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="InvoiceRecord">
+		SELECT 
+			<include refid="invoiceRecordColumns"/>
+		FROM bus_ir_invoice_record a
+		<include refid="invoiceRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="buyOrder != null and buyOrder.id != null and buyOrder.id != ''">
+				AND a.buy_order_id = #{buyOrder.id}
+			</if>
+			<if test="buyOrder != null and buyOrder.orderNo != null and buyOrder.orderNo != ''">
+				AND o.order_no = #{buyOrder.orderNo}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="titleType != null and titleType != ''">
+				AND a.title_type = #{titleType}
+			</if>
+			<if test="title != null and title != ''">
+				AND a.title LIKE 
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+			<if test="contentType != null and contentType != ''">
+				AND a.content_type = #{contentType}
+			</if>
+			<if test="receiveName != null and receiveName != ''">
+				AND a.receive_name = #{receiveName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="InvoiceRecord">
+		SELECT 
+			<include refid="invoiceRecordColumns"/>
+		FROM bus_ir_invoice_record a
+		<include refid="invoiceRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bus_ir_invoice_record(
+			id,
+			buy_order_id,
+			money,
+			status,
+			type,
+			title_type,
+			title,
+			tax_no,
+			content_type,
+			receive_name,
+			receive_tel,
+			receive_area_str,
+			receive_area_detail,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{buyOrder.id},
+			#{money},
+			#{status},
+			#{type},
+			#{titleType},
+			#{title},
+			#{taxNo},
+			#{contentType},
+			#{receiveName},
+			#{receiveTel},
+			#{receiveAreaStr},
+			#{receiveAreaDetail},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bus_ir_invoice_record SET 	
+			buy_order_id = #{buyOrder.id},
+			money = #{money},
+			status = #{status},
+			type = #{type},
+			title_type = #{titleType},
+			title = #{title},
+			tax_no = #{taxNo},
+			content_type = #{contentType},
+			receive_name = #{receiveName},
+			receive_tel = #{receiveTel},
+			receive_area_str = #{receiveAreaStr},
+			receive_area_detail = #{receiveAreaDetail},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE bus_ir_invoice_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

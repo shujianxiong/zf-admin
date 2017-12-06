@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.ProductDao">
+    
+	<sql id="productColumns">
+		a.id AS "id",
+		a.produce_id AS "produce.id",
+		p.code AS "produce.code",
+		p.name AS "produce.name",
+		p.status AS "produce.status",
+		a.goods_id AS "goods.id",
+		g.code AS "goods.code",
+		g.name AS "goods.name",
+		g.icon AS "goods.icon",
+		g.sample_photo AS "goods.samplePhoto",
+		g.photo AS "goods.photo",
+		a.code AS "code",
+		a.scan_code AS "scanCode",
+		a.factory_code AS "factoryCode",
+		a.certificate_no AS "certificateNo",
+		a.status AS "status",
+		a.update_status AS "updateStatus",
+		a.status_logistics AS "statusLogistics",
+		a.wareplace_id AS "wareplace.id",
+		wp.code AS "wareplace.code",
+		wp.lock_flag AS "wareplace.lockFlag",
+		wp.usable_flag AS "wareplace.usableFlag",
+		wp.warecounter_id AS "wareplace.warecounter.id",
+		wc.code AS "wareplace.warecounter.code",
+		wc.warearea_id AS "wareplace.warecounter.warearea.id",
+		wa.code AS "wareplace.warecounter.warearea.code",
+		wa.warehouse_id AS "wareplace.warecounter.warearea.warehouse.id",
+		wh.code AS "wareplace.warecounter.warearea.warehouse.code",
+<!-- 		wp.scan_code AS "wareplace.scanCode", -->
+		a.hold_user_id AS "holdUser.id",
+		hu.name AS "holdUser.name",
+		a.weight AS "weight",
+		a.price_purchase AS "pricePurchase",
+	    a.broken_photo AS "brokenPhoto",
+		a.supplier_id AS "supplier.id",
+		s.name AS "supplier.name",
+		
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="productJoins">
+	LEFT JOIN lgt_ps_produce p 		on p.id=a.produce_id
+	LEFT JOIN lgt_ps_goods g 		on g.id=p.goods_id
+	LEFT JOIN lgt_ps_wareplace wp	on wp.id=a.wareplace_id
+	LEFT JOIN lgt_ps_warecounter wc	on wc.id=wp.warecounter_id
+	LEFT JOIN lgt_ps_warearea wa	on wa.id=wc.warearea_id
+	LEFT JOIN lgt_ps_warehouse wh	on wh.id=wa.warehouse_id
+	LEFT JOIN sys_user hu			on hu.id=a.hold_user_id
+	LEFT JOIN lgt_si_supplier s     on s.id = a.supplier_id
+	</sql>
+    
+	<select id="get" resultType="Product">
+		SELECT 
+			<include refid="productColumns"/>
+		FROM lgt_ps_product a
+		<include refid="productJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByScanCode" resultType="Product">
+		SELECT 
+			<include refid="productColumns"/>
+		FROM lgt_ps_product a
+		<include refid="productJoins"/>
+		WHERE a.scan_code = #{scanCode}
+	</select>
+	
+	<!-- 货品打印 -->
+	<select id="printPreview" resultType="Product">
+	SELECT
+        p.code AS "produce.code",
+        p.name AS "produce.name",
+        g.code AS "goods.code",
+        g.name AS "goods.name",
+        g.icon AS "goods.icon",
+        g.sample_photo AS "goods.samplePhoto",
+        c.category_name AS "goods.category.categoryName",
+        
+        a.code AS "code",
+        a.wareplace_id AS "wareplace.id",
+        wp.code AS "wareplace.code",
+        wp.lock_flag AS "wareplace.lockFlag",
+        wp.usable_flag AS "wareplace.usableFlag",
+        wp.warecounter_id AS "wareplace.warecounter.id",
+        wc.code AS "wareplace.warecounter.code",
+        wc.warearea_id AS "wareplace.warecounter.warearea.id",
+        wa.code AS "wareplace.warecounter.warearea.code",
+        wa.warehouse_id AS "wareplace.warecounter.warearea.warehouse.id",
+        wh.code AS "wareplace.warecounter.warearea.warehouse.code",
+        a.weight AS "weight",
+        a.price_purchase AS "pricePurchase",
+        a.supplier_id AS "supplier.id"
+        
+        
+        FROM lgt_ps_product a
+        
+        LEFT JOIN lgt_ps_produce p      on p.id=a.produce_id
+	    LEFT JOIN lgt_ps_goods g        on g.id=p.goods_id
+	    LEFT JOIN lgt_ps_category c     on c.id = g.category_id
+	    LEFT JOIN lgt_ps_wareplace wp   on wp.id=a.wareplace_id
+	    LEFT JOIN lgt_ps_warecounter wc on wc.id=wp.warecounter_id
+	    LEFT JOIN lgt_ps_warearea wa    on wa.id=wc.warearea_id
+	    LEFT JOIN lgt_ps_warehouse wh   on wh.id=wa.warehouse_id
+	    <where>
+	        a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+                AND (p.code LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR p.name LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    OR
+                    a.code LIKE
+                    <if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+                    )
+            </if>
+            <if test="scanCode != null and scanCode != ''">
+                AND a.scan_code = #{scanCode}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="statusLogistics != null and statusLogistics != ''">
+                AND a.status_logistics = #{statusLogistics}
+            </if>
+            <!-- 货位 -->
+            <if test="wareplace != null and wareplace.id !=null and wareplace.id != ''">
+                AND a.wareplace_id = #{wareplace.id}
+            </if>
+            <!-- 货架 -->
+            <if test="wareplace != null and wareplace.warecounter.id !=null and wareplace.warecounter.id != ''">
+                AND wp.warecounter_id = #{wareplace.warecounter.id}
+            </if>
+            <!-- 区域 -->
+            <if test="wareplace != null and wareplace.warecounter.warearea.id !=null and wareplace.warecounter.warearea.id != ''">
+                AND wc.warearea_id = #{wareplace.warecounter.warearea.id}
+            </if>
+            <!-- 仓库 -->
+            <if test="wareplace != null and wareplace.warecounter.warearea.warehouse.id !=null and wareplace.warecounter.warearea.warehouse.id != ''">
+                AND wa.warehouse_id = #{wareplace.warecounter.warearea.warehouse.id}
+            </if>
+	    </where>
+	</select>
+	
+	
+	<select id="findList" resultType="Product">
+		SELECT 
+			<include refid="productColumns"/>
+		FROM lgt_ps_product a
+		<include refid="productJoins"/>
+		<where>
+ 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="delFlag != null and delFlag != ''">
+				AND a.del_flag = #{delFlag}
+			</if>
+			<if test="searchParameter != null and searchParameter.keyWord != null and searchParameter.keyWord != ''">
+				AND (p.code LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR p.name LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					OR
+					a.code LIKE
+					<if test="dbName == 'oracle'">'%'||#{searchParameter.keyWord}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{searchParameter.keyWord}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{searchParameter.keyWord},'%')</if>
+					)
+			</if>
+			<if test="scanCode != null and scanCode != ''">
+				AND a.scan_code = #{scanCode}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="statusLogistics != null and statusLogistics != ''">
+				AND a.status_logistics = #{statusLogistics}
+			</if>
+			<!-- 货位 -->
+			<if test="wareplace != null and wareplace.id !=null and wareplace.id != ''">
+				AND a.wareplace_id = #{wareplace.id}
+			</if>
+			<!-- 货架 -->
+			<if test="wareplace != null and wareplace.warecounter.id !=null and wareplace.warecounter.id != ''">
+				AND wp.warecounter_id = #{wareplace.warecounter.id}
+			</if>
+			<!-- 区域 -->
+			<if test="wareplace != null and wareplace.warecounter.warearea.id !=null and wareplace.warecounter.warearea.id != ''">
+				AND wc.warearea_id = #{wareplace.warecounter.warearea.id}
+			</if>
+			<!-- 仓库 -->
+			<if test="wareplace != null and wareplace.warecounter.warearea.warehouse.id !=null and wareplace.warecounter.warearea.warehouse.id != ''">
+				AND wa.warehouse_id = #{wareplace.warecounter.warearea.warehouse.id}
+			</if>
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+			<!-- 关联产品ID -->
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				AND a.produce_id = #{produce.id}
+			</if>
+			<!-- 多个状态联合查询，比如获取有效的货品数据 -->
+			<if test="productStatusList != null and productStatusList.size() > 0">
+				AND a.status in
+				<foreach collection="productStatusList" item="sta" open="(" separator="," close=")">
+					#{sta}
+				</foreach>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Product">
+		SELECT 
+			<include refid="productColumns"/>
+		FROM lgt_ps_product a
+		<include refid="productJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC, a.code DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findCount" resultType="Integer">
+		select count(id) from lgt_ps_product
+	</select>
+	
+	<select id="findByBarCode" parameterType="String" resultType="Product">
+		select
+		a.id AS "id",
+		a.produce_id AS "produce.id",
+		a.goods_id AS "goods.id",
+		a.code AS "code",
+		a.scan_code AS "scanCode",
+		a.factory_code AS "factoryCode",
+		a.certificate_no AS "certificateNo",
+		a.status AS "status",
+		a.status_logistics AS "statusLogistics",
+		a.wareplace_id AS "wareplace.id",
+		a.hold_user_id AS "holdUser.id",
+		a.weight AS "weight",
+		a.price_purchase AS "pricePurchase",
+		a.supplier_id AS "supplier.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+		from lgt_ps_product a
+		WHERE a.code = #{barCode}
+	</select>
+	
+	<select id="findListByProductCodeWithDel" resultType="Product">
+		SELECT 
+			<include refid="productColumns"/>
+		FROM lgt_ps_product a
+		<include refid="productJoins"/>
+		WHERE a.code = #{code}
+	</select>
+	
+	<!-- 如果无原厂编码或证书编号，则不插向这两个字段插入空值，保持两字段为null（因为这两个字段做了唯一性限制） -->
+	<insert id="insert">
+		INSERT INTO lgt_ps_product(
+			id,
+			produce_id,
+			goods_id,
+			code,
+			scan_code,
+			<if test="factoryCode != null and factoryCode != ''">
+				factory_code,
+			</if>
+			<if test="certificateNo != null and certificateNo != ''">
+				certificate_no,
+			</if>
+			status,
+			<if test="updateStatus != null and updateStatus != ''">
+				update_status,
+			</if>
+			status_logistics,
+			wareplace_id,
+			hold_user_id,
+			weight,
+			price_purchase,
+			supplier_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			broken_photo,
+			del_flag
+		) VALUES (
+			#{id},
+			#{produce.id},
+			#{goods.id},
+			#{code},
+			#{scanCode},
+			<if test="factoryCode != null and factoryCode != ''">
+				#{factoryCode},
+			</if>
+			<if test="certificateNo != null and certificateNo != ''">
+				#{certificateNo},
+			</if>
+			#{status},
+			<if test="updateStatus != null and updateStatus != ''">
+				#{updateStatus},
+			</if>
+			#{statusLogistics},
+			#{wareplace.id},
+			#{holdUser.id},
+			#{weight},
+			#{pricePurchase},
+			#{supplier.id},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{brokenPhoto},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_product SET 	
+			produce_id = #{produce.id},
+			goods_id = #{goods.id},
+			code = #{code},
+			<if test="scanCode != null and scanCode != ''">
+			scan_code = #{scanCode},
+			</if>
+			status = #{status},
+			update_status = #{updateStatus},
+			status_logistics = #{statusLogistics},
+			wareplace_id = #{wareplace.id},
+			hold_user_id = #{holdUser.id},
+			factory_code = #{factoryCode},
+			certificate_no = #{certificateNo},
+			weight = #{weight},
+			price_purchase = #{pricePurchase},
+			supplier_id = #{supplier.id},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			broken_photo = #{brokenPhoto}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateSingle">
+		UPDATE lgt_ps_product SET 	
+			<if test="produce != null and produce.id != null and produce.id != ''">
+				produce_id = #{produce.id},
+			</if>
+			<if test="goods != null and goods.id != null and goods.id != ''">
+				goods_id = #{goods.id},
+			</if>
+			<if test="code != null and code != ''">
+				code = #{code},
+			</if>
+			<if test="scanCode != null and scanCode != ''">
+				scan_code = #{scanCode},
+			</if>
+			<if test="factoryCode != null and factoryCode != ''">
+				factory_code = #{factoryCode},
+			</if>
+			<if test="certificateNo != null and certificateNo != ''">
+				certificate_no = #{certificateNo},
+			</if>
+			<if test="status != null and status != ''">
+				status = #{status},
+			</if>
+			<if test="updateStatus != null and updateStatus != ''">
+				update_status = #{updateStatus},
+			</if>
+			<if test="statusLogistics != null and statusLogistics != ''">
+				status_logistics = #{statusLogistics},
+			</if>
+			<!-- 如果传入wareplace而不传入wareplace.id，则清空货品货位 -->
+			<if test="wareplace != null">
+				wareplace_id = #{wareplace.id},
+			</if>
+			<!-- 如果传入holdUser而不传入holdUser.id，则清空货品持有人 -->
+			<if test="holdUser != null">
+				hold_user_id = #{holdUser.id},
+			</if>
+			<if test="weight != null and weight != ''">
+				weight = #{weight},
+			</if>
+			<if test="pricePurchase != null and pricePurchase != ''">
+				price_purchase = #{pricePurchase},
+			</if>
+			<if test="remarks != null and remarks != ''">
+				remarks = #{remarks},
+			</if>
+			<if test="supplier != null and supplier.id != null and supplier.id != ''">
+			     supplier_id = #{supplier.id},
+			</if>
+			<if test="brokenPhoto != null and brokenPhoto != null and brokenPhoto != ''">
+			     broken_photo = #{brokenPhoto},
+			</if>
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateScanCode">
+		UPDATE lgt_ps_product SET 
+			scan_code = #{scanCode},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	<update id="updateStatusByAuto">
+		UPDATE lgt_ps_product SET
+		update_status = '0'
+		WHERE update_status = '1'
+	</update>
+	<update id="delete">
+		UPDATE lgt_ps_product SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="lockByProduceId" parameterType="map">
+		UPDATE lgt_ps_product SET 
+			status = #{status}
+		WHERE produce_id = #{produceId}
+	</update>
+	
+	
+	<!-- Wap  Select Interface Start -->
+	<select id="getByCodeWithOutDel" resultType="Product">
+	   select
+	        a.id AS "id",
+	        a.produce_id AS "produce.id",
+	        a.goods_id AS "goods.id",
+	        g.name AS "goods.name",
+	        
+	        g.code AS "goods.code",
+            g.icon AS "goods.icon",
+            g.status AS "goods.status",
+            g.is_coupon_usable AS "goods.isCouponUsable",
+            g.is_recommend AS "goods.isRecommend",
+
+	        g.factory_code AS "goods.factoryCode",
+	        (select b.name from lgt_bs_brand b where b.id=g.brand_id) AS "goods.brand.name",
+            (select c.name from lgt_bs_designer c where c.id=g.designer_id) AS "goods.designer.name",
+	        
+	        pe.name AS "produce.name",
+	        pe.factory_code AS "produce.factoryCode",
+	        count(a.id) AS "produce.stockNormal",
+	        
+	        a.code AS "code",
+	        a.scan_code AS "scanCode",
+	        a.factory_code AS "factoryCode",
+	        a.certificate_no AS "certificateNo",
+	        a.status AS "status",
+	        a.status_logistics AS "statusLogistics",
+	        a.wareplace_id AS "wareplace.id",
+	        a.hold_user_id AS "holdUser.id",
+	        a.weight AS "weight",
+	        a.price_purchase AS "pricePurchase",
+	        a.create_by AS "createBy.id",
+	        a.create_date AS "createDate",
+	        a.update_by AS "updateBy.id",
+	        a.update_date AS "updateDate",
+	        a.remarks AS "remarks",
+	        a.del_flag AS "delFlag",
+	        a.supplier_id AS "supplier.id",
+	        
+	        concat(h.name,'-',ar.name,'-',c.code,'-',p.code) AS 'fullWareplace' 
+
+        FROM lgt_ps_product a
+        LEFT JOIN lgt_ps_produce pe ON pe.id = a.produce_id
+        LEFT JOIN lgt_ps_goods g ON g.id = a.goods_id
+        LEFT JOIN lgt_ps_wareplace p ON p.id = a.wareplace_id
+		LEFT JOIN lgt_ps_warecounter c ON c.id = p.warecounter_id
+		LEFT JOIN lgt_ps_warearea ar ON ar.id = c.warearea_id
+		LEFT JOIN lgt_ps_warehouse h ON h.id = ar.warehouse_id 
+        WHERE a.code = #{0} AND a.del_flag = 0
+	</select>
+	<!-- Wap  Select Interface End -->
+	
+	
+	<select id="countByProduce" resultType="int">
+		SELECT COUNT(1) FROM lgt_ps_product WHERE produce_id = #{produceId}
+	</select>
+</mapper>

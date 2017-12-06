@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.WarecounterDao">
+    
+	<sql id="WarecounterColumns">
+		a.id AS "id",
+		a.warearea_id 	AS "warearea.id",
+		wa.code 		AS "warearea.code",
+		wa.type         AS "warearea.type",
+		wh.id 			AS "warearea.warehouse.id",
+		wh.name 		AS "warearea.warehouse.name",
+		wh.code 		AS "warearea.warehouse.code",
+		a.code AS "code",
+		a.supplier_id   AS "supplier.id",
+		s.name          AS "supplier.name",
+		a.category_id   AS "category.id",
+		c.category_name AS "category.categoryName",
+		a.usable_flag AS "usableFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="WarecounterJoins">
+		LEFT JOIN lgt_ps_warearea wa ON wa.id = a.warearea_id AND wa.del_flag = 0
+		LEFT JOIN lgt_ps_warehouse wh ON wh.id = wa.warehouse_id AND wh.del_flag = 0
+		LEFT JOIN lgt_ps_category c ON c.id=a.category_id
+		LEFT JOIN lgt_si_supplier s ON s.id=a.supplier_id
+	</sql>
+    
+	<select id="get" resultType="Warecounter">
+		SELECT 
+			<include refid="WarecounterColumns"/>
+		FROM lgt_ps_warecounter a
+		<include refid="WarecounterJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getBroken" resultType="Warecounter">
+		SELECT 
+			<include refid="WarecounterColumns"/>
+		FROM lgt_ps_warecounter a
+		<include refid="WarecounterJoins"/>
+		WHERE
+			wh.id = #{warehouseId}
+			AND wa.type = '2'
+			AND a.supplier_id = #{supplierId}
+			AND a.category_id = #{categoryId}
+			AND a.usable_flag = '1'
+		ORDER BY wh.order_no, wa.code, a.code
+		LIMIT 1
+	</select>
+	
+	<select id="findList" resultType="Warecounter">
+		SELECT 
+			<include refid="WarecounterColumns"/>
+		FROM lgt_ps_warecounter a
+		<include refid="WarecounterJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="warearea != null and warearea.id != null and warearea.id != ''">
+				AND a.warearea_id = #{warearea.id}
+			</if>
+			<if test="supplier != null and supplier.id != null and supplier.id != ''">
+				AND a.supplier_id = #{supplier.id}
+			</if>
+			<if test="category != null and category.id != null and category.id != ''">
+				AND a.category_id = #{category.id}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks = #{remarks}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY wh.order_no,wa.code,a.code
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Warecounter">
+		SELECT 
+			<include refid="WarecounterColumns"/>
+		FROM lgt_ps_warecounter a
+		<include refid="WarecounterJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY wh.order_no,wa.code,a.code
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_warecounter(
+			id,
+			warearea_id,
+			code,
+			supplier_id,
+            category_id,
+			usable_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{warearea.id},
+			#{code},
+			#{supplier.id},
+            #{category.id},
+			#{usableFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_warecounter SET 	
+			warearea_id = #{warearea.id},
+			code = #{code},
+			supplier_id  = #{supplier.id},
+            category_id  = #{category.id},
+			usable_flag = #{usableFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_warecounter SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="countByWarearea" resultType="int">
+		SELECT COUNT(1) FROM lgt_ps_warecounter WHERE warearea_id = #{wareareaId} AND del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+</mapper>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.idx.dao.gd.SceneDao">
+    
+	<sql id="sceneColumns">
+		a.id AS "id",
+		a.pid AS "scene.id",
+		s.name AS "scene.name",
+		a.name AS "name",
+		a.english_name AS "englishName",
+		a.dp_photo AS "dpPhoto",
+		a.top_photo AS "topPhoto",
+		a.search_icon AS "searchIcon",
+		a.list_icon_choose AS "listIconChoose",
+		a.list_icon_unchoose AS "listIconUnchoose",
+		a.order_no AS "orderNo",
+		a.index_flag AS "indexFlag",
+		a.usable_flag AS "usableFlag",
+		a.description AS "description",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sceneJoins">
+	    LEFT JOIN idx_gd_scene s ON s.id = a.pid
+	</sql>
+    
+	<select id="get" resultType="Scene">
+		SELECT 
+			<include refid="sceneColumns"/>
+		FROM idx_gd_scene a
+		<include refid="sceneJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Scene">
+		SELECT 
+			<include refid="sceneColumns"/>
+		FROM idx_gd_scene a
+		<include refid="sceneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="indexFlag != null and indexFlag != ''">
+			     AND a.index_flag = #{indexFlag}
+			</if>
+			<if test="usableFlag != null and usableFlag != ''">
+			     AND a.usable_flag = #{usableFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findParentList" resultType="Scene">
+		SELECT 
+			<include refid="sceneColumns"/>
+		FROM idx_gd_scene a
+		<include refid="sceneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.pid is null
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="indexFlag != null and indexFlag != ''">
+			     AND a.index_flag = #{indexFlag}
+			</if>
+			<if test="usableFlag != null and usableFlag != ''">
+			     AND a.usable_flag = #{usableFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findSubList" resultType="Scene">
+	   SELECT 
+            <include refid="sceneColumns"/>
+        FROM idx_gd_scene a
+        <include refid="sceneJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND (a.pid is not null AND a.pid !='')
+            <if test="scene != null and scene.id != null and scene.id != ''">
+                 AND a.pid = #{scene.id}
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name LIKE 
+                    <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                    <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                    <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+            <if test="indexFlag != null and indexFlag != ''">
+                 AND a.index_flag = #{indexFlag}
+            </if>
+            <if test="usableFlag != null and usableFlag != ''">
+                 AND a.usable_flag = #{usableFlag}
+            </if>
+        </where>
+        ORDER BY a.order_no
+	</select>
+	
+	<select id="countInUsedScene" resultType="java.lang.Integer">
+	    SELECT sum(a.c) as count FROM (
+	       SELECT count(s.id) as c FROM idx_gd_scene s WHERE s.pid = #{id} AND s.del_flag = #{DEL_FLAG_NORMAL}
+		   union all
+		   SELECT count(c.id) as c FROM idx_gd_collocation c WHERE c.scene_id = #{id} AND c.del_flag = #{DEL_FLAG_NORMAL}
+		) AS a
+	</select>
+	
+	<select id="findAllList" resultType="Scene">
+		SELECT 
+			<include refid="sceneColumns"/>
+		FROM idx_gd_scene a
+		<include refid="sceneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.order_no
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO idx_gd_scene(
+			id,
+			pid,
+			name,
+			english_name,
+			dp_photo,
+			top_photo,
+			search_icon,
+			list_icon_choose,
+			list_icon_unchoose,
+			order_no,
+			index_flag,
+			usable_flag,
+			description,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{scene.id},
+			#{name},
+			#{englishName},
+			#{dpPhoto},
+			#{topPhoto},
+			#{searchIcon},
+			#{listIconChoose},
+			#{listIconUnchoose},
+			#{orderNo},
+			#{indexFlag},
+			#{usableFlag},
+			#{description},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE idx_gd_scene SET 	
+			pid = #{scene.id},
+			name = #{name},
+			english_name = #{englishName},
+			dp_photo = #{dpPhoto},
+			top_photo = #{topPhoto},
+			search_icon = #{searchIcon},
+			list_icon_choose = #{listIconChoose},
+			list_icon_unchoose = #{listIconUnchoose},
+			order_no = #{orderNo},
+			index_flag = #{indexFlag},
+			description = #{description},
+			usable_flag = #{usableFlag},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE idx_gd_scene SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

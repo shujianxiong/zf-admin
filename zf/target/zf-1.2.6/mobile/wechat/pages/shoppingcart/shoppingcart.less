@@ -1,0 +1,453 @@
+@import "../../baseConfig/config.less";
+/**-----------------------购物车----------------------------*/
+.shopCart_warp{
+    position: relative;
+    //==============头部
+    .selected{
+        position: fixed;
+        top: 0 ;
+        height: 50px;
+        width:100%;
+        z-index: 999;
+        background: @blockbacground;
+        .selected_area{
+            position: relative;
+            width: 65%;
+            height: 30px;
+            margin: 10px auto;
+            background: #FFFFFF;
+            span{
+                line-height: 30px;
+                margin-left: 10px;
+                color: #000;
+                font-size: 1.3rem;
+            }
+            i{
+                font-size: @smallIcon;
+                float: right;
+                padding: 0 10px;
+                color: #000;
+                line-height: 30px;
+            }
+            .selected_sub{
+                position: absolute;
+                top: 30px;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                li{
+                    height: 30px;
+                    width: 100%;
+                    border-top: 1px solid #999;
+                    line-height: 30px;
+                    color: #000;
+                    font-size: 1.1rem;
+                    text-align: center;
+                }
+            }
+        }
+        .edit{
+            position: absolute;
+            right: 0;
+            top: 0;
+            line-height: 50px;
+            padding: 0 10px;
+            font-size: 1.3rem;
+        }
+    }
+    //==============提示
+    .hint{
+        margin-top: 50px;
+        height: 36px;
+        width: 100%;
+        background: #000;
+        line-height: 36px;
+        color: #fff;
+        text-indent: 10px;
+        font-size: 0.9rem;
+        i{
+            position: absolute;
+            right: 10PX;
+            top: 0;
+        }
+    }
+    .mode_warp{
+        overflow: hidden;
+        .head{
+            height: 40px;
+            width: 100%;
+            background: @backgroundcolor;
+            padding: 10px 0;
+            box-sizing: border-box;
+            i{
+                display: inline-block;
+                width: 10%;
+                text-align:center ;
+                line-height: 20px;
+                font-size: 2.4rem;
+            }
+            span{
+                line-height: 20px;
+                font-size: 1.4rem;
+            }
+        }
+        //==============内容项
+        .content_warp{
+            overflow: hidden;
+            border-top: 1px solid @linecolor;
+            li{
+                position: relative;
+                width: 100%;
+                overflow: hidden;
+                padding: 10px 10px 10px 10%;
+                background: @blockbacground;
+                box-sizing: border-box;
+                .icon{
+                    position: absolute;
+                    top: 50%;
+                    left: 0;
+                    margin-top: -1.2rem;
+                    width: 10%;
+                    text-align:center ;
+                    i{
+                        font-size: 2.4rem;
+                    }
+                }
+                .img{
+                    float: left;
+                    width: 40%;
+                    
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+                .text{
+                    float: right;
+                    width: 60%;
+                    padding-left: 10px;
+                    box-sizing: border-box;
+                    h2{
+                        font-size: 1.3rem;
+                        line-height: 20px;
+                        display: -webkit-box;
+                        text-overflow: ellipsis;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-flex: 1;
+                        overflow:hidden;
+                        span{
+                            font-size: 1.2rem;
+                        }
+                    }
+                    p{
+                        font-size: 1rem;
+                        color: #aaa;
+                    }
+                    span{
+                        font-size: 1rem;
+                        color: #e41f1f;
+                        &.Stock{
+                          color:#fff;
+                        }
+                        b{
+                          font-size: 1rem;
+                        }
+                    }
+                }
+                .edit{
+                    float: left;
+                    width: 60%;
+                    box-sizing: border-box;
+                    .inputArea{
+                        width: 90%;
+                        margin: 0 5% ;
+                        height: 36px;
+                        background: @blockbacground;
+                         .border-radius(5px);
+                         text-align: center;
+                         line-height: 36px;
+                         border:1px solid @linecolor;
+                         b{
+                             float: left;
+                             display: block;
+                             width: 30%;
+                             height: 100%;
+                             font-size: 2.4rem;
+                             color: #fff;
+                         }
+                         input{
+                             float: left;
+                             width: 40%;
+                             border: none;
+                             box-sizing: border-box;
+                             height: 100%;
+                             border-top: none;
+                             border-bottom: none;
+                             text-align: center;
+                             font-size: 1.6rem;
+                             color: #fff;
+                              background: @blockbacground;
+
+                         }
+                    }
+                    .selected_area{
+                        width: 90%;
+                        margin: 10px 5% ;
+                        padding: 0 10px;
+                        .border-radius(5px);
+                        background: @blockbacground;
+                        height: 36px;
+                        color: #ddd;
+                        line-height: 36px;
+                        box-sizing: border-box;
+                         border:1px solid @linecolor;
+                        p{
+                            display: inline-block;
+                            float: left;
+                        }
+                        i{
+                            float: right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.bottomBar{
+    position: fixed;
+   bottom: 0;
+    height: 45px;
+    width: 100%;
+    z-index: 999;
+    background: @blockbacground;
+     border-top: 1px solid @linecolor;
+    .allSelect{
+        float: left;
+        color: #fff;
+        padding-left: 10px;
+        line-height: 45px;
+        i{
+            font-size: 2.4rem;
+        }
+        span{
+            font-size: 1.4rem;
+        }
+    }
+    .tatal_num{
+        float: left;
+        width: 40%;
+        text-align: right;
+        padding: 5px 0;
+        h2{
+            line-height: 20px;
+           font-size: 1.2rem; 
+           span{
+               color: #e41f1f;
+           }
+        }
+        p{
+            line-height: 16px;
+            color: #fff;
+            font-size: 1rem; 
+        }
+    }
+    .submit,.moveToCollect,.delete{
+        float: right;
+        font-size: 1.4rem; 
+        line-height: 45px;
+        width:100px;
+        background: @goldencolor;
+        color: #FFFFFF;
+        text-align: center;
+    }
+    .delete{
+       background: #E41F1F; 
+    }
+}
+
+.goodsDetail_property_selected{
+    .shade{
+        display: none;
+        z-index: 999;
+        position: fixed;
+        top: 0;
+        left: 0; 
+        width:100%;
+        height: 100%;
+        background: #000000;
+        opacity: 0.5;
+    }
+    .selected_content{
+        position: fixed;
+        top: 100%;
+        left: 0;
+        max-height: 90%;
+        width: 100%;
+        transform:translateY(0);
+        -webkit-transform:translateY(0);
+        transition:transform 1s linear;
+        -webkit-transition:transform 1s linear;
+        z-index: 999;
+        background: #fff;    
+        overflow: hidden;
+        #selected_content_close{
+            display: block;
+            height: 20px;
+            width: 100%;
+            font-size:2.4rem;
+            text-align: right;
+            i{
+                padding-right: 10px;
+                color: #000;
+            }
+            
+        }
+        .goodPvw{
+           overflow: hidden;
+           padding: 10px;
+           .img{
+               float: left;
+               width: 30%;
+             box-sizing: border-box;
+               img{
+                   width: 100%;
+               }
+           }
+           .title{
+               float: right;
+               padding: 0 10px;
+               width: 70%;
+             box-sizing: border-box;
+               h2{
+                  line-height: 24px; 
+                  font-size: @commonText;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;
+                  color: #000;
+               }
+               span{
+                   line-height: 20px;
+                   font-size: 1.1rem;
+                   color: #e41f1f
+               }
+               p{
+                   line-height: 20px;
+                  font-size: 1.3rem;
+                   color: #e41f1f 
+               }
+           }
+        }
+        .button{
+            height: 60px;
+            overflow: hidden;
+            span{
+                display: block;
+                height: 30px;
+                width: 100px;
+                text-align: center;
+                line-height: 30px;
+                font-size: @commonText;
+                margin: 15px auto;
+                .border-radius(5px);
+                background: @goldencolor;
+                color: #fff;
+            }
+        }
+    }
+}
+
+.goodsDetail_property_selec{
+    width: 100%;
+    height: auto;
+    overflow: auto;
+    margin: 5px 0;
+    padding: 5px 0;
+    color: #000;
+    li{
+        width: 33.333%;
+        float: left;
+        span{
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            text-align: center;
+            line-height: 26px;
+            font-size: @commonText;
+            .border-radius(7px);
+            border: 1px solid #ddd;
+            &.active{
+                background-color: @goldencolor;
+                color: #fff;
+            }
+        }
+    } 
+}
+.property_num{
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    border-bottom: 1px solid #f4c158;
+    border-top: 1px solid #f4c158;
+    .numTitle{
+        color: @goldencolor;
+        line-height: 60px;
+        padding: 0 10px;
+             font-size: 1.4rem;
+    }
+    .inputArea{
+        float: right;
+        height: 30px;
+        width: 120px;
+        border: 1px solid @linecolor;
+         .border-radius(5px);
+         margin: 15px;
+         text-align: center;
+         line-height: 30px;color: #000;
+         b{
+             float: left;
+             display: block;
+             width: 30%;
+             height: 100%;
+             font-size: 2.4rem;
+         }
+         input{
+             float: left;
+             width: 40%;
+             border: 1px solid @linecolor;
+             box-sizing: border-box;
+             height: 100%;
+             border-top: none;
+             border-bottom: none;
+             text-align: center;
+             font-size: 1.6rem;
+         }
+    }
+}
+.goodsDetail_text_line{
+    position: relative;
+    width: 100%;
+    height: 20px;
+    color: @goldencolor;
+    font-size: @describText;
+    text-align: center;
+    span{
+        position: absolute;
+        left: -10px;
+        top: 9px;
+        width: 120%;
+        height: 1px;
+        background: @goldencolor;
+    };
+    p{
+        position: relative;
+        padding: 0 5px;
+        display: inline-block;
+        background-image: -webkit-linear-gradient(#fff, #fff);
+        background-image: linear-gradient(#fff, #fff);
+        z-index: 9;
+    }
+}
+.guessLike{
+   margin-bottom: 50px;
+}

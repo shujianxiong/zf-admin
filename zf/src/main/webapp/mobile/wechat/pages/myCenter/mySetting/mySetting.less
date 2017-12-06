@@ -1,0 +1,51 @@
+@import "../../../baseConfig/config.less";
+/**-----------------------导航栏----------------------------*/
+.message{
+    height: 44px;
+    i{
+        float: right;
+        position: relative;
+        line-height: 44px;
+        font-size: 2rem;
+        width: 10%;
+        margin: 0 10px;
+        text-align: center;
+        color: #fff;
+        span{
+            position: absolute;
+            top: 5px;
+            right: 0;
+            display: block;
+            width: 16px;
+            height: 16px;
+            background: #ff6a56;
+            .border-radius(100%);
+            color: #fff;
+            text-align: center;
+            line-height: 16px;
+        }
+    }
+}
+.settingarea{
+    background: @blockbacground;
+    li{
+        height: 46px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0 10px;
+        border-bottom: 1px solid @linecolor;
+        line-height: 46px;
+        span{
+            font-size: 1.4rem;
+            padding: 0 5px;
+        }
+        i{
+            font-size: 2rem;
+            &.right{
+                font-size: 1.6rem;
+                float: right;
+            }
+        }
+    }
+}
+

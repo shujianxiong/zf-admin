@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinazhoufan.admin.modules.lgt.dao.ps.ProduceUpdateDao">
+    
+	<sql id="produceUpdateColumns">
+		a.id AS "id",
+		a.produce_id AS "produce.id",		
+        p.code AS "produce.code",
+		p.name AS "produce.name",   
+		a.src_price_purchase AS "srcPricePurchase",
+		a.des_price_purchase AS "desPricePurchase",
+		a.src_price_operation AS "srcPriceOperation",
+		a.des_price_operation AS "desPriceOperation",
+		a.src_is_buy AS "srcIsBuy",
+		a.des_is_buy AS "desIsBuy",
+		a.src_price_buy AS "srcPriceBuy",
+		a.des_price_buy AS "desPriceBuy",
+		
+		a.src_scale_discount AS "srcScaleDiscount",
+		a.des_scale_discount AS "desScaleDiscount",
+		
+		a.src_is_experience AS "srcIsExperience",
+		a.des_is_experience AS "desIsExperience",
+		
+		a.src_scale_experience AS "srcScaleExperience",
+		a.des_scale_experience AS "desScaleExperience",
+		
+		a.src_is_forebuy AS "srcIsForebuy",
+		a.des_is_forebuy AS "desIsForebuy",
+		a.src_is_foreexperience AS "srcIsForeexperience",
+		a.des_is_foreexperience AS "desIsForeexperience",
+		a.check_by AS "checkBy.id",
+		a.check_time AS "checkTime",
+		a.check_remarks AS "checkRemarks",
+		a.check_status AS "checkStatus",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="produceUpdateJoins">
+	     LEFT JOIN lgt_ps_produce p ON p.id = a.produce_id
+	</sql>
+    
+	<select id="get" resultType="ProduceUpdate">
+		SELECT 
+			<include refid="produceUpdateColumns"/>
+		FROM lgt_ps_produce_update a
+		<include refid="produceUpdateJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProduceUpdate">
+		SELECT 
+			<include refid="produceUpdateColumns"/>
+		FROM lgt_ps_produce_update a
+		<include refid="produceUpdateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="produce != null">
+			    <if test="produce.id != null and produce.id != ''">
+			         AND a.produce_id = #{produce.id}
+			    </if>
+			    <if test="produce.code != null and produce.code != ''">
+			         AND p.code = #{produce.code}
+			    </if>
+			    <if test="produce.name != null and produce.name != ''">
+			         AND p.name = #{produce.name}
+			    </if>
+			</if>
+			<if test="checkStatus != null and checkStatus != ''">
+			    AND a.check_status = #{checkStatus}
+			</if>
+			<if test="desIsBuy != null and desIsBuy != ''">
+			     AND a.des_is_buy = #{desIsBuy}
+			</if>
+			<if test="desIsExperience != null and desIsExperience != ''">
+                 AND a.des_is_experience = #{desIsExperience}
+            </if>
+            <if test="desIsForebuy != null and desIsForebuy != ''">
+                 AND a.des_is_forebuy = #{desIsForebuy}
+            </if>
+            <if test="desIsForeexperience != null and desIsForeexperience != ''">
+                 AND a.des_is_foreexperience = #{desIsForeexperience}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findUnOkList" resultType="ProduceUpdate">
+	    SELECT 
+            <include refid="produceUpdateColumns"/>
+        FROM lgt_ps_produce_update a
+        <include refid="produceUpdateJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            AND a.produce_id = #{produce.id}
+            AND a.check_status != #{checkStatus}
+        </where>
+	</select>
+	
+	<select id="findAllList" resultType="ProduceUpdate">
+		SELECT 
+			<include refid="produceUpdateColumns"/>
+		FROM lgt_ps_produce_update a
+		<include refid="produceUpdateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO lgt_ps_produce_update(
+			id,
+			produce_id,
+			src_price_purchase,
+			des_price_purchase,
+			src_price_operation,
+			des_price_operation,
+			src_is_buy,
+			des_is_buy,
+			src_price_buy,
+			des_price_buy,
+			
+			src_scale_discount,
+            des_scale_discount,
+			
+			src_is_experience,
+			des_is_experience,
+			src_scale_experience,
+			des_scale_experience,
+			src_is_forebuy,
+			des_is_forebuy,
+			src_is_foreexperience,
+			des_is_foreexperience,
+			check_by,
+			check_time,
+			check_remarks,
+			check_status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{produce.id},
+			#{srcPricePurchase},
+			#{desPricePurchase},
+			#{srcPriceOperation},
+			#{desPriceOperation},
+			#{srcIsBuy},
+			#{desIsBuy},
+			#{srcPriceBuy},
+			#{desPriceBuy},
+			
+			#{srcScaleDiscount},
+			#{desScaleDiscount},
+			
+			#{srcIsExperience},
+			#{desIsExperience},
+			#{srcScaleExperience},
+			#{desScaleExperience},
+			#{srcIsForebuy},
+			#{desIsForebuy},
+			#{srcIsForeexperience},
+			#{desIsForeexperience},
+			#{checkBy.id},
+			#{checkTime},
+			#{checkRemarks},
+			#{checkStatus},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE lgt_ps_produce_update SET 	
+			produce_id = #{produce.id},
+			src_price_purchase = #{srcPricePurchase},
+			des_price_purchase = #{desPricePurchase},
+			src_price_operation = #{srcPriceOperation},
+			des_price_operation = #{desPriceOperation},
+			src_is_buy = #{srcIsBuy},
+			des_is_buy = #{desIsBuy},
+			src_price_buy = #{srcPriceBuy},
+			des_price_buy = #{desPriceBuy},
+			
+			src_scale_discount = #{srcScaleDiscount},
+            des_scale_discount = #{desScaleDiscount},
+			
+			src_is_experience = #{srcIsExperience},
+			des_is_experience = #{desIsExperience},
+			src_scale_experience = #{srcScaleExperience},
+			des_scale_experience = #{desScaleExperience},
+			src_is_forebuy = #{srcIsForebuy},
+			des_is_forebuy = #{desIsForebuy},
+			src_is_foreexperience = #{srcIsForeexperience},
+			des_is_foreexperience = #{desIsForeexperience},
+			check_by = #{checkBy.id},
+			check_time = #{checkTime},
+			check_remarks = #{checkRemarks},
+			check_status = #{checkStatus},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE lgt_ps_produce_update SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
